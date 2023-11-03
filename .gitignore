@@ -1,0 +1,36 @@
+# Node.js
+node_modules/
+
+# Logs
+logs
+*.log
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor-specific files
+.vscode/
+.idea/
+
+# Dependency directories
+/jspm_packages/
+/bower_components/
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn
+yarn-error.log
+.pnp
+.pnp.js
+yarn-debug.log
+
+# Optionally, you can add your own project-specific ignores here.
