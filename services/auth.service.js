@@ -1,18 +1,10 @@
-const util = require('util');
 const connectToDatabase = require('../db.conn');
+const sql = require('../services/sql.service')
 
-
-
+// SIGN IN
 async function signIn(userData) {
   try {
     const connection = await connectToDatabase();
-
-    const insertQuery = `
-      INSERT INTO users
-      (profile_picture, email, password, role, marital_status, country, organization, designation, qualification, register_date)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-
     const values = [
       userData.profile_picture || '',
       userData.email || '',
@@ -25,16 +17,16 @@ async function signIn(userData) {
       userData.qualification || '',
       userData.register_date || '',
     ];
-
-    const results = await connection.query(insertQuery, values);
+    const results = await connection.query(sql.REGISTER_USER, values);
     return results.values;
   } catch (error) {
     console.error('Error creating user:', error);
-    throw error; // Re-throw the error for handling elsewhere
+    throw error;
   }
 }
 
-// Export the createUser function
+
+// EXPORTS
 module.exports = {
   signIn
 };
