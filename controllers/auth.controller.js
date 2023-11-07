@@ -3,16 +3,13 @@ const authService = require('../services/auth.service');
 
 
 module.exports = {
+
   // REGISTER
   async register(req, res) {
     try {
-      const { email, password, role, marital_status, country, organization, designation, qualification, register_date } = req.body;
-      const registrationResult = await authService.register( email, password, role, marital_status, country, organization, designation, qualification, register_date);
-      if ('message' in registrationResult && registrationResult.message === 'User is already registered') {
-        return res.status(409).json({ error: 'User is already registered' });
-      } else {
-        return res.status(201).json({ message: 'User created successfully', user: registrationResult.user });
-      }
+      const { email, password, role, marital_status, country, organization, designation, qualification, register_date, register_id, admin_type, status, employee_id } = req.body;
+      const registrationResult = await authService.register(email, password, role, marital_status, country, organization, designation, qualification, register_date, register_id, admin_type, status, employee_id);
+      return res.status(201).json({ message: registrationResult.message });
     } catch (error) {
       console.error('Error creating user:', error);
       return res.status(500).json({ error: 'Failed to create user' });
@@ -22,11 +19,13 @@ module.exports = {
   // SIGN IN
   async signIn(req, res) {
     try {
-      const { email, password } = req.body;
-      const signInResult = await authService.signIn(email, password);
-      if ('message' in signInResult && signInResult.message === 'Sign in successfully') {
-        return res.status(200).json({ message: 'Sign in successfully', user: signInResult.user });
-      } else {
+      const { email, password, role } = req.body;
+      const user = await authService.signIn(email, password, role);
+
+      if (user) {
+        return res.status(200).json({ message: 'Sign in successfully', user: user });
+      }
+      else {
         return res.status(401).json({ message: 'Sign in failed' });
       }
     } catch (error) {
