@@ -36,7 +36,7 @@ module.exports = {
 
   // FOR REGISTERING A TEACHER
 
-  
+
   ADD_INSTRUCTOR: `
   INSERT INTO instructor
   (user_id)
@@ -107,6 +107,13 @@ module.exports = {
   where  users.email=? and users.role =? AND student.register_id =?
   `,
 
+  SIGN_IN_STUDENT: `
+  SELECT *
+  FROM users
+  inner join student on student.user_id = users.id 
+  where users.email=? and users.password=? and users.role =?
+`,
+
 
 
 
@@ -143,7 +150,19 @@ module.exports = {
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `,
 
+  // CHECK ADMIN ALREADY EXISTS
+  // 1 =super,
+  // 2= instrutor,
+  // 3=inventory,
+  // 4=student,
+  // 5= program
 
+  SIGN_IN_ADMIN: `
+    SELECT *
+    FROM users
+    inner join admin on admin.user_id = users.id 
+    where users.email=? and users.password=? and users.role =?
+  `,
 
 
 

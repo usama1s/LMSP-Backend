@@ -7,8 +7,8 @@ module.exports = {
     try {
       const connection = await pool.getConnection();
 
-      // REGISTERING ROLE IS ADMIN
-      if (role == 'Admin') {
+      // REGISTERING ROLE 1 IS ADMIN
+      if (role == 1) {
         const [isUserRegistered] = await connection.query(sql.CHECK_USER_REGISTERED, [email, role]);
         const [isAdminRegistered] = await connection.query(sql.CHECK_ADMIN_REGISTERED, [email, role, admin_type]);
         if (isUserRegistered.length > 0 && isAdminRegistered.length > 0) {
@@ -23,8 +23,20 @@ module.exports = {
         }
       }
 
-      // REGISTERING ROLE IS STUDENT
-      if (role == 'Student') {
+      // REGISTERING ROLE 2 IS INSTRUSTOR
+      if (role == 2) {
+        const [isUserRegistered] = await connection.query(sql.CHECK_USER_REGISTERED, [email, role]);
+        if (isUserRegistered.length > 0) {
+          return { message: 'Instructor is already registered' };
+        }
+        const [result] = await connection.query(sql.REGISTER_USER, [email, password, role, marital_status, country, organization, designation, qualification, register_date]);
+        const user_id = result.insertId;
+        await connection.query(sql.ADD_INSTRUCTOR, [user_id]);
+        return { message: 'Instructor registered successfully' };
+      }
+
+      // REGISTERING ROLE 3 IS STUDENT
+      if (role == 3) {
         const [isUserRegistered] = await connection.query(sql.CHECK_USER_REGISTERED, [email, role]);
         const [isStudentRegistered] = await connection.query(sql.CHECK_STUDENT_REGISTERED, [email, role, register_id]);
         if (isUserRegistered.length > 0 && isStudentRegistered.length > 0) {
@@ -39,17 +51,6 @@ module.exports = {
         }
       }
 
-      // REGISTERING ROLE IS INSTRUSTOR
-      if (role == 'Instructor') {
-        const [isUserRegistered] = await connection.query(sql.CHECK_USER_REGISTERED, [email, role]);
-        if (isUserRegistered.length > 0) {
-          return { message: 'Instructor is already registered' };
-        }
-        const [result] = await connection.query(sql.REGISTER_USER, [email, password, role, marital_status, country, organization, designation, qualification, register_date]);
-        const user_id = result.insertId;
-        await connection.query(sql.ADD_INSTRUCTOR, [user_id]);
-        return { message: 'Instructor registered successfully' };
-      }
     } catch (error) {
       console.error('Error creating user:', error);
       throw error;
@@ -61,21 +62,18 @@ module.exports = {
   async signIn(email, password, role) {
     try {
       const connection = await pool.getConnection();
-      if (role === 'Instructor') {
+      if (role === 1) {
+        const [result] = await connection.query(sql.SIGN_IN_ADMIN, [email, password, role]);
+        const user = [result[0], result[1]];
+        return user;
+      } else if (role === 2) {
         const [result] = await connection.query(sql.SIGN_IN_INSTRUCTOR, [email, password, role]);
         const user = result[0];
         return user;
-      } else if (role === 'Student') {
+      } else if (role === 3) {
         const [result] = await connection.query(sql.SIGN_IN_STUDENT, [email, password, role]);
         const user = result[0];
         return user;
-      } else if (role === 'Admin') {
-        const [result] = await connection.query(sql.SIGN_IN_ADMIN, [email, password, role]);
-        const user = result[0];
-        return user;
-      } else {
-        // Handle other roles or conditions here
-        // For example, return { role: 'Other', user: user }
       }
 
     } catch (error) {
