@@ -151,7 +151,7 @@ module.exports = {
 `,
 
   // CHECK ADMIN ALREADY EXISTS
-  // 1 =super,
+  // 1 =super WILL REGISTER ADMIN,
   // 2= instrutor,
   // 3=inventory,
   // 4=student,
@@ -165,5 +165,39 @@ module.exports = {
   `,
 
 
+  // TO ADD COURSES TO BE STUDIED
+  ADD_INVENTORY_ITEM: `
+  INSERT INTO inventory 
+  (admin_id, title, description, expiry, induction, make, model, information_file, video_file, failure_reason) 
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ `,
+
+  // ADD FILE 
+  ADD_IMAGES_OF_ITEM: `
+  INSERT INTO inventory_image 
+  (inventory_id, image_1, image_2, image_3, image_4, image_5, image_6, image_7, image_8, image_9, image_10) 
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ `,
+
+  // GET ALL ITEMS
+  GET_ALL_ITEMS: `
+ SELECT *
+ FROM inventory
+ inner join inventory_image on inventory.inventory_id  = inventory_image.inventory_id 
+ `,
+  // GET ALL ITEMS BY ID
+  GET_ITEM_BY_ID: `
+ SELECT *
+ FROM inventory
+ inner join inventory_image on inventory.inventory_id  = inventory_image.inventory_id 
+ where inventory.i
+ 
+ 
+ 
+ 
+ 
+ 
+ nventory_id=?
+ `,
 
 };

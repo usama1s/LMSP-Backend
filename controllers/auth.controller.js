@@ -12,7 +12,7 @@ module.exports = {
       return res.status(201).json({ message: registrationResult.message });
     } catch (error) {
       console.error('Error creating user:', error);
-      return res.status(500).json({ error: 'Failed to create user' });
+      return res.status(401).json({ error: 'Failed to create user' });
     }
   },
 
@@ -30,7 +30,7 @@ module.exports = {
       }
     } catch (error) {
       console.error('Error signing in:', error);
-      return res.status(500).json({ error: 'Failed to sign in' });
+      return res.status(401).json({ error: 'Failed to sign in' });
     }
   }
 };
