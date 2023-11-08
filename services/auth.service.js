@@ -1,5 +1,6 @@
 const pool = require('../db.conn');
 const sql = require('../services/sql.service')
+const { generateToken } = require('../util/JWT')
 
 module.exports = {
   // TO RESGISTER USERS
@@ -64,7 +65,8 @@ module.exports = {
       const connection = await pool.getConnection();
       if (role === 1) {
         const [result] = await connection.query(sql.SIGN_IN_ADMIN, [email, password, role]);
-        const user = [result[0], result[1]];
+        const token = generateToken(result[0].id);
+        const user = [result[0], result[1], token];
         return user;
       } else if (role === 2) {
         const [result] = await connection.query(sql.SIGN_IN_INSTRUCTOR, [email, password, role]);
