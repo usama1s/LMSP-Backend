@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const SECRET = process.env.JWT_SECRET || "123456789abcdefghi";
 
-const generateToken = (user_id,role) => {
+const generateToken = (user_id) => {
     const payload = {
         user: user_id
     }
