@@ -13,8 +13,8 @@ module.exports = {
   // ADD ADMIN, STUDENT, INSTRUCTOR
   REGISTER_USER: `
    INSERT INTO users
-   (email, password, role, marital_status, country, organization, designation, qualification, register_date)
-   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+   (profile_picture, email, password, role, marital_status, country, organization, designation, qualification, register_date, first_name, last_name)
+   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
  `,
 
 
@@ -104,7 +104,7 @@ module.exports = {
   SELECT users.id , users.email, student.register_id
   FROM users
   inner join student on student.user_id =users.id 
-  where  users.email=? and users.role =? AND student.register_id =?
+  where  users.email=? and users.role =?
   `,
 
   SIGN_IN_STUDENT: `
@@ -138,9 +138,21 @@ module.exports = {
 
   // TO ADD COURSES TO BE STUDIED
   ADD_COURSE: `
-   INSERT INTO users
-   (profile_picture, email, password, role, marital_status, country, organization, designation, qualification, register_date)
-   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+   INSERT INTO course
+   (course_name, course_description)
+   VALUES (?, ?)
+`,
+  // TO ADD COURSES TO BE STUDIED
+  ADD_MODULE: `
+  INSERT INTO module
+  (course_id, module_name)
+  VALUES (?, ?)
+`,
+  // TO ADD COURSES TO BE STUDIED
+  ADD_TOPIC: `
+  INSERT INTO topic
+  (module_id, topic_name, lecture_file)
+  VALUES (?, ?, ?)
 `,
 
   // TO RECORD THAT WHICH STUDENT IS REGISTERED IN WHICH COURSE

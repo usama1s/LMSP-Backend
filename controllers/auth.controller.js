@@ -7,14 +7,52 @@ module.exports = {
   // REGISTER
   async register(req, res) {
     try {
-      const { email, password, role, marital_status, country, organization, designation, qualification, register_date, register_id, admin_type, status, employee_id } = req.body;
-      const registrationResult = await authService.register(email, password, role, marital_status, country, organization, designation, qualification, register_date, register_id, admin_type, status, employee_id);
+      const {
+        email,
+        password,
+        role,
+        marital_status,
+        country,
+        organization,
+        designation,
+        qualification,
+        register_date,
+        register_id,
+        admin_type,
+        status,
+        employee_id,
+        first_name,
+        last_name,
+      } = req.body;
+
+      const profile_image = req.file;
+
+      const registrationResult = await authService.register(
+        email,
+        password,
+        role,
+        marital_status,
+        country,
+        organization,
+        designation,
+        qualification,
+        register_date,
+        register_id,
+        admin_type,
+        status,
+        employee_id,
+        profile_image_path = profile_image.path,
+        first_name,
+        last_name,
+      );
+
       return res.status(201).json({ message: registrationResult.message });
     } catch (error) {
       console.error('Error creating user:', error);
       return res.status(401).json({ error: 'Failed to create user' });
     }
   },
+
 
   // SIGN IN
   async signIn(req, res) {

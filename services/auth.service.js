@@ -4,7 +4,7 @@ const { generateToken } = require('../util/JWT')
 
 module.exports = {
   // TO RESGISTER USERS
-  async register(email, password, role, marital_status, country, organization, designation, qualification, register_date, register_id, admin_type, status, employee_id) {
+  async register(email, password, role, marital_status, country, organization, designation, qualification, register_date, register_id, admin_type, status, employee_id, profile_image, first_name, last_name) {
     try {
       const connection = await pool.getConnection();
 
@@ -19,27 +19,27 @@ module.exports = {
         await connection.query(sql.ADD_ADMIN, [user_id, employee_id, admin_type]);
         return isUserRegistered.length === 0 ? { message: 'Admin registered successfully' } : { message: 'Admin registered Again' };
         async function createUserAndReturnId() {
-          const [result] = await connection.query(sql.REGISTER_USER, [email, password, role, marital_status, country, organization, designation, qualification, register_date]);
+          const [result] = await connection.query(sql.REGISTER_USER, [profile_image, email, password, role, marital_status, country, organization, designation, qualification, register_date, first_name, last_name]);
           return result.insertId;
         }
       }
 
       // REGISTERING ROLE 2 IS INSTRUSTOR
-      if (role == 2) {
+      else if (role == 2) {
         const [isUserRegistered] = await connection.query(sql.CHECK_USER_REGISTERED, [email, role]);
         if (isUserRegistered.length > 0) {
           return { message: 'Instructor is already registered' };
         }
-        const [result] = await connection.query(sql.REGISTER_USER, [email, password, role, marital_status, country, organization, designation, qualification, register_date]);
+        const [result] = await connection.query(sql.REGISTER_USER, [profile_image, email, password, role, marital_status, country, organization, designation, qualification, register_date, first_name, last_name]);
         const user_id = result.insertId;
         await connection.query(sql.ADD_INSTRUCTOR, [user_id]);
         return { message: 'Instructor registered successfully' };
       }
 
       // REGISTERING ROLE 3 IS STUDENT
-      if (role == 3) {
+      else if (role == 3) {
         const [isUserRegistered] = await connection.query(sql.CHECK_USER_REGISTERED, [email, role]);
-        const [isStudentRegistered] = await connection.query(sql.CHECK_STUDENT_REGISTERED, [email, role, register_id]);
+        const [isStudentRegistered] = await connection.query(sql.CHECK_STUDENT_REGISTERED, [email, role]);
         if (isUserRegistered.length > 0 && isStudentRegistered.length > 0) {
           return { message: 'Student is already registered' };
         }
@@ -47,9 +47,13 @@ module.exports = {
         await connection.query(sql.ADD_STUDENT, [user_id, register_id, status ? status : 'active']);
         return isUserRegistered.length === 0 ? { message: 'Student registered successfully' } : { message: 'Student registered Again' };
         async function createUserAndReturnId() {
-          const [result] = await connection.query(sql.REGISTER_USER, [email, password, role, marital_status, country, organization, designation, qualification, register_date]);
+          const [result] = await connection.query(sql.REGISTER_USER, [profile_image, email, password, role, marital_status, country, organization, designation, qualification, register_date, first_name, last_name]);
           return result.insertId;
         }
+      }
+      else{
+        return { message: 'No user registered' };
+
       }
 
     } catch (error) {
@@ -83,7 +87,6 @@ module.exports = {
       throw error;
     }
   },
+
+
 }
-
-
-
