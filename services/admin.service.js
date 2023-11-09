@@ -39,6 +39,17 @@ module.exports = {
         } catch (error) {
             throw error;
         }
+    },
+
+     // ADD COURSE
+     async addCourse(courseDetails) {
+        try {
+            
+            const [results] = await pool.query(sql.ADD_COURSE, inventoryId);
+            return results[0];
+        } catch (error) {
+            throw error;
+        }
     }
 
 

@@ -1,17 +1,20 @@
 const express = require('express');
 const adminController = require('../controllers/admin.controller');
 const multer = require('multer');
+const path = require('path');
 const router = express.Router();
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // Destination folder for uploaded files
+        cb(null, uploadPath); 
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, uniqueSuffix + '-' + file.originalname);
     },
 });
+const uploadPath = path.join(__dirname, '../uploads');
+
 const upload = multer({ storage });
 
 router.post('/add-item', upload.fields([
@@ -31,10 +34,12 @@ router.post('/add-item', upload.fields([
 
 router.get('/get-all-item', adminController.getAllItems);
 router.get('/get-item/:inventoryId', adminController.getItemById);
-router.get('/uploads/:filename', (req, res) => {
-    const { filename } = req.params;
-    res.sendFile(filename, { root: 'uploads' });
-});
+
+
+router.post('/add-course', adminController.addCourse);
+// router.post('/add-module', adminController.addModule);
+// router.post('/add-topic', adminController.addTopic);
+
 
 
 module.exports = router;
