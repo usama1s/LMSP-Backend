@@ -38,6 +38,12 @@ router.get('/get-item/:inventoryId', adminController.getItemById);
 
 router.post('/add-full-course-details', upload.single('lecture_file'), adminController.addCourseFullDetails);
 
+router.post('/add-program', adminController.addProgram);
+
+router.post('/add-program_plan', adminController.addProgramPlan);
+
+
+
 // router.post('/add-module', adminController.addModule);
 // router.post('/add-topic', adminController.addTopic);
 

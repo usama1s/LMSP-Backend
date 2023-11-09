@@ -88,12 +88,21 @@ CREATE TABLE topic (
 
 CREATE TABLE program (
     program_id INT AUTO_INCREMENT PRIMARY KEY,
-    program_name INT,
-    course_description VARCHAR(500)
+    program_name varchar (50),
 );
 
+CREATE TABLE program_plan (
+    program_plan_id INT AUTO_INCREMENT PRIMARY KEY,
+    course_id INT, 
+    program_id INT, 
+    program_name varchar (50),
+    start_date varchar(15),
+    end_date varchar(15),
+    FOREIGN KEY (course_id) REFERENCES course(course_id),
+    FOREIGN KEY (program_id) REFERENCES program(program_id)
+);
 
-
+ALTER TABLE users MODIFY profile_picture VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 

@@ -72,6 +72,28 @@ module.exports = {
         } catch (error) {
             return res.status(500).json({ error: 'An error occurred' });
         }
-    }
+    },
+
+     // ADD PROGRAM
+     async addProgram(req, res) {
+        try {
+            const programDetails = req.body
+            const result = await adminService.addProgram(programDetails);
+            return res.status(200).json({ result });
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred' });
+        }
+    },
+
+    // ADD PROGRAM PLAN
+    async addProgramPlan(req, res) {
+        try {
+            const programPlanDetails = req.body
+            const result = await adminService.addProgramPlan(programPlanDetails);
+            return res.status(200).json({ result });
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred' });
+        }
+    },
 
 }

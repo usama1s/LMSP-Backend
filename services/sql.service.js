@@ -155,6 +155,20 @@ module.exports = {
   VALUES (?, ?, ?)
 `,
 
+  // TO ADD COURSES TO BE STUDIED
+  ADD_PROGRAM: `
+  INSERT INTO program
+  (program_name)
+  VALUES (?)
+`,
+  ADD_PROGRAM_PLAN: `
+INSERT INTO program_plan
+(course_id, program_id,instructor_id, program_name, start_date, end_date)
+VALUES (?, ?, ?, ?, ?,?)
+`,
+
+
+
   // TO RECORD THAT WHICH STUDENT IS REGISTERED IN WHICH COURSE
   ADD_STUDENT_COURSE: `
   INSERT INTO users

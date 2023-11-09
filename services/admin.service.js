@@ -62,9 +62,36 @@ module.exports = {
         } catch (error) {
             throw error;
         }
-    }
+    },
 
+    // ADD PROGRAM 
+    async addProgram(programDetails) {
+        try {
+            const programName = programDetails.program_name
+            await pool.query(sql.ADD_PROGRAM, programName);
+            return { message: 'Program added' };
 
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // ADD PROGRAM PLAN
+    async addProgramPlan(programDetails) {
+        try {
+            const programId = programDetails.program_id
+            const courseId = programDetails.course_id
+            const instructorId = programDetails.instructor_id
+            const programName = programDetails.program_name
+            const startDate = programDetails.start_date
+            const endDate = programDetails.end_date
+            await pool.query(sql.ADD_PROGRAM_PLAN, [courseId, programId, instructorId, programName, startDate, endDate]);
+            return { message: 'Program plan added' };
+
+        } catch (error) {
+            throw error;
+        }
+    },
 
 }
 
