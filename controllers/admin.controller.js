@@ -62,10 +62,12 @@ module.exports = {
     },
 
     // ADD COURSE
-    async addCourse(req, res) {
+    async addCourseFullDetails(req, res) {
         try {
-            const [courseDetails] = req.body
-            const result = await adminService.addCourse(courseDetails);
+            const courseDetails = req.body
+            const lecture_file = req.file;
+
+            const result = await adminService.addCourseFullDetails(courseDetails, lecture_file_path = lecture_file.path);
             return res.status(200).json({ result });
         } catch (error) {
             return res.status(500).json({ error: 'An error occurred' });

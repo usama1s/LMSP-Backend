@@ -41,16 +41,30 @@ module.exports = {
         }
     },
 
-     // ADD COURSE
-     async addCourse(courseDetails) {
+    // ADD COURSE
+    async addCourseFullDetails(courseDetails, lecture_file) {
         try {
-            
-            const [results] = await pool.query(sql.ADD_COURSE, inventoryId);
-            return results[0];
+            const course_name = courseDetails.course_name;
+            const course_description = courseDetails.course_description;
+            const module_name = courseDetails.module_name;
+            const topic_name = courseDetails.topic_name;
+            const lectureFile = lecture_file; // Renamed to avoid naming conflict
+
+            const [addCourse] = await pool.query(sql.ADD_COURSE, [course_name, course_description]);
+            const courseId = addCourse.insertId;
+
+            const [addModule] = await pool.query(sql.ADD_MODULE, [courseId, module_name]); // Assuming you have a separate query for adding a module
+            const moduleId = addModule.insertId;
+            await pool.query(sql.ADD_TOPIC, [moduleId, topic_name, lectureFile]);
+
+            return { message: 'Course, module, topics, added' };
+
         } catch (error) {
             throw error;
         }
     }
 
 
+
 }
+

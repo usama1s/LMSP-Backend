@@ -6,7 +6,7 @@ const router = express.Router();
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, uploadPath); 
+        cb(null, uploadPath);
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -36,7 +36,8 @@ router.get('/get-all-item', adminController.getAllItems);
 router.get('/get-item/:inventoryId', adminController.getItemById);
 
 
-router.post('/add-course', adminController.addCourse);
+router.post('/add-full-course-details', upload.single('lecture_file'), adminController.addCourseFullDetails);
+
 // router.post('/add-module', adminController.addModule);
 // router.post('/add-topic', adminController.addTopic);
 

@@ -3,15 +3,22 @@ require('dotenv').config();
 
 const SECRET = process.env.JWT_SECRET || "123456789abcdefghi";
 
-const generateToken = (user_id, role) => {
+const generateToken = (user_id, role, admin_type) => {
     const payload = {
         user: user_id,
         role: role,
+        admin_type: admin_type
+    };
 
-    }
-    const token = sign(payload, SECRET, { expiresIn: "20d" });
+    // You may want to customize the expiresIn value based on your requirements
+    const options = {
+        expiresIn: "20d"
+    };
+
+    const token = sign(payload, SECRET, options);
     return token;
 };
+
 
 const validateToken = async (req, res, next) => {
 

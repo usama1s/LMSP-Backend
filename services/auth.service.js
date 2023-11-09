@@ -1,8 +1,10 @@
 const pool = require('../db.conn');
 const sql = require('../services/sql.service')
-const { generateToken } = require('../util/JWT')
+const { generateToken } = require('../util/admin.jwt')
 
 module.exports = {
+
+  
   // TO RESGISTER USERS
   async register(email, password, role, marital_status, country, organization, designation, qualification, register_date, register_id, admin_type, status, employee_id, profile_image, first_name, last_name) {
     try {
@@ -51,7 +53,7 @@ module.exports = {
           return result.insertId;
         }
       }
-      else{
+      else {
         return { message: 'No user registered' };
 
       }
@@ -69,7 +71,7 @@ module.exports = {
       const connection = await pool.getConnection();
       if (role === 1) {
         const [result] = await connection.query(sql.SIGN_IN_ADMIN, [email, password, role]);
-        const token = generateToken(result[0].id);
+        const token = generateToken(result[0].id, result[0].role, result[0].admin_type);
         const user = [result[0], result[1], token];
         return user;
       } else if (role === 2) {

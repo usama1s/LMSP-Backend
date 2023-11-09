@@ -64,3 +64,57 @@ CREATE TABLE inventory_image (
     FOREIGN KEY (inventory_id) REFERENCES inventory(inventory_id)
 );
 
+
+CREATE TABLE course (
+    course_id INT AUTO_INCREMENT PRIMARY KEY,
+    course_name INT,
+    course_description VARCHAR(500)
+);
+
+CREATE TABLE module (
+	module_id INT AUTO_INCREMENT PRIMARY KEY,
+    course_id INT, 
+    module_name varchar (50),
+    FOREIGN KEY (course_id) REFERENCES course(course_id)
+);
+
+CREATE TABLE topic (
+	topic_id INT AUTO_INCREMENT PRIMARY KEY,
+    module_id INT , 
+    topic_name varchar (100),
+    lecture_file VARCHAR(200),
+    FOREIGN KEY (module_id) REFERENCES module(module_id)
+);
+
+CREATE TABLE program (
+    program_id INT AUTO_INCREMENT PRIMARY KEY,
+    program_name INT,
+    course_description VARCHAR(500)
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

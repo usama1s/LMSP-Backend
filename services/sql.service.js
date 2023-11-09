@@ -163,11 +163,15 @@ module.exports = {
 `,
 
   // CHECK ADMIN ALREADY EXISTS
-  // 1 =super WILL REGISTER ADMIN,
-  // 2= instrutor,
-  // 3=inventory,
-  // 4=student,
-  // 5= program
+  // 1 admin{
+  //      1 super_admin
+  //      2 instructor_incharge
+  //      3 inventory_incharge
+  //      4 student_incharge
+  //      5 program_incharge
+  //  }
+  //  2 instructor
+  //  3 student
 
   SIGN_IN_ADMIN: `
     SELECT *
