@@ -2,6 +2,16 @@ const adminService = require('../services/admin.service');
 
 module.exports = {
 
+     //GET ALL USERS
+     async getAllUsers(req, res) {
+        try {
+            const result = await adminService.getAllUsers();
+            return res.status(200).json({ result });
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred' });
+        }
+    },
+
     // ADD ITEM WITH PICTURES
     async addItem(req, res) {
         try {

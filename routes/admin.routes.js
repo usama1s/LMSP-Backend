@@ -17,6 +17,8 @@ const uploadPath = path.join(__dirname, '../uploads');
 
 const upload = multer({ storage });
 
+
+
 router.post('/add-item', upload.fields([
     { name: 'information_file' },
     { name: 'video_file' },
@@ -31,6 +33,8 @@ router.post('/add-item', upload.fields([
     { name: 'image_9' },
     { name: 'image_10' },
 ]), adminController.addItem);
+
+router.get('/get-all-users', adminController.getAllUsers);
 
 router.get('/get-all-item', adminController.getAllItems);
 router.get('/get-item/:inventoryId', adminController.getItemById);

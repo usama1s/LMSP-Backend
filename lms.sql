@@ -102,6 +102,14 @@ CREATE TABLE program_plan (
     FOREIGN KEY (program_id) REFERENCES program(program_id)
 );
 
+CREATE TABLE time_table (
+    time_table_id INT AUTO_INCREMENT PRIMARY KEY,
+    program_plan_id INT,
+    class_date varchar(15),
+    class_time varchar(15),
+    FOREIGN KEY (program_plan_id) REFERENCES program_plan(program_plan_id)
+);
+
 ALTER TABLE users MODIFY profile_picture VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 

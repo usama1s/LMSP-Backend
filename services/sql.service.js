@@ -6,8 +6,12 @@ module.exports = {
 
   // SHARED   
   // ADD ADMIN, STUDENT, INSTRUCTOR
-  GET_ALL_USER: `
-  SELECT * FROM users
+  GET_ALL_USERS: `
+  SELECT *
+  FROM users
+  left JOIN admin ON admin.user_id = users.id
+  left JOIN student ON student.user_id = users.id
+  left JOIN instructor ON instructor.user_id = users.id;
   `,
 
   // ADD ADMIN, STUDENT, INSTRUCTOR

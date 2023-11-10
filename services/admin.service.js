@@ -4,6 +4,21 @@ const pool = require('../db.conn');
 
 module.exports = {
 
+    //GET ALL USERS
+    async getAllUsers() {
+        try {
+            const [results] = await pool.query(sql.GET_ALL_USERS);
+
+            if (results.length === 1) {
+                return results[0];
+            } else {
+                return results;
+            }
+        } catch (error) {
+            throw error;
+        }
+    },
+
     // ADD ITEM IN INVENTORY TABLE
     async addItem({ admin_id, title, description, expiry, induction, make, model, failure_reason, informationFilePath, videoFilePath, imageFilePaths }) {
         try {
