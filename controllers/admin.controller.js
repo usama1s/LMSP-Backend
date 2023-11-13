@@ -1,9 +1,12 @@
 const adminService = require('../services/admin.service');
+const mime = require('mime-types');
+const fs = require('fs').promises;
+const path = require('path');
 
 module.exports = {
 
-     //GET ALL USERS
-     async getAllUsers(req, res) {
+    //GET ALL USERS
+    async getAllUsers(req, res) {
         try {
             const result = await adminService.getAllUsers();
             return res.status(200).json({ result });
@@ -74,18 +77,56 @@ module.exports = {
     // ADD COURSE
     async addCourseFullDetails(req, res) {
         try {
-            const courseDetails = req.body
-            const lecture_file = req.file;
+            let result;
+            const courseDetails = req.body;
+            const modules = courseDetails.modules || [];
 
-            const result = await adminService.addCourseFullDetails(courseDetails, lecture_file_path = lecture_file.path);
-            return res.status(200).json({ result });
+            for (let i = 0; i < modules.length; i++) {
+                const module = modules[i];
+                if (!module.topics) {
+                    console.error(`Module ${i} does not have topics.`);
+                    continue;
+                }
+
+                const topics = module.topics;
+
+                for (let j = 0; j < topics.length; j++) {
+                    const topic = topics[j];
+
+                    const base64File = topic.lecture_file;
+
+                    if (!base64File) {
+                        console.error(`File not found for Module ${i}, Topic ${j}.`);
+                        continue;
+                    }
+
+                    // Decode the base64 data
+                    const buffer = Buffer.from(base64File, 'base64');
+
+                    // Use mime-types to get the file extension
+                    const mimeType = mime.lookup(buffer);
+                    const fileExtension = mimeType ? mime.extension(mimeType) : 'txt';
+
+                    // Assuming a unique identifier is used for the file name
+                    const fileName = `lecture_${Date.now()}_${i}_${j}.${fileExtension}`;
+                    const filePath = path.join(__dirname, '../uploads', fileName);
+
+                    await fs.writeFile(filePath, buffer);
+                    result = await adminService.addCourseFullDetails(courseDetails, module, topic, filePath);
+                }
+                return res.status(200).json({ result });
+            }
+
         } catch (error) {
+            console.error(error);
             return res.status(500).json({ error: 'An error occurred' });
         }
     },
 
-     // ADD PROGRAM
-     async addProgram(req, res) {
+
+
+    // ADD PROGRAM
+    async addProgram(req, res) {
         try {
             const programDetails = req.body
             const result = await adminService.addProgram(programDetails);
@@ -100,6 +141,17 @@ module.exports = {
         try {
             const programPlanDetails = req.body
             const result = await adminService.addProgramPlan(programPlanDetails);
+            return res.status(200).json({ result });
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred' });
+        }
+    },
+
+    // ADD CLASS
+    async addClass(req, res) {
+        try {
+            const classDetails = req.body
+            const result = await adminService.addClass(classDetails);
             return res.status(200).json({ result });
         } catch (error) {
             return res.status(500).json({ error: 'An error occurred' });
