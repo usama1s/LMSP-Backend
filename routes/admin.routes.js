@@ -17,6 +17,9 @@ const uploadPath = path.join(__dirname, '../uploads');
 
 const upload = multer({ storage });
 
+router.post('/add-full-course-details', adminController.addCourseFullDetails);  
+
+
 
 
 router.post('/add-item', upload.fields([
@@ -40,11 +43,14 @@ router.get('/get-all-item', adminController.getAllItems);
 router.get('/get-item/:inventoryId', adminController.getItemById);
 
 
-router.post('/add-full-course-details', upload.single('lecture_file'), adminController.addCourseFullDetails);
+
 
 router.post('/add-program', adminController.addProgram);
 
 router.post('/add-program_plan', adminController.addProgramPlan);
+
+router.post('/add-class', adminController.addClass);
+
 
 
 
