@@ -100,12 +100,15 @@ module.exports = {
                         continue;
                     }
 
+                    // Check if the file type is PDF
+                    const fileExtension = mime.extension(topic.lecture_file_type);
+                    if (fileExtension.toLowerCase() !== 'pdf') {
+                        console.log(`Skipping non-PDF file for Module ${i}, Topic ${j}.`);
+                        continue;
+                    }
+
                     // Decode the base64 data
                     const buffer = Buffer.from(base64File, 'base64');
-
-                    // Use mime-types to get the file extension
-                    const mimeType = mime.lookup(buffer);
-                    const fileExtension = mimeType ? mime.extension(mimeType) : 'txt';
 
                     // Assuming a unique identifier is used for the file name
                     const fileName = `lecture_${Date.now()}_${i}_${j}.${fileExtension}`;
@@ -116,7 +119,6 @@ module.exports = {
                 }
                 return res.status(200).json({ result });
             }
-
         } catch (error) {
             console.error(error);
             return res.status(500).json({ error: 'An error occurred' });
