@@ -17,10 +17,13 @@ const storage = multer.diskStorage({
     },
 });
 const uploadPath = path.join(__dirname, '../uploads');
-const upload = multer({ storage });
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 10 * 1024 * 1024 }, // Adjust the size limit as needed
+});
 
 //ROUTES
-router.post('/register', upload.single('profile_image'), authController.register);
+router.post('/register', authController.register);
 router.post('/sign-in', authController.signIn);
 
 
