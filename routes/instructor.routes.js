@@ -17,7 +17,7 @@ const uploadPath = path.join(__dirname, '../uploads');
 
 const upload = multer({ storage });
 
-router.get('/add-quiz', instructorController.addQuiz);
+router.post('/add-quiz', instructorController.addQuiz);
 
 // router.get('/add-assignment', upload.single('assignment_file') ,instructorController.addAssignment);
 

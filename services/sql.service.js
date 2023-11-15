@@ -50,10 +50,18 @@ module.exports = {
   `,
 
   ADD_QUIZ: `
-    INSERT INTO users
-    (profile_picture, email, password, role, marital_status, country, organization, designation, qualification, register_date)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO quiz
+    (program_plan_id, quiz_date)
+    VALUES(?, ?);
+  
   `,
+
+  ADD_QUIZ_QUESTION: `
+  INSERT INTO lms.quiz_question
+  (quiz_id, question, option_1, option_2, option_3, option_4, question_picture)
+  VALUES(?, ?, ?, ?, ?, ?, ?)
+
+`,
 
   ADD_ASSIGNMENT: `
     INSERT INTO users

@@ -72,15 +72,15 @@ module.exports = {
       if (role === 1) {
         const [result] = await connection.query(sql.SIGN_IN_ADMIN, [email, password, role]);
         const token = generateToken(result[0].id, result[0].role, result[0].admin_type);
-        const user = [result[0], result[1], token];
+        const user = [result[0], token];
         return user;
       } else if (role === 2) {
         const [result] = await connection.query(sql.SIGN_IN_INSTRUCTOR, [email, password, role]);
-        const user = result[0];
+        const user = [result[0]];
         return user;
       } else if (role === 3) {
         const [result] = await connection.query(sql.SIGN_IN_STUDENT, [email, password, role]);
-        const user = result[0];
+        const user = [result[0]];
         return user;
       }
 
