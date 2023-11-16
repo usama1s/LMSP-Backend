@@ -56,31 +56,6 @@ module.exports = {
         }
     },
 
-    // ADD COURSE
-    // async addCourseFullDetails(courseDetails, lecture_file) {
-    //     try {
-    //         const course_name = courseDetails.course_name;
-    //         const course_description = courseDetails.course_description;
-    //         const module_name = courseDetails.module_name;
-    //         const topic_name = courseDetails.topic_name;
-    //         const lectureFile = lecture_file; // Renamed to avoid naming conflict
-
-    //         const [addCourse] = await pool.query(sql.ADD_COURSE, [course_name, course_description]);
-    //         const courseId = addCourse.insertId;
-
-    //         const [addModule] = await pool.query(sql.ADD_MODULE, [courseId, module_name]); // Assuming you have a separate query for adding a module
-    //         const moduleId = addModule.insertId;
-    //         await pool.query(sql.ADD_TOPIC, [moduleId, topic_name, lectureFile]);
-
-    //         return { message: 'Course, module, topics, added' };
-
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // },
-
-
-
     async addCourseFullDetails(courseDetails, module, topic, filePath) {
         try {
             const course_name = courseDetails.course_name;
@@ -124,6 +99,16 @@ module.exports = {
             await pool.query(sql.ADD_PROGRAM_PLAN, [courseId, programId, instructorId, programName, startDate, endDate]);
             return { message: 'Program plan added' };
 
+        } catch (error) {
+            throw error;
+        }
+    },
+    
+    //GET ITEM ID
+    async getAllProgramPlan() {
+        try {
+            const [results] = await pool.query(sql.GET_PROGRAM_PLAN);
+            return results;
         } catch (error) {
             throw error;
         }

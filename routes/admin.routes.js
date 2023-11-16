@@ -49,6 +49,8 @@ router.post('/add-program', adminController.addProgram);
 
 router.post('/add-program_plan', adminController.addProgramPlan);
 
+router.get('/get-all-program_plan', adminController.getAllProgramPlan);  
+
 router.post('/add-class', adminController.addClass);
 
 
