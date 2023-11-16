@@ -58,8 +58,8 @@ module.exports = {
 
   ADD_QUIZ_QUESTION: `
   INSERT INTO lms.quiz_question
-  (quiz_id, question, option_1, option_2, option_3, option_4, question_picture)
-  VALUES(?, ?, ?, ?, ?, ?, ?)
+  (quiz_id, question, option_1, option_2, option_3, option_4, question_picture, answer)
+  VALUES(?, ?, ?, ?, ?, ?, ?,?)
 
 `,
 
@@ -146,6 +146,12 @@ module.exports = {
     INSERT INTO time_table
     (program_plan_id, class_date, class_time)
     VALUES (?, ?, ?)
+  `,
+
+  GET_PROGRAM_PLAN: `
+  SELECT *
+  FROM program_plan 
+  inner join course on program_plan.course_id = course.course_id 
   `,
 
   ADD_STUDENT_COURSE: `
