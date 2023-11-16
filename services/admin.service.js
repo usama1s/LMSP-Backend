@@ -104,6 +104,8 @@ module.exports = {
                 
                 await pool.query(sql.ADD_PROGRAM_PLAN, [course_id, programId, instructor_id]);
             }
+            return { message: 'Program plan added' };
+
         } catch (error) {
             console.error(error);
             throw error;

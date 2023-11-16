@@ -132,7 +132,7 @@ module.exports = {
         try {
             const programDetails = req.body
             const result = await adminService.addProgram(programDetails);
-            return res.status(200).json({ result });
+            return res.status(200).json(result);
         } catch (error) {
             return res.status(500).json({ error: 'An error occurred' });
         }
@@ -143,14 +143,14 @@ module.exports = {
         try {
             const programPlanDetails = req.body
             const result = await adminService.addProgramPlan(programPlanDetails);
-            return res.status(200).json({ result });
+            return res.status(200).json(result);
         } catch (error) {
             return res.status(500).json({ error: 'An error occurred' });
         }
     },
 
-     // GET PROGRAM PLAN
-     async getAllProgramPlan(req, res) {
+    // GET PROGRAM PLAN
+    async getAllProgramPlan(req, res) {
         try {
             const result = await adminService.getAllProgramPlan();
             return res.status(200).json({ result });
