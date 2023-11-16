@@ -132,14 +132,14 @@ module.exports = {
 
   ADD_PROGRAM: `
     INSERT INTO program
-    (program_name)
-    VALUES (?)
+    (program_name, start_date, end_date)
+    VALUES (?, ?, ?)
   `,
 
   ADD_PROGRAM_PLAN: `
     INSERT INTO program_plan
-    (course_id, program_id, instructor_id, program_name, start_date, end_date)
-    VALUES (?, ?, ?, ?, ?, ?)
+    (course_id, program_id, instructor_id)
+    VALUES (?, ?, ?)
   `,
 
   ADD_TIME_TABLE: `

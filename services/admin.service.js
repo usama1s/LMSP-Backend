@@ -79,7 +79,6 @@ module.exports = {
     async addProgram(programDetails) {
         try {
             const programName = programDetails.program_name
-            await pool.query(sql.ADD_PROGRAM, programName);
             return { message: 'Program added' };
 
         } catch (error) {
@@ -90,20 +89,27 @@ module.exports = {
     // ADD PROGRAM PLAN
     async addProgramPlan(programDetails) {
         try {
-            const programId = programDetails.program_id
-            const courseId = programDetails.course_id
-            const instructorId = programDetails.instructor_id
-            const programName = programDetails.program_name
-            const startDate = programDetails.start_date
-            const endDate = programDetails.end_date
-            await pool.query(sql.ADD_PROGRAM_PLAN, [courseId, programId, instructorId, programName, startDate, endDate]);
-            return { message: 'Program plan added' };
-
+            const programName = programDetails.program_name;
+            const startDate = programDetails.start_date;
+            const endDate = programDetails.end_date;
+            
+            const [addProgram] = await pool.query(sql.ADD_PROGRAM, [programName, startDate, endDate]);
+            const programId = addProgram.insertId;
+            
+            const courses = programDetails.courses;
+    
+            for (let i = 0; i < courses.length; ++i) {
+                const course_id = courses[i].course_id;
+                const instructor_id = courses[i].instructor_id;
+                
+                await pool.query(sql.ADD_PROGRAM_PLAN, [course_id, programId, instructor_id]);
+            }
         } catch (error) {
+            console.error(error);
             throw error;
         }
     },
-    
+
     //GET ITEM ID
     async getAllProgramPlan() {
         try {
