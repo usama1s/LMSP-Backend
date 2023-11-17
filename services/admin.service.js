@@ -136,5 +136,14 @@ module.exports = {
         }
     },
 
+    //GET ITEM ID
+    async getAllCourses() {
+        try {
+            const [courses] = await pool.query(sql.GET_ALL_COURSES);
+            return courses;
+        } catch (error) {
+            throw error;
+        }
+    },
 }
 

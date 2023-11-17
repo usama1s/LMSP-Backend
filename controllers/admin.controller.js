@@ -170,4 +170,13 @@ module.exports = {
         }
     },
 
+    // GET PROGRAM PLAN
+    async getAllCourses(req, res) {
+        try {
+            const result = await adminService.getAllCourses();
+            return res.status(200).json({ result });
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred' });
+        }
+    },
 }

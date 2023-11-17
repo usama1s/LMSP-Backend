@@ -150,7 +150,8 @@ module.exports = {
 
   GET_PROGRAM_PLAN: `
   SELECT *
-  FROM program_plan 
+  FROM program
+  inner join program_plan  on program_plan.program_id  = program.program_id 
   inner join course on program_plan.course_id = course.course_id 
   `,
 
@@ -190,5 +191,12 @@ module.exports = {
     FROM inventory
     INNER JOIN inventory_image ON inventory.inventory_id = inventory_image.inventory_id
     WHERE inventory.inventory_id=?
+  `,
+
+  GET_ALL_COURSES: `
+  SELECT *
+  FROM course
+  INNER JOIN module  ON module.course_id  = course.course_id 
+  INNER JOIN topic ON topic.module_id = module.module_id 
   `,
 };
