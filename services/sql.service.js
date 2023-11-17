@@ -199,4 +199,16 @@ module.exports = {
   INNER JOIN module  ON module.course_id  = course.course_id 
   INNER JOIN topic ON topic.module_id = module.module_id 
   `,
+
+  GET_ALL_INSTRUCTORS: `
+  SELECT *
+  FROM users
+  INNER JOIN instructor ON instructor.user_id = users.id 
+  `,
+
+  ENROLL_STUDENT: `
+  INSERT INTO student_enrollment
+  (program_plan_id, student_id, enrollment_date, program_status)
+  VALUES(?, ?, ?, ?)
+  `,
 };

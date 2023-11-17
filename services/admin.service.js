@@ -92,16 +92,16 @@ module.exports = {
             const programName = programDetails.program_name;
             const startDate = programDetails.start_date;
             const endDate = programDetails.end_date;
-            
+
             const [addProgram] = await pool.query(sql.ADD_PROGRAM, [programName, startDate, endDate]);
             const programId = addProgram.insertId;
-            
+
             const courses = programDetails.courses;
-    
+
             for (let i = 0; i < courses.length; ++i) {
                 const course_id = courses[i].course_id;
                 const instructor_id = courses[i].instructor_id;
-                
+
                 await pool.query(sql.ADD_PROGRAM_PLAN, [course_id, programId, instructor_id]);
             }
             return { message: 'Program plan added' };
@@ -136,13 +136,42 @@ module.exports = {
         }
     },
 
-    //GET ITEM ID
+    //GET ALL COURSES
     async getAllCourses() {
         try {
             const [courses] = await pool.query(sql.GET_ALL_COURSES);
             return courses;
         } catch (error) {
             throw error;
+        }
+    },
+
+    //GET ALL COURSES
+    async getAllInstructor() {
+        try {
+            const [instructors] = await pool.query(sql.GET_ALL_INSTRUCTORS);
+            return instructors;
+        } catch (error) {
+            console.log(error)
+            throw error;
+        }
+    },
+
+    // ENROLLMENT DETAILS
+    async enrollStudent(enrollmentDetails) {
+        try {
+            let i
+            const program_plan_id = enrollmentDetails.program_plan_id;
+            const student_id = enrollmentDetails.student_id;
+            const enrollment_date = enrollmentDetails.enrollment_date;
+            const program_status = enrollmentDetails.program_status;
+            for (i = 0; i < program_plan_id.length; ++i) {
+                await pool.query(sql.ENROLL_STUDENT, [program_plan_id[i], student_id, enrollment_date, program_status]);
+            }
+            return { message: 'Student enrolled' };
+
+        } catch (error) {
+            return { error };
         }
     },
 }

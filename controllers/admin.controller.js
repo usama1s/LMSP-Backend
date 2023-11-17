@@ -125,8 +125,6 @@ module.exports = {
         }
     },
 
-
-
     // ADD PROGRAM
     async addProgram(req, res) {
         try {
@@ -179,4 +177,26 @@ module.exports = {
             return res.status(500).json({ error: 'An error occurred' });
         }
     },
+
+    // GET ALL INSTRUCTORS
+    async getAllInstructor(req, res) {
+        try {
+            const instructors = await adminService.getAllInstructor();
+            return res.status(200).json({ instructors });
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred' });
+        }
+    },
+
+    // ENROLL STUDENT
+    async enrollStudent(req, res) {
+        try {
+            const enrollmentDetails = req.body
+            const result = await adminService.enrollStudent(enrollmentDetails);
+            return res.status(200).json(result);
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred' });
+        }
+    },
+
 }

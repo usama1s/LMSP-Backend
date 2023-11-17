@@ -110,6 +110,38 @@ CREATE TABLE time_table (
     FOREIGN KEY (program_plan_id) REFERENCES program_plan(program_plan_id)
 );
 
+CREATE TABLE quiz (
+    quiz_id INT AUTO_INCREMENT PRIMARY KEY,
+    program_plan_id INT,
+    quiz_date varchar(15),
+    FOREIGN KEY (program_plan_id) REFERENCES program_plan(program_plan_id)
+);
+
+CREATE TABLE quiz_question (
+    quiz_question_id INT AUTO_INCREMENT PRIMARY KEY,
+    quiz_id INT,
+    question varchar(500),
+    option_1 varchar(50),
+    option_2 varchar(50),
+    option_3 varchar(50),
+    option_4 varchar(50),
+    question_picture varchar(50),
+    FOREIGN KEY (quiz_id) REFERENCES quiz(quiz_id)
+);
+
+CREATE TABLE student_enrollment (
+    student_enrollment_id INT AUTO_INCREMENT PRIMARY KEY,
+    program_plan_id INT,
+    student_id INT,
+    enrollment_date varchar(15),
+    program_status varchar(20),
+    FOREIGN KEY (program_plan_id) REFERENCES program_plan(program_plan_id),
+    FOREIGN KEY (student_id) REFERENCES student(student_id)
+);
+
+
+
+
 ALTER TABLE users MODIFY profile_picture VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
