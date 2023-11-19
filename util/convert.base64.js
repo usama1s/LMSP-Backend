@@ -33,4 +33,20 @@ module.exports = {
         await fs.writeFile(filePath, buffer);
         return filePath;
     },
+
+    // BASE 64 TO MP4
+    async base64ToMp4(file) {
+        // const splitJpg = base64File.split(',')
+        // const buffer = Buffer.from(splitJpg[1], 'base64');
+
+        const base64File = file;
+        const buffer = Buffer.from(base64File, 'base64');
+        const defaultExtension = 'mp4';
+
+        const fileName = `mp4_file${Date.now()}.${defaultExtension}`;
+        const filePath = path.join(__dirname, '../uploads', fileName);
+
+        await fs.writeFile(filePath, buffer);
+        return filePath;
+    },
 }
