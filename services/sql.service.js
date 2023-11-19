@@ -34,6 +34,23 @@ module.exports = {
   INNER JOIN course ON course.course_id = program_plan.course_id 
 `,
 
+  CHANGE_PASSWORD: `
+  UPDATE users
+  SET  password=? 
+  WHERE id=?;
+`,
+
+  CHANGE_PROFILE_PICTURE: `
+  UPDATE users
+  SET profile_picture=?
+  WHERE id=0;
+`,
+  CHANGE_PERSONAL_DETAILS: `
+  UPDATE users
+  SET  marital_status=?, country=?, organization=?, designation=?, qualification=?, first_name='', last_name=''
+  WHERE id=0;
+`,
+
   // INSTRUCTOR____________________________________________________________________________________________________________
 
   ADD_INSTRUCTOR: `

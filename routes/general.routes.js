@@ -7,6 +7,7 @@ const generalController = require('../controllers/general.controller');
 router.get('/uploads/:filename', generalController.serveFile);
 router.get('/get-all-students', generalController.getAllStudents);
 router.get('/get-all-students-with-programs', generalController.getAllStudentsWithPrograms);
+router.put('/change-password', generalController.changePassword);
 
 
 module.exports = router;

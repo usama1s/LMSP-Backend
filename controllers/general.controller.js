@@ -26,6 +26,18 @@ module.exports = {
         }
     },
 
+    //GET ALL STUDENTS WITH PROGRAM THEY ARE ENROLLED IN
+    async changePassword(req, res) {
+        try {
+            const { current_password, new_password, user_id } = req.body
+
+            const result = await generalServices.changePassword(current_password, new_password, user_id);
+            return res.status(200).json(result);
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred' });
+        }
+    },
+
     // FETCH DATA FROM FOLDER AND RETURN BASE 64
     serveFile: (req, res) => {
         try {
