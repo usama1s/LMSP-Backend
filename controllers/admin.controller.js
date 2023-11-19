@@ -77,48 +77,10 @@ module.exports = {
     // ADD COURSE
     async addCourseFullDetails(req, res) {
         try {
-            let result;
             const courseDetails = req.body;
-            const modules = courseDetails.modules || [];
-
-            for (let i = 0; i < modules.length; i++) {
-                const module = modules[i];
-                if (!module.topics) {
-                    console.error(`Module ${i} does not have topics.`);
-                    continue;
-                }
-
-                const topics = module.topics;
-
-                for (let j = 0; j < topics.length; j++) {
-                    const topic = topics[j];
-
-                    const base64File = topic.lecture_file;
-
-                    if (!base64File) {
-                        console.error(`File not found for Module ${i}, Topic ${j}.`);
-                        continue;
-                    }
-
-                    // Check if the file type is PDF
-                    const fileExtension = mime.extension(topic.lecture_file_type);
-                    if (fileExtension.toLowerCase() !== 'pdf') {
-                        console.log(`Skipping non-PDF file for Module ${i}, Topic ${j}.`);
-                        continue;
-                    }
-
-                    // Decode the base64 data
-                    const buffer = Buffer.from(base64File, 'base64');
-
-                    // Assuming a unique identifier is used for the file name
-                    const fileName = `lecture_${Date.now()}_${i}_${j}.${fileExtension}`;
-                    const filePath = path.join(__dirname, '../uploads', fileName);
-
-                    await fs.writeFile(filePath, buffer);
-                    result = await adminService.addCourseFullDetails(courseDetails, module, topic, filePath);
-                }
-                return res.status(200).json({ result });
-            }
+            const { course_name, course_description, modules } = courseDetails;
+            const result = await adminService.addCourseFullDetails(course_name, course_description, modules);
+            res.status(200).json(result.message)
         } catch (error) {
             console.error(error);
             return res.status(500).json({ error: 'An error occurred' });
@@ -168,11 +130,11 @@ module.exports = {
         }
     },
 
-    // GET PROGRAM PLAN
+    // GET ALL COURSES
     async getAllCourses(req, res) {
         try {
             const result = await adminService.getAllCourses();
-            return res.status(200).json({ result });
+            return res.status(200).json(result);
         } catch (error) {
             return res.status(500).json({ error: 'An error occurred' });
         }

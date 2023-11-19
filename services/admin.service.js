@@ -1,5 +1,6 @@
 const sql = require('../services/sql.service')
 const pool = require('../db.conn');
+const convertBase64 = require('../util/convert.base64.js')
 
 
 module.exports = {
@@ -56,24 +57,27 @@ module.exports = {
         }
     },
 
-    async addCourseFullDetails(courseDetails, module, topic, filePath) {
+    // ADD COURSE
+    async addCourseFullDetails(course_name, course_description, modules) {
         try {
-            const course_name = courseDetails.course_name;
-            const course_description = courseDetails.course_description;
 
             const [addCourse] = await pool.query(sql.ADD_COURSE, [course_name, course_description]);
             const courseId = addCourse.insertId;
-            const module_name = module.module_name;
 
-            const [addModule] = await pool.query(sql.ADD_MODULE, [courseId, module_name]);
-            const moduleId = addModule.insertId;
-            await pool.query(sql.ADD_TOPIC, [moduleId, topic.topic_name, filePath]);
+            for (module of modules) {
+                const module_name = module.module_name;
+                const [addModule] = await pool.query(sql.ADD_MODULE, [courseId, module_name]);
+                const moduleId = addModule.insertId;
+                for (topic of module.topics) {
+                    const lectureFilePath = await convertBase64.base64ToPdf(topic.lecture_file);
+                    await pool.query(sql.ADD_TOPIC, [moduleId, topic.topic_name, lectureFilePath]);
+                }
+            }
             return { message: 'Course, modules, topics added' };
         } catch (error) {
             throw error;
         }
     },
-
 
     // ADD PROGRAM 
     async addProgram(programDetails) {
@@ -138,7 +142,41 @@ module.exports = {
     async getAllCourses() {
         try {
             const [courses] = await pool.query(sql.GET_ALL_COURSES);
-            return courses;
+
+            const resultObject = {
+                "course_name": courses.length ? courses[0].course_name : '',
+                "course_description": courses.length ? courses[0].course_description : '',
+                "modules": []
+            };
+
+            const modulesMap = new Map();
+
+            for (const course of courses) {
+                const module = modulesMap.get(course.module_name);
+
+                if (!module) {
+                    const newModule = {
+                        "module_name": course.module_name,
+                        "topics": [
+                            {
+                                "topic_name": course.topic_name,
+                                "lecture_file_type": "application/pdf",
+                                "lecture_file": course.lecture_file
+                            }
+                        ]
+                    };
+                    resultObject.modules.push(newModule);
+                    modulesMap.set(course.module_name, newModule);
+                } else {
+                    module.topics.push({
+                        "topic_name": course.topic_name,
+                        "lecture_file_type": "application/pdf",
+                        "lecture_file": course.lecture_file
+                    });
+                }
+            }
+
+            return resultObject;
         } catch (error) {
             throw error;
         }
