@@ -139,8 +139,23 @@ CREATE TABLE student_enrollment (
     FOREIGN KEY (student_id) REFERENCES student(student_id)
 );
 
+CREATE TABLE assignments (
+    assignment_id INT AUTO_INCREMENT PRIMARY KEY,
+    program_plan_id INT,
+    assignment_date varchar(15),
+    assignment_file varchar(150),
+    FOREIGN KEY (program_plan_id) REFERENCES program_plan(program_plan_id)
+);
 
 
+CREATE TABLE assignment_submitted (
+    assignment_submitted_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    assignment_id INT,
+    submitted_file varchar(150),
+    FOREIGN KEY (student_id) REFERENCES student(student_id),
+    FOREIGN KEY (assignment_id) REFERENCES assignments(assignment_id)
+);
 
 ALTER TABLE users MODIFY profile_picture VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

@@ -95,6 +95,13 @@ module.exports = {
     WHERE users.email=? AND users.password=? AND users.role = ?
   `,
 
+  ASSIGNMENT_SUBMISSION: `
+   INSERT INTO assignment_submitted
+   (student_id, assignment_id, submitted_file, marks, grade)
+   VALUES(?, ?, ?, ?, ?)
+  
+`,
+
   // ADMIN____________________________________________________________________________________________________________
 
   CHECK_ADMIN_REGISTERED: `
