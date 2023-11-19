@@ -1,7 +1,5 @@
 const instructorService = require('../services/instructor.service');
 const convertBase64 = require('../util/convert.base64.js')
-const fs = require('fs').promises;
-const path = require('path');
 module.exports = {
 
     // INSTRUCTOR ADD QUIZES
