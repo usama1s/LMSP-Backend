@@ -14,7 +14,7 @@ module.exports = {
 
                 const quizPath = await convertBase64.base64ToJpg(image)
                 await instructorService.addQuizQuestion(quizId, question, options, quizPath, correctOption);
-                
+
             }
 
             return res.json({ message: 'Quiz added successfully' });
@@ -36,6 +36,23 @@ module.exports = {
             await instructorService.addAssignment(program_plan_id, assignment_date, assignmentPath);
 
             return res.json({ message: 'Assignment added successfully' });
+        } catch (error) {
+
+            console.error(error);
+            return res.status(500).json({ error: 'An error occurred' });
+
+        }
+    },
+
+    // MARK ATTENDENCE OF STUDENT
+    async markAttendence(req, res) {
+        try {
+            
+            const attendenceDetails = req.body;
+            const { students, attendence_date } = attendenceDetails;
+            const marked = await instructorService.markAttendence(students, attendence_date);
+            return res.json(marked.message);
+
         } catch (error) {
 
             console.error(error);

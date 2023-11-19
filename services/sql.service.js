@@ -73,6 +73,12 @@ module.exports = {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `,
 
+  MARK_ATTENDENCE: `
+   INSERT INTO student_attendence
+   (student_id, attendence_status, attendence_date)
+   VALUES(?, ?, ?)
+`,
+
   // STUDENT____________________________________________________________________________________________________________
 
   ADD_STUDENT: `

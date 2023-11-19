@@ -33,4 +33,16 @@ module.exports = {
             console.log(error);
         }
     },
+
+    // MARK ATTENDENCE OF STUDENT
+    async markAttendence(students, attendence_date) {
+        try {
+            for (const student of students) {
+                await pool.query(sql.MARK_ATTENDENCE, [student.student_id, student.attendence_status, attendence_date]);
+            }
+            return { message: 'Attendence added successfully.' };
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }
