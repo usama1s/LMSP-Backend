@@ -21,6 +21,13 @@ module.exports = {
     WHERE email=? AND role=?
   `,
 
+  GET_ALL_STUDENTS: `
+  SELECT *
+  FROM student
+  INNER JOIN users ON student.user_id = users.id
+`,
+
+
   // INSTRUCTOR____________________________________________________________________________________________________________
 
   ADD_INSTRUCTOR: `

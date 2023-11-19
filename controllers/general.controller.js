@@ -1,8 +1,22 @@
 // controllers/fileController.js
+const generalServices = require("../services/general.service")
 const path = require('path');
 const fs = require('fs');
 
+
 module.exports = {
+
+    async getAllStudents(req, res) {
+        try {
+            const result = await generalServices.getAllStudents();
+            return res.status(200).json(result);
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred' });
+        }
+    },
+
+
+
     serveFile: (req, res) => {
         try {
             const { filename } = req.params;
