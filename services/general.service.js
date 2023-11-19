@@ -13,4 +13,14 @@ module.exports = {
         }
     },
 
+    //GET ALL STUDENTS WITH PROGRAM THEY ARE ENROLLED IN
+    async getAllStudentsWithPrograms() {
+        try {
+            const [students] = await pool.query(sql.GET_STUDENT_WITH_PROGRAMS_DETAILS);
+            return students;
+        } catch (error) {
+            console.log(error)
+        }
+    },
+
 }

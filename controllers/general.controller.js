@@ -6,6 +6,7 @@ const fs = require('fs');
 
 module.exports = {
 
+    //GET ALL STUDENTS
     async getAllStudents(req, res) {
         try {
             const result = await generalServices.getAllStudents();
@@ -15,8 +16,17 @@ module.exports = {
         }
     },
 
+    //GET ALL STUDENTS WITH PROGRAM THEY ARE ENROLLED IN
+    async getAllStudentsWithPrograms(req, res) {
+        try {
+            const result = await generalServices.getAllStudentsWithPrograms();
+            return res.status(200).json(result);
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred' });
+        }
+    },
 
-
+    // FETCH DATA FROM FOLDER AND RETURN BASE 64
     serveFile: (req, res) => {
         try {
             const { filename } = req.params;
@@ -38,7 +48,7 @@ module.exports = {
             console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
-    }
+    },
 
 }
 

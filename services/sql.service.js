@@ -27,6 +27,12 @@ module.exports = {
   INNER JOIN users ON student.user_id = users.id
 `,
 
+  GET_STUDENT_WITH_PROGRAMS_DETAILS: `
+  SELECT *
+  FROM student_enrollment
+  INNER JOIN program_plan ON student_enrollment.program_plan_id  = program_plan.program_plan_id 
+  INNER JOIN course ON course.course_id = program_plan.course_id 
+`,
 
   // INSTRUCTOR____________________________________________________________________________________________________________
 
@@ -229,4 +235,13 @@ module.exports = {
   (program_plan_id, student_id, enrollment_date, program_status)
   VALUES(?, ?, ?, ?)
   `,
+
+  GET_ALL_ADMINS: `
+    SELECT *
+    FROM users
+    inner join admin on admin.user_id = users.id 
+    where admin.admin_type > 1
+  `,
+
+
 };
