@@ -21,7 +21,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/api', index);
 
 
-app.listen(process.env.PORT, () => {
-    console.log(`Server is running on port ${process.env.PORT}`);
+const port = process.env.PORT || 5000;
+const ipAddress = process.env.IP_ADDRESS || 'localhost';
+
+app.listen(port, ipAddress, () => {
+  console.log(`Server is running on http://${ipAddress}:${port}`);
 });
 
