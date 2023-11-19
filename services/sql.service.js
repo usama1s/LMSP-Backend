@@ -153,17 +153,17 @@ module.exports = {
     VALUES (?, ?, ?)
   `,
 
-  ADD_TIME_TABLE: `
-    INSERT INTO time_table
-    (program_plan_id, class_date, class_time)
-    VALUES (?, ?, ?)
+  GET_PROGRAM_PLAN: `
+    SELECT *
+    FROM program
+    inner join program_plan  on program_plan.program_id  = program.program_id 
+    inner join course on program_plan.course_id = course.course_id 
   `,
 
-  GET_PROGRAM_PLAN: `
-  SELECT *
-  FROM program
-  inner join program_plan  on program_plan.program_id  = program.program_id 
-  inner join course on program_plan.course_id = course.course_id 
+  ADD_CLASS: `
+    INSERT INTO time_table
+    (program_plan_id, class_date, class_time, class_link)
+    VALUES(?, ?, ?, ?);
   `,
 
   ADD_STUDENT_COURSE: `

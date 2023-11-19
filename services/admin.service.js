@@ -125,10 +125,8 @@ module.exports = {
     // ADD CLASS
     async addClass(classDetails) {
         try {
-            const programPlanId = classDetails.program_plan_id
-            const classDate = classDetails.class_date
-            const classTime = classDetails.class_time
-            await pool.query(sql.ADD_PROGRAM_PLAN, [programPlanId, classDate, classTime]);
+            const { program_plan_id, class_date, class_time, class_link } = classDetails;
+            await pool.query(sql.ADD_CLASS, [program_plan_id, class_date, class_time, class_link]);
             return { message: 'Class added' };
 
         } catch (error) {
