@@ -21,11 +21,34 @@ module.exports = {
     },
 
     // ADD ITEM IN INVENTORY TABLE
-    async addItem({ admin_id, title, description, expiry, induction, make, model, failure_reason, informationFilePath, videoFilePath, imageFilePaths }) {
+    async addItem(inventoryItemDetail) {
         try {
-            const [result] = await pool.query(sql.ADD_INVENTORY_ITEM, [admin_id, title, description, expiry, induction, make, model, informationFilePath, videoFilePath, failure_reason]);
+            const { admin_id, title, description, expiry, induction, make, model, failure_reason, attachments } = inventoryItemDetail
+            const videoFilePath = await convertBase64.base64ToMp4(attachments.video_file)
+            const infoFilePath = await convertBase64.base64ToPdf(attachments.info_file)
+            const images = attachments.images
+            const [result] = await pool.query(sql.ADD_INVENTORY_ITEM, [admin_id, title, description, expiry, induction, make, model, infoFilePath, videoFilePath, failure_reason]);
             const inventoryId = result.insertId;
+            const imageFilePaths = [];
+
+            for (let i = 1; i <= 10; i++) {
+                const key = `image_${i}`;
+                const imageBase64 = images[key] || null;
+
+                if (imageBase64) {
+                    const imageFilePath = await convertBase64.base64ToJpg(imageBase64);
+                    imageFilePaths.push(imageFilePath);
+                } else {
+                    // If image doesn't exist, push null
+                    imageFilePaths.push(null);
+                }
+            }
+
+            // Now you have the array of imageFilePaths, and you can use it in your SQL query
             await pool.query(sql.ADD_IMAGES_OF_ITEM, [inventoryId, ...imageFilePaths]);
+
+
+
             return { message: 'Inventory item and files uploaded successfully' };
         } catch (error) {
             throw error; // You can choose to throw the error for handling at a higher level
