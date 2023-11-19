@@ -1,4 +1,5 @@
-const instructorService = require('../services/instructor.service')
+const instructorService = require('../services/instructor.service');
+const convertBase64 = require('../util/convert.base64.js')
 const fs = require('fs').promises;
 const path = require('path');
 module.exports = {
@@ -12,15 +13,10 @@ module.exports = {
             const quizId = await instructorService.addQuiz(program_plan_id, quiz_date);
 
             for (const { question, options, correctOption, image } of quiz_questions) {
-                const base64File = image;
-                const buffer = Buffer.from(base64File, 'base64');
-                const defaultExtension = 'jpeg';
 
-                const fileName = `quiz_image${Date.now()}.${defaultExtension}`;
-                const quizImagePath = path.join(__dirname, '../uploads', fileName);
-
-                await fs.writeFile(quizImagePath, buffer);
-                await instructorService.addQuizQuestion(quizId, question, options, quizImagePath, correctOption);
+                const quizPath = await convertBase64.base64ToJpg(image)
+                await instructorService.addQuizQuestion(quizId, question, options, quizPath, correctOption);
+                
             }
 
             return res.json({ message: 'Quiz added successfully' });
@@ -33,27 +29,20 @@ module.exports = {
     // INSTRUCTOR ADD ASSIGNMENT
     async addAssignment(req, res) {
         try {
-            const quizDetails = req.body;
-            const { program_plan_id, quiz_date, quiz_questions } = quizDetails;
+            const assignmentDetails = req.body;
 
-            const quizId = await instructorService.addAssignment(program_plan_id, quiz_date);
+            const { program_plan_id, assignment_date, assignment_file } = assignmentDetails;
 
-            for (const { question, options, correctOption, image } of quiz_questions) {
-                const base64File = image;
-                const buffer = Buffer.from(base64File, 'base64');
-                const defaultExtension = 'jpeg';
+            const assignmentPath = await convertBase64.base64ToPdf(assignment_file)
 
-                const fileName = `quiz_image${Date.now()}.${defaultExtension}`;
-                const quizImagePath = path.join(__dirname, '../uploads', fileName);
+            await instructorService.addAssignment(program_plan_id, assignment_date, assignmentPath);
 
-                await fs.writeFile(quizImagePath, buffer);
-                await instructorService.addAssignment(quizId, question, options, quizImagePath, correctOption);
-            }
-
-            return res.json({ message: 'Quiz added successfully' });
+            return res.json({ message: 'Assignment added successfully' });
         } catch (error) {
+
             console.error(error);
             return res.status(500).json({ error: 'An error occurred' });
+
         }
     }
 }

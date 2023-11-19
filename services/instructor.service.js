@@ -22,5 +22,15 @@ module.exports = {
         const option3 = options[2];
         const option4 = options[3];
         await pool.query(sql.ADD_QUIZ_QUESTION, [quizId, question, option1, option2, option3, option4, quiz_image_path, correctOption]);
-    }
+    },
+
+    // INSTRUCTOR ADD ASSIGNMENTS
+    async addAssignment(program_plan_id, assignment_date, assignmentFilePath) {
+        try {
+            const [addAssignment] = await pool.query(sql.ADD_ASSIGNMENT, [program_plan_id, assignment_date, assignmentFilePath]);
+        }
+        catch (error) {
+            console.log(error);
+        }
+    },
 }
