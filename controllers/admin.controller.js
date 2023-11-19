@@ -199,4 +199,13 @@ module.exports = {
         }
     },
 
+    //GET ALL ADMINS
+    async getAllAdmins(req, res) {
+        try {
+            const admins = await adminService.getAllAdmins();
+            return res.status(200).json({ admins });
+        } catch (error) {
+            return res.status(500).json({ error: 'An error occurred' });
+        }
+    },
 }

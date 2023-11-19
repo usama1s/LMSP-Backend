@@ -172,5 +172,15 @@ module.exports = {
             return { error };
         }
     },
+
+    //GET ALL ADMINS
+    async getAllAdmins() {
+        try {
+            const [admins] = await pool.query(sql.GET_ALL_ADMINS);
+            return admins;
+        } catch (error) {
+            console.log(error)
+        }
+    },
 }
 

@@ -15,15 +15,11 @@ const storage = multer.diskStorage({
 });
 const uploadPath = path.join(__dirname, '../uploads');
 
-const upload = multer({ storage });
+const upload = multer({ storage })
 
 
-
-
-
-
+// ROUTES
 router.post('/add-full-course-details', adminController.addCourseFullDetails);  
-
 router.post('/add-item', upload.fields([
     { name: 'information_file' },
     { name: 'video_file' },
@@ -38,27 +34,19 @@ router.post('/add-item', upload.fields([
     { name: 'image_9' },
     { name: 'image_10' },
 ]), adminController.addItem);
-
-router.get('/get-all-users', adminController.getAllUsers);
-
-router.get('/get-all-item', adminController.getAllItems);
+router.post('/add-program', adminController.addProgram);
+router.post('/add-program_plan', adminController.addProgramPlan);
+router.post('/add-class', adminController.addClass);
+router.post('/enroll-student', adminController.enrollStudent);
 
 router.get('/get-item/:inventoryId', adminController.getItemById);
-
-router.post('/add-program', adminController.addProgram);
-
-router.post('/add-program_plan', adminController.addProgramPlan);
-
+router.get('/get-all-users', adminController.getAllUsers);
+router.get('/get-all-item', adminController.getAllItems);
 router.get('/get-all-courses', adminController.getAllCourses);  
-
 router.get('/get-all-instructors', adminController.getAllInstructor);  
-
 router.get('/get-all-program_plan', adminController.getAllProgramPlan);  
+router.get('/get-all-admins', adminController.getAllAdmins);  
 
-router.post('/add-class', adminController.addClass);
-
-
-router.post('/enroll-student', adminController.enrollStudent);
 
 
 
