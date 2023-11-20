@@ -24,9 +24,9 @@ module.exports = {
     },
 
     // GET QUIZ
-    async getQuiz() {
+    async getQuiz(date) {
         try {
-            const [quiz] = await pool.query(sql.GET_QUIZ);
+            const [quiz] = await pool.query(sql.GET_QUIZ, date);
             return { quiz };
 
         } catch (error) {

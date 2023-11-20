@@ -32,7 +32,8 @@ module.exports = {
     // GET QUIZ
     async getQuiz(req, res) {
         try {
-            const quiz = await studentService.getQuiz();
+            const quizDate = req.params.date;
+            const quiz = await studentService.getQuiz(quizDate);
             res.status(200).json(quiz);
         } catch (error) {
             console.error(error);

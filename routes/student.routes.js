@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/submit-quiz', studentController.submitQuiz);
 router.post('/submit-assignment', studentController.submitAssignment);
-router.get('/get-quiz', studentController.getQuiz);
+router.get('/get-quiz/:date', studentController.getQuiz);
 
 
 module.exports = router;

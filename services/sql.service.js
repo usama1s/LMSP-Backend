@@ -145,10 +145,11 @@ VALUES(?, ?, ?, ?, ?);
 
 `,
 
-GET_QUIZ: `
-SELECT *
-FROM quiz
-INNER JOIN quiz_question  ON quiz_question.quiz_id  = quiz .quiz_id  
+  GET_QUIZ: `
+  SELECT *
+  FROM quiz
+  INNER JOIN quiz_question  ON quiz_question.quiz_id  = quiz .quiz_id  
+  where quiz.quiz_date=? 
 `,
   // ADMIN____________________________________________________________________________________________________________
 
