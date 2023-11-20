@@ -5,9 +5,12 @@ const pool = require('../db.conn');
 module.exports = {
 
     // SUBMIT QUIZ 
-    async submitQuiz(req, res) {
-        const submittedQuizDetails = req.body;
+    async submitQuiz(submittedQuizDetails) {
+        const { student_id, quiz_id, total_marks, obtained_marks, grade } = submittedQuizDetails;
+        await pool.query(sql.QUIZ_SUBMISSION, [student_id, quiz_id, total_marks, obtained_marks, grade]);
+        return { message: 'Quiz submitted successfully.' };
     },
+
 
     // SUBMIT ASSIGNMENT
     async submitAssignment(student_id, assignment_id, submittedFilePath, marks, grade) {
@@ -18,6 +21,16 @@ module.exports = {
         } catch (error) {
             console.log(error);
         }
-    }
+    },
 
+    // GET QUIZ
+    async getQuiz() {
+        try {
+            const [quiz] = await pool.query(sql.GET_QUIZ);
+            return { quiz };
+
+        } catch (error) {
+            console.log(error);
+        }
+    },
 }

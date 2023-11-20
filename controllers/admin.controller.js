@@ -1,7 +1,4 @@
 const adminService = require('../services/admin.service');
-const mime = require('mime-types');
-const fs = require('fs').promises;
-const path = require('path');
 
 module.exports = {
 
@@ -54,7 +51,7 @@ module.exports = {
             const courseDetails = req.body;
             const { course_name, course_description, modules } = courseDetails;
             const result = await adminService.addCourseFullDetails(course_name, course_description, modules);
-            res.status(200).json(result.message)
+            res.status(200).json(result.message);
         } catch (error) {
             console.error(error);
             return res.status(500).json({ error: 'An error occurred' });
@@ -108,7 +105,7 @@ module.exports = {
     async getAllCourses(req, res) {
         try {
             const result = await adminService.getAllCourses();
-            return res.status(200).json(result);
+            return res.status(200).json(result.message);
         } catch (error) {
             return res.status(500).json({ error: 'An error occurred' });
         }

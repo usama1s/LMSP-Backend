@@ -17,7 +17,7 @@ module.exports = {
 
             }
 
-            return res.json({ message: 'Quiz added successfully' });
+            return res.json('Quiz added successfully');
         } catch (error) {
             console.error(error);
             return res.status(500).json({ error: 'An error occurred' });
@@ -35,7 +35,7 @@ module.exports = {
 
             await instructorService.addAssignment(program_plan_id, assignment_date, assignmentPath);
 
-            return res.json({ message: 'Assignment added successfully' });
+            return res.json('Assignment added successfully');
         } catch (error) {
 
             console.error(error);
@@ -47,7 +47,7 @@ module.exports = {
     // MARK ATTENDENCE OF STUDENT
     async markAttendence(req, res) {
         try {
-            
+
             const attendenceDetails = req.body;
             const { students, attendence_date } = attendenceDetails;
             const marked = await instructorService.markAttendence(students, attendence_date);
@@ -59,5 +59,5 @@ module.exports = {
             return res.status(500).json({ error: 'An error occurred' });
 
         }
-    }
+    },
 }

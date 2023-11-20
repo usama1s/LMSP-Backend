@@ -5,7 +5,14 @@ module.exports = {
 
     // SUBMIT QUIZ 
     async submitQuiz(req, res) {
-        const submittedQuizDetails = req.body;
+        try {
+            const submittedQuizDetails = req.body;
+            const quizSubmitted = await studentService.submitQuiz(submittedQuizDetails);
+            res.status(200).json(quizSubmitted.message);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
     },
 
     // SUBMIT ASSIGNMENT
@@ -16,6 +23,17 @@ module.exports = {
             const submittedFilePath = await convertBase64.base64ToPdf(submitted_file);
             const assignmentSubmitted = await studentService.submitAssignment(student_id, assignment_id, submittedFilePath, marks, grade);
             res.status(200).json(assignmentSubmitted.message);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    },
+
+    // GET QUIZ
+    async getQuiz(req, res) {
+        try {
+            const quiz = await studentService.getQuiz();
+            res.status(200).json(quiz);
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Internal Server Error' });

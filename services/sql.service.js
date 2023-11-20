@@ -138,6 +138,18 @@ module.exports = {
   
 `,
 
+  QUIZ_SUBMISSION: `
+INSERT INTO quiz_submitted
+(student_id, quiz_id, total_marks, obtained_marks, grade)
+VALUES(?, ?, ?, ?, ?);
+
+`,
+
+GET_QUIZ: `
+SELECT *
+FROM quiz
+INNER JOIN quiz_question  ON quiz_question.quiz_id  = quiz .quiz_id  
+`,
   // ADMIN____________________________________________________________________________________________________________
 
   CHECK_ADMIN_REGISTERED: `
