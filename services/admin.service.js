@@ -207,50 +207,6 @@ module.exports = {
     }
   },
 
-  //GET ALL COURSES
-  // async getAllCourses() {
-  //     try {
-  //         const [courses] = await pool.query(sql.GET_ALL_COURSES);
-
-  //         const resultObject = {
-  //             "course_name": courses.length ? courses[0].course_name : '',
-  //             "course_description": courses.length ? courses[0].course_description : '',
-  //             "modules": []
-  //         };
-
-  //         const modulesMap = new Map();
-
-  //         for (const course of courses) {
-  //             const module = modulesMap.get(course.module_name);
-
-  //             if (!module) {
-  //                 const newModule = {
-  //                     "module_name": course.module_name,
-  //                     "topics": [
-  //                         {
-  //                             "topic_name": course.topic_name,
-  //                             "lecture_file_type": "application/pdf",
-  //                             "lecture_file": course.lecture_file
-  //                         }
-  //                     ]
-  //                 };
-  //                 resultObject.modules.push(newModule);
-  //                 modulesMap.set(course.module_name, newModule);
-  //             } else {
-  //                 module.topics.push({
-  //                     "topic_name": course.topic_name,
-  //                     "lecture_file_type": "application/pdf",
-  //                     "lecture_file": course.lecture_file
-  //                 });
-  //             }
-  //         }
-
-  //         return resultObject;
-  //     } catch (error) {
-  //         throw error;
-  //     }
-  // },
-
   async getAllCourses() {
     try {
       const [courses] = await pool.query(sql.GET_ALL_COURSES);
