@@ -1,4 +1,5 @@
 const authService = require("../services/auth.service");
+const convertBase64 = require('../util/convert.base64.js')
 const mime = require("mime");
 const fs = require("fs").promises;
 const path = require("path");
@@ -7,56 +8,9 @@ module.exports = {
   // REGISTER
   async register(req, res) {
     try {
-      const {
-        email,
-        password,
-        role,
-        marital_status,
-        country,
-        profile_image_type,
-        organization,
-        designation,
-        qualification,
-        register_date,
-        register_id,
-        admin_type,
-        status,
-        employee_id,
-        first_name,
-        last_name,
-        profile_image,
-      } = req.body;
-
-      const base64File = profile_image;
-      const buffer = Buffer.from(base64File, "base64");
-      const fileExtension = mime.extension(profile_image_type);
-      const defaultExtension = "txt";
-
-      const fileName = `profile_image${Date.now()}.${
-        fileExtension || defaultExtension
-      }`;
-      const profile_image_path = path.join(__dirname, "../uploads", fileName);
-
-      await fs.writeFile(profile_image_path, buffer);
-
-      const registrationResult = await authService.register(
-        email,
-        password,
-        role,
-        marital_status,
-        country,
-        organization,
-        designation,
-        qualification,
-        register_date,
-        register_id,
-        admin_type,
-        status,
-        employee_id,
-        profile_image_path,
-        first_name,
-        last_name
-      );
+      const userDetail = req.body;
+      const profileFilePath = await convertBase64.base64ToJpg(userDetail.profile_image);
+      const registrationResult = await authService.register(userDetail,profileFilePath);
 
       return res.status(201).json({ message: registrationResult.message });
     } catch (error) {
