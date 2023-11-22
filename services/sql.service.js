@@ -146,10 +146,22 @@ VALUES(?, ?, ?, ?, ?);
 `,
 
   GET_QUIZ: `
-  SELECT *
-  FROM quiz
-  INNER JOIN quiz_question  ON quiz_question.quiz_id  = quiz .quiz_id  
-  where quiz.quiz_date=? 
+  SELECT
+    quiz.quiz_date,
+    quiz_question.question,
+    quiz_question.option_1,
+    quiz_question.option_2,
+    quiz_question.option_3,
+    quiz_question.option_4,
+    quiz_question.question_picture,
+    quiz_question.answer
+FROM
+    student_enrollment
+INNER JOIN program_plan ON student_enrollment.program_plan_id = program_plan.program_plan_id
+INNER JOIN quiz ON quiz.program_plan_id = program_plan.program_plan_id
+INNER JOIN quiz_question ON quiz_question.quiz_question_id = quiz.quiz_id
+WHERE
+    student_enrollment.student_id = ?
 `,
   // ADMIN____________________________________________________________________________________________________________
 
@@ -272,6 +284,4 @@ VALUES(?, ?, ?, ?, ?);
     inner join admin on admin.user_id = users.id 
     where admin.admin_type > 1
   `,
-
-
 };

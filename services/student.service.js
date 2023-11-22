@@ -24,11 +24,10 @@ module.exports = {
     },
 
     // GET QUIZ
-    async getQuiz(date) {
+    async getQuiz(student_id) {
         try {
-            const [quiz] = await pool.query(sql.GET_QUIZ, date);
+            const [quiz] = await pool.query(sql.GET_QUIZ, student_id);
             return { quiz };
-
         } catch (error) {
             console.log(error);
         }

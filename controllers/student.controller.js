@@ -32,8 +32,8 @@ module.exports = {
     // GET QUIZ
     async getQuiz(req, res) {
         try {
-            const quizDate = req.params.date;
-            const quiz = await studentService.getQuiz(quizDate);
+            const student_id = req.params.student_id;
+            const quiz = await studentService.getQuiz(student_id);
             res.status(200).json(quiz);
         } catch (error) {
             console.error(error);
@@ -42,3 +42,11 @@ module.exports = {
     }
 
 }
+
+
+
+// SELECT quiz_question.question,quiz_question.option_1,quiz_question.option_2,quiz_question.option_3,quiz_question.option_4,quiz_question.question_picture,quiz_question.answer FROM student_enrollment
+// INNER JOIN program_plan on student_enrollment.program_plan_id=program_plan.program_plan_id
+// INNER JOIN quiz on quiz.program_plan_id=program_plan.program_plan_id
+// INNER JOIN quiz_question on quiz_question.quiz_question_id=quiz.quiz_id
+// WHERE student_enrollment.student_id=1
