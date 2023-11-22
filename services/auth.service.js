@@ -80,16 +80,28 @@ module.exports = {
       if (role === 1) {
         const [result] = await pool.query(sql.SIGN_IN_ADMIN, [email, password, role]);
         const token = generateToken(result[0].id, result[0].role, result[0].admin_type);
-        const user = [result, token];
-        return user;
+        if(result.length>0){
+          const user = [result, token];
+          return user;
+        }else{
+          return { message: 'Admin does not exist' };
+        }
       } else if (role === 2) {
         const [result] = await pool.query(sql.SIGN_IN_INSTRUCTOR, [email, password, role]);
-        const user = result;
-        return user;
+        if(result.length>0){
+          const user = [result];
+          return user;
+        }else{
+          return { message: 'Instructor does not exist' };
+        }
       } else if (role === 3) {
         const [result] = await pool.query(sql.SIGN_IN_STUDENT, [email, password, role]);
-        const user = result;
-        return user;
+        if(result.length>0){
+          const user = [result];
+          return user;
+        }else{
+          return { message: 'Student does not exist' };
+        }
       }
 
     } catch (error) {
