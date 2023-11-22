@@ -41,7 +41,7 @@ module.exports = {
         if (isUserRegistered.length > 0) {
           return { message: 'Instructor is already registered' };
         }
-        const [result] = await pool.query(sql.REGISTER_USER, [profile_image, email, password, role, marital_status, country, organization, designation, qualification, register_date, first_name, last_name]);
+        const [result] = await pool.query(sql.REGISTER_USER, [profileFilePath, email, password, role, marital_status, country, organization, designation, qualification, register_date, first_name, last_name]);
         const user_id = result.insertId;
         await pool.query(sql.ADD_INSTRUCTOR, [user_id]);
         return { message: 'Instructor registered successfully' };
@@ -58,7 +58,7 @@ module.exports = {
         await pool.query(sql.ADD_STUDENT, [user_id, register_id, status ? status : 'active']);
         return isUserRegistered.length === 0 ? { message: 'Student registered successfully' } : { message: 'Student registered Again' };
         async function createUserAndReturnId() {
-          const [result] = await pool.query(sql.REGISTER_USER, [profile_image, email, password, role, marital_status, country, organization, designation, qualification, register_date, first_name, last_name]);
+          const [result] = await pool.query(sql.REGISTER_USER, [profileFilePath, email, password, role, marital_status, country, organization, designation, qualification, register_date, first_name, last_name]);
           return result.insertId;
         }
       }
