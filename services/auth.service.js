@@ -84,11 +84,11 @@ module.exports = {
         return user;
       } else if (role === 2) {
         const [result] = await pool.query(sql.SIGN_IN_INSTRUCTOR, [email, password, role]);
-        const user = [result[0]];
+        const user = result;
         return user;
       } else if (role === 3) {
         const [result] = await pool.query(sql.SIGN_IN_STUDENT, [email, password, role]);
-        const user = [result[0]];
+        const user = result;
         return user;
       }
 

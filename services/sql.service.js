@@ -145,6 +145,10 @@ VALUES(?, ?, ?, ?, ?);
 
 `,
 
+  GET_ATTENDENCE: `
+  SELECT * FROM student_attendence WHERE student_id=?;
+`,
+
   GET_QUIZ: `
   SELECT
     quiz.quiz_date,
