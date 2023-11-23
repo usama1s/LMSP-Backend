@@ -157,11 +157,25 @@ CREATE TABLE assignment_submitted (
     FOREIGN KEY (assignment_id) REFERENCES assignments(assignment_id)
 );
 
+
+CREATE TABLE assignment_status (
+    assignment_status_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_id INT,
+    assignment_id INT,
+    FOREIGN KEY (student_id) REFERENCES student(student_id),
+    FOREIGN KEY (assignment_id) REFERENCES assignments(assignment_id)
+);
+
+
 ALTER TABLE users MODIFY profile_picture VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 
-
+-- SELECT student_attendence.attendence_status
+-- FROM student_attendence
+-- LEFT JOIN student_enrollment ON student_enrollment.student_id = student_attendence.student_id
+-- LEFT JOIN program_plan ON program_plan.program_plan_id = student_enrollment.program_plan_id
+-- WHERE program_plan.course_id = 51 AND student_attendence.student_id=1 AND student_attendence.attendence_status=1 AND program_plan.program_id=17
 
 
 

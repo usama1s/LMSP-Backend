@@ -137,6 +137,12 @@ module.exports = {
    VALUES(?, ?, ?, ?, ?)
   
 `,
+  ASSIGNMENT_NOT_SUBMISSION: `
+INSERT INTO assignment_submitted
+(student_id, assignment_id)
+VALUES(?, ?)
+
+`,
 
   QUIZ_SUBMISSION: `
 INSERT INTO quiz_submitted
@@ -145,8 +151,27 @@ VALUES(?, ?, ?, ?, ?);
 
 `,
 
+  QUIZ_NOT_SUBMITTED: `
+INSERT INTO quiz_submitted
+(student_id, quiz_id)
+VALUES(?, ?);
+
+`,
+
   GET_ATTENDENCE: `
   SELECT * FROM student_attendence WHERE student_id=?;
+`,
+
+  GET_ATTENDENCE_FOR_CHART: `
+  SELECT COUNT(student_attendence.attendence_status) AS total_attendance_count
+  FROM student_attendence
+  LEFT JOIN student_enrollment ON student_enrollment.student_id = student_attendence.student_id
+  LEFT JOIN program_plan ON program_plan.program_plan_id = student_enrollment.program_plan_id
+  WHERE program_plan.course_id = ?
+    AND student_attendence.student_id = ?
+    AND student_attendence.attendence_status = ?
+    AND program_plan.program_id = ?;
+  
 `,
 
   GET_QUIZ: `

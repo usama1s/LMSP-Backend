@@ -37,6 +37,38 @@ module.exports = {
     }
   },
 
+  // ASSIGNMENT NOT SUBMITTED
+  async quizNotSubmit(req, res) {
+    try {
+      const submittedAssignmentDetails = req.body;
+      const { student_id, quizNotSubmit } = submittedAssignmentDetails;
+      const assignmentSubmitted = await studentService.quizNotSubmit(
+        student_id,
+        quizNotSubmit
+      );
+      res.status(200).json(assignmentSubmitted.message);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+
+  // ASSIGNMENT NOT SUBMITTED
+  async assignmentNotSubmitted(req, res) {
+    try {
+      const submittedAssignmentDetails = req.body;
+      const { student_id, assignment_id } = submittedAssignmentDetails;
+      const assignmentSubmitted = await studentService.assignmentNotSubmitted(
+        student_id,
+        assignment_id
+      );
+      res.status(200).json(assignmentSubmitted.message);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+
   // GET QUIZ
   async getQuiz(req, res) {
     try {
@@ -53,8 +85,24 @@ module.exports = {
   async getAttendence(req, res) {
     try {
       const student_id = req.params.student_id;
-      const quiz = await studentService.getAttendence(student_id);
-      res.status(200).json(quiz);
+      const attendence = await studentService.getAttendence(student_id);
+      res.status(200).json(attendence);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+
+  // GET ATTENDENCE FOR PIE CHART
+  async getAttendenceForChart(req, res) {
+    try {
+        const { student_id, course_id, program_id } = req.params;
+      const attendenceForChart = await studentService.getAttendenceForChart(
+        student_id,
+        course_id,
+        program_id
+      );
+      res.status(200).json(attendenceForChart);
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
