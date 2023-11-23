@@ -1,63 +1,83 @@
-const instructorService = require('../services/instructor.service');
-const convertBase64 = require('../util/convert.base64.js')
+const instructorService = require("../services/instructor.service");
+const convertBase64 = require("../util/convert.base64.js");
 module.exports = {
+  // INSTRUCTOR ADD QUIZES
+  async addQuiz(req, res) {
+    try {
+      const quizDetails = req.body;
+      const { program_plan_id, quiz_date, quiz_questions } = quizDetails;
 
-    // INSTRUCTOR ADD QUIZES
-    async addQuiz(req, res) {
-        try {
-            const quizDetails = req.body;
-            const { program_plan_id, quiz_date, quiz_questions } = quizDetails;
+      const quizId = await instructorService.addQuiz(
+        program_plan_id,
+        quiz_date
+      );
 
-            const quizId = await instructorService.addQuiz(program_plan_id, quiz_date);
+      for (const {
+        question,
+        options,
+        correctOption,
+        image,
+      } of quiz_questions) {
+        const quizPath = await convertBase64.base64ToJpg(image);
+        await instructorService.addQuizQuestion(
+          quizId,
+          question,
+          options,
+          quizPath,
+          correctOption
+        );
+      }
 
-            for (const { question, options, correctOption, image } of quiz_questions) {
+      return res.json("Quiz added successfully");
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
 
-                const quizPath = await convertBase64.base64ToJpg(image)
-                await instructorService.addQuizQuestion(quizId, question, options, quizPath, correctOption);
+  // INSTRUCTOR ADD ASSIGNMENT
+  async addAssignment(req, res) {
+    try {
+      const assignmentDetails = req.body;
 
-            }
+      const {
+        program_plan_id,
+        assignment_date,
+        assignment_file,
+        assignment_instruction,
+        assignment_title,
+      } = assignmentDetails;
 
-            return res.json('Quiz added successfully');
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ error: 'An error occurred' });
-        }
-    },
+      const assignmentPath = await convertBase64.base64ToPdf(assignment_file);
 
-    // INSTRUCTOR ADD ASSIGNMENT
-    async addAssignment(req, res) {
-        try {
-            const assignmentDetails = req.body;
+      await instructorService.addAssignment(
+        program_plan_id,
+        assignment_date,
+        assignmentPath,
+        assignment_instruction,
+        assignment_title,
+      );
 
-            const { program_plan_id, assignment_date, assignment_file } = assignmentDetails;
+      return res.json("Assignment added successfully");
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
 
-            const assignmentPath = await convertBase64.base64ToPdf(assignment_file)
-
-            await instructorService.addAssignment(program_plan_id, assignment_date, assignmentPath);
-
-            return res.json('Assignment added successfully');
-        } catch (error) {
-
-            console.error(error);
-            return res.status(500).json({ error: 'An error occurred' });
-
-        }
-    },
-
-    // MARK ATTENDENCE OF STUDENT
-    async markAttendence(req, res) {
-        try {
-
-            const attendenceDetails = req.body;
-            const { students, attendence_date } = attendenceDetails;
-            const marked = await instructorService.markAttendence(students, attendence_date);
-            return res.json(marked.message);
-
-        } catch (error) {
-
-            console.error(error);
-            return res.status(500).json({ error: 'An error occurred' });
-
-        }
-    },
-}
+  // MARK ATTENDENCE OF STUDENT
+  async markAttendence(req, res) {
+    try {
+      const attendenceDetails = req.body;
+      const { students, attendence_date } = attendenceDetails;
+      const marked = await instructorService.markAttendence(
+        students,
+        attendence_date
+      );
+      return res.json(marked.message);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+};
