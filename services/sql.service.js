@@ -92,9 +92,9 @@ module.exports = {
 `,
 
   ADD_ASSIGNMENT: `
-    INSERT INTO assignments
-    (program_plan_id, assignment_date, assignment_file)
-    VALUES(?, ?, ?)
+    INSERT INTO assignment
+    (program_plan_id, assignment_date, assignment_file, assignment_instruction, assignment_title)
+    VALUES(?, ?, ?, ?, ?)
   `,
 
   ADD_STUDENT_ATTENDENCE: `
@@ -216,19 +216,11 @@ WHERE
 
 GET_ASSIGNMENT: `
 SELECT
-  quiz.quiz_date,
-  quiz_question.question,
-  quiz_question.option_1,
-  quiz_question.option_2,
-  quiz_question.option_3,
-  quiz_question.option_4,
-  quiz_question.question_picture,
-  quiz_question.answer
+  assignments.assignment_file,assignments.assignment_date,assignments.assignment_instruction,assignments.assignment_title
 FROM
   student_enrollment
 INNER JOIN program_plan ON student_enrollment.program_plan_id = program_plan.program_plan_id
-INNER JOIN quiz ON quiz.program_plan_id = program_plan.program_plan_id
-INNER JOIN quiz_question ON quiz_question.quiz_question_id = quiz.quiz_id
+INNER JOIN assignments ON assignments.program_plan_id = program_plan.program_plan_id
 WHERE
   student_enrollment.student_id = ?
 `,
