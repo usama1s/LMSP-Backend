@@ -178,6 +178,23 @@ WHERE program_plan.course_id = ?
   
 `,
 
+  GET_COURSE_DETAILS_WITH_COURSE_ID: `
+SELECT
+    course.course_name,
+    users.first_name,
+    users.last_name,
+    program_plan.program_id
+FROM
+    users
+INNER JOIN instructor ON instructor.user_id = users.id
+LEFT JOIN program_plan ON instructor.instructor_id = program_plan.instructor_id
+LEFT JOIN course ON course.course_id = program_plan.course_id
+WHERE
+    course.course_id = ?
+;
+
+`,
+
   GET_QUIZ: `
   SELECT
     quiz.quiz_date,
@@ -196,6 +213,28 @@ INNER JOIN quiz_question ON quiz_question.quiz_question_id = quiz.quiz_id
 WHERE
     student_enrollment.student_id = ?
 `,
+
+GET_ASSIGNMENT: `
+SELECT
+  quiz.quiz_date,
+  quiz_question.question,
+  quiz_question.option_1,
+  quiz_question.option_2,
+  quiz_question.option_3,
+  quiz_question.option_4,
+  quiz_question.question_picture,
+  quiz_question.answer
+FROM
+  student_enrollment
+INNER JOIN program_plan ON student_enrollment.program_plan_id = program_plan.program_plan_id
+INNER JOIN quiz ON quiz.program_plan_id = program_plan.program_plan_id
+INNER JOIN quiz_question ON quiz_question.quiz_question_id = quiz.quiz_id
+WHERE
+  student_enrollment.student_id = ?
+`,
+
+
+
   // ADMIN____________________________________________________________________________________________________________
 
   CHECK_ADMIN_REGISTERED: `

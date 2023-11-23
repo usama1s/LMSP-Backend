@@ -9,8 +9,11 @@ router.post('/submit-assignment', studentController.submitAssignment);
 router.post('/assignment-not-submitted', studentController.assignmentNotSubmitted);
 router.post('/quiz-not-submitted', studentController.quizNotSubmit);
 router.get('/get-quiz/:student_id', studentController.getQuiz);
+router.get('/get-assignment/:student_id', studentController.getAssignment);
 router.get('/get-attendence/:student_id', studentController.getAttendence);
 router.get('/get-attendence-for-chart/:student_id/:course_id/:program_id', studentController.getAttendenceForChart);
+router.get('/get-course/:course_id', studentController.getCourseDetailsWithId);
+
 
 
 

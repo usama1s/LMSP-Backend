@@ -68,6 +68,16 @@ module.exports = {
     }
   },
 
+  // GET ASSIGNMENT
+  async getAssignment(student_id) {
+    try {
+      const [assignment] = await pool.query(sql.GET_ASSIGNMENT, student_id);
+      return { assignment };
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
   // GET QUIZ
   async getAttendence(student_id) {
     try {
@@ -82,6 +92,7 @@ module.exports = {
     }
   },
 
+  // GET ATTENDENCE FOR PIE CHART
   async getAttendenceForChart(student_id, course_id, program_id) {
     try {
       const [totalPresents] = await pool.query(sql.GET_ATTENDENCE_FOR_CHART, [
@@ -97,6 +108,18 @@ module.exports = {
         program_id,
       ]);
       return [totalPresents[0], totalAbsents[0]];
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  // GET ATTENDENCE FOR PIE CHART
+  async getCourseDetailsWithId(course_id) {
+    try {
+      const [course] = await pool.query(sql.GET_COURSE_DETAILS_WITH_COURSE_ID, [
+        course_id,
+      ]);
+      return course;
     } catch (error) {
       console.log(error);
     }
