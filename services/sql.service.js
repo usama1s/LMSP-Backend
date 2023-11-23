@@ -178,7 +178,7 @@ WHERE program_plan.course_id = ?
   
 `,
 
-  GET_COURSE_DETAILS_WITH_COURSE_ID: `
+  GET_COURSE_DETAILS_WITH_STUDENT_ID: `
 SELECT
     course.course_name,
     users.first_name,

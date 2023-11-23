@@ -122,11 +122,11 @@ module.exports = {
   },
 
   // GET COURSE WITH COURSE ID
-  async getCourseDetailsWithId(req, res) {
+  async getCourseDetailsWithStudentId(req, res) {
     try {
-      const { course_id} = req.params;
-      const course = await studentService.getCourseDetailsWithId(
-        course_id
+      const { student_id} = req.params;
+      const course = await studentService.getCourseDetailsWithStudentId(
+        student_id
       );
       res.status(200).json(course);
     } catch (error) {

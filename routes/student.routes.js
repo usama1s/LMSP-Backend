@@ -12,7 +12,7 @@ router.get('/get-quiz/:student_id', studentController.getQuiz);
 router.get('/get-assignment/:student_id', studentController.getAssignment);
 router.get('/get-attendence/:student_id', studentController.getAttendence);
 router.get('/get-attendence-for-chart/:student_id/:course_id/:program_id', studentController.getAttendenceForChart);
-router.get('/get-course/:course_id', studentController.getCourseDetailsWithId);
+router.get('/get-course/:student_id', studentController.getCourseDetailsWithStudentId);
 
 
 
