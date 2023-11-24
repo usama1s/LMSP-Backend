@@ -179,18 +179,20 @@ WHERE program_plan.course_id = ?
 `,
 
   GET_COURSE_DETAILS_WITH_STUDENT_ID: `
-SELECT
-    course.course_name,
-    users.first_name,
-    users.last_name,
-    program_plan.program_id
+  SELECT
+  course.course_id,
+  course.course_name,
+  course.course_description,
+  users.first_name,
+  users.last_name
 FROM
-    users
-INNER JOIN instructor ON instructor.user_id = users.id
-LEFT JOIN program_plan ON instructor.instructor_id = program_plan.instructor_id
+  student_enrollment
+LEFT JOIN program_plan ON program_plan.program_plan_id = student_enrollment.program_plan_id
+INNER JOIN instructor ON instructor.instructor_id = program_plan.instructor_id
+INNER JOIN users ON users.id = instructor.user_id
 LEFT JOIN course ON course.course_id = program_plan.course_id
 WHERE
-    course.course_id = ?
+  student_enrollment.student_id = ?
 ;
 
 `,

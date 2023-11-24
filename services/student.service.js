@@ -162,7 +162,7 @@ module.exports = {
   },
 
   // GET ATTENDENCE FOR PIE CHART
-  async getCourseDetailsWithStudentId(course_id) {
+  async getCourseDetailsWithStudentId(student_id) {
     try {
       const [course] = await pool.query(
         sql.GET_COURSE_DETAILS_WITH_STUDENT_ID,
