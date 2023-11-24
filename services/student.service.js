@@ -2,6 +2,7 @@ const sql = require("../services/sql.service");
 const pool = require("../db.conn");
 
 module.exports = {
+  
   // SUBMIT QUIZ
   async submitQuiz(submittedQuizDetails) {
     const { student_id, quiz_id, total_marks, obtained_marks, grade, status } =

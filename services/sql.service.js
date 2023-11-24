@@ -103,6 +103,17 @@ module.exports = {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `,
 
+  GET_STUDENTS_PROGRAM_PLAN: `
+  SELECT
+  *
+FROM
+  users
+LEFT JOIN student ON student.user_id = users.id
+INNER JOIN student_enrollment ON student_enrollment.student_id = student.student_id
+INNER JOIN program_plan ON program_plan.program_plan_id = student_enrollment.program_plan_id
+WHERE program_plan.program_plan_id=?
+  `,
+
   MARK_ATTENDENCE: `
    INSERT INTO student_attendence
    (student_id, attendence_status, attendence_date)
@@ -218,7 +229,7 @@ LEFT JOIN program_plan on program_plan.program_plan_id=quiz.program_plan_id
 WHERE quiz_submitted.student_id=? AND program_plan.course_id=? AND quiz_submitted.quiz_id=?
 `,
 
-GET_ASSIGNMENTS: `
+  GET_ASSIGNMENTS: `
 SELECT
 *
 FROM

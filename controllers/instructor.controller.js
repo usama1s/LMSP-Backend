@@ -55,7 +55,7 @@ module.exports = {
         assignment_date,
         assignmentPath,
         assignment_instruction,
-        assignment_title,
+        assignment_title
       );
 
       return res.json("Assignment added successfully");
@@ -75,6 +75,19 @@ module.exports = {
         attendence_date
       );
       return res.json(marked.message);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+
+  async getStudents(req, res) {
+    try {
+      const { program_plan_id } = req.params;
+
+      const students = await instructorService.getStudents(program_plan_id);
+
+      return res.json(students);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "An error occurred" });

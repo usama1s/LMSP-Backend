@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.post('/add-quiz', instructorController.addQuiz);
 router.post('/add-assignment' ,instructorController.addAssignment);
+router.get('/get-students-by-program-plan/:program_plan_id' ,instructorController.getStudents);
+
 router.post('/mark-attendence' ,instructorController.markAttendence);
 
 

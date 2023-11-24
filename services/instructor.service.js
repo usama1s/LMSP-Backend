@@ -75,4 +75,16 @@ module.exports = {
       console.log(error);
     }
   },
+
+  // INSTRUCTOR ADD ASSIGNMENTS
+  async getStudents(program_plan_id) {
+    try {
+      const [students] = await pool.query(sql.GET_STUDENTS_PROGRAM_PLAN, [
+        program_plan_id,
+      ]);
+      return students;
+    } catch (error) {
+      console.log(error);
+    }
+  },
 };
