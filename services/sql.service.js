@@ -196,25 +196,45 @@ WHERE
 `,
 
   GET_QUIZ: `
-  SELECT
-    *
+SELECT
+*
 FROM
-    quiz_submitted
+quiz_question
+INNER JOIN quiz ON quiz.quiz_id = quiz_question.quiz_id
+LEFT jOIN program_plan ON program_plan.program_plan_id=quiz.program_plan_id
+WHERE program_plan.course_id=?
+`,
+
+  GET_QUIZ_STATUS: `
+SELECT
+*
+FROM
+quiz_submitted
 INNER JOIN student ON quiz_submitted.student_id =student.student_id
 INNER JOIN quiz on quiz.quiz_id=quiz_submitted.quiz_id
 LEFT JOIN program_plan on program_plan.program_plan_id=quiz.program_plan_id
-WHERE quiz_submitted.student_id=? AND program_plan.course_id=?
+WHERE quiz_submitted.student_id=? AND program_plan.course_id=? AND quiz_submitted.quiz_id=?
 `,
 
-  GET_ASSIGNMENT: `
+GET_ASSIGNMENTS: `
+SELECT
+*
+FROM
+assignments
+LEFT jOIN program_plan ON program_plan.program_plan_id=assignments.program_plan_id
+WHERE program_plan.course_id=?
+`,
+
+  GET_ASSIGNMENT_STATUS: `
   SELECT
   *
 FROM
   assignment_submitted
-INNER JOIN student ON assignment_submitted.student_id =student.student_id
-INNER JOIN assignments on assignments.assignment_id=assignment_submitted.assignment_id
-LEFT JOIN program_plan on program_plan.program_plan_id=assignments.program_plan_id
-WHERE assignment_submitted.student_id=? AND program_plan.course_id=?
+INNER JOIN student ON assignment_submitted.student_id = student.student_id
+INNER JOIN assignments ON assignments.assignment_id = assignment_submitted.assignment_id
+LEFT JOIN program_plan ON program_plan.program_plan_id = assignments.program_plan_id
+WHERE
+  assignment_submitted.student_id = ? AND program_plan.course_id = ? AND assignment_submitted.assignment_id = ?
 `,
 
   // ADMIN____________________________________________________________________________________________________________

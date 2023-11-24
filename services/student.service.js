@@ -59,11 +59,35 @@ module.exports = {
     }
   },
 
-  // GET QUIZ
+  // GET QUIZ STATUS
   async getQuiz(student_id, course_id) {
     try {
-      const [quiz] = await pool.query(sql.GET_QUIZ, [student_id, course_id]);
-      return { quiz };
+      const [quizzes] = await pool.query(sql.GET_QUIZ, course_id);
+
+      const quizToAttempt = [];
+
+      for (const quiz of quizzes) {
+        const [quizStatus] = await pool.query(sql.GET_QUIZ_STATUS, [
+          student_id,
+          course_id,
+          quiz.quiz_id,
+        ]);
+        if (quizStatus.length === 0) {
+          quizToAttempt.push(quiz);
+        }
+      }
+      const modifiedResult = {
+        quizData: {
+          ...quizToAttempt.reduce((acc, quiz) => {
+            const quizId = quiz.quiz_id;
+            acc[quizId] = acc[quizId] || [];
+            acc[quizId].push(quiz);
+            return acc;
+          }, {}),
+        },
+      };
+
+      return modifiedResult;
     } catch (error) {
       console.log(error);
     }
@@ -72,11 +96,31 @@ module.exports = {
   // GET ASSIGNMENT
   async getAssignment(student_id, course_id) {
     try {
-      const [assignment] = await pool.query(sql.GET_ASSIGNMENT, [
-        student_id,
-        course_id,
-      ]);
-      return { assignment };
+      const [assignments] = await pool.query(sql.GET_ASSIGNMENTS, course_id);
+
+      const assignmentsToAttempt = [];
+      for (const assignment of assignments) {
+        const [assignmentStatus] = await pool.query(sql.GET_ASSIGNMENT_STATUS, [
+          student_id,
+          course_id,
+          assignment.assignment_id,
+        ]);
+        if (assignmentStatus.length == 0) {
+          assignmentsToAttempt.push(assignment);
+        }
+      }
+      const modifiedResult = {
+        assignmentData: {
+          ...assignmentsToAttempt.reduce((acc, assignment) => {
+            const assignment_id = assignment.assignment_id;
+            acc[assignment_id] = acc[assignment_id] || [];
+            acc[assignment_id].push(assignment);
+            return acc;
+          }, {}),
+        },
+      };
+
+      return modifiedResult;
     } catch (error) {
       console.log(error);
     }

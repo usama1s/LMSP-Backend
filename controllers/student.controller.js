@@ -69,11 +69,14 @@ module.exports = {
     }
   },
 
-  // GET QUIZ
+  // GET QUIZ 
   async getQuiz(req, res) {
     try {
       const { student_id, course_id } = req.params;
-      const quiz = await studentService.getQuiz(student_id, course_id);
+      const quiz = await studentService.getQuiz(
+        student_id,
+        course_id,
+      );
       res.status(200).json(quiz);
     } catch (error) {
       console.error(error);
