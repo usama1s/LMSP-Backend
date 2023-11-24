@@ -72,8 +72,8 @@ module.exports = {
   // GET QUIZ
   async getQuiz(req, res) {
     try {
-      const student_id = req.params.student_id;
-      const quiz = await studentService.getQuiz(student_id);
+      const { student_id, course_id } = req.params;
+      const quiz = await studentService.getQuiz(student_id, course_id);
       res.status(200).json(quiz);
     } catch (error) {
       console.error(error);
@@ -84,8 +84,11 @@ module.exports = {
   // GET ASSIGNMENT
   async getAssignment(req, res) {
     try {
-      const student_id = req.params.student_id;
-      const Assignment = await studentService.getAssignment(student_id);
+      const { student_id, course_id } = req.params;
+      const Assignment = await studentService.getAssignment(
+        student_id,
+        course_id
+      );
       res.status(200).json(Assignment);
     } catch (error) {
       console.error(error);
@@ -124,7 +127,7 @@ module.exports = {
   // GET COURSE WITH COURSE ID
   async getCourseDetailsWithStudentId(req, res) {
     try {
-      const { student_id} = req.params;
+      const { student_id } = req.params;
       const course = await studentService.getCourseDetailsWithStudentId(
         student_id
       );

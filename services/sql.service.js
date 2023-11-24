@@ -86,13 +86,13 @@ module.exports = {
   `,
 
   ADD_QUIZ_QUESTION: `
-   INSERT INTO lms.quiz_question
+   INSERT INTO quiz_question
    (quiz_id, question, option_1, option_2, option_3, option_4, question_picture, answer)
    VALUES(?, ?, ?, ?, ?, ?, ?,?)
 `,
 
   ADD_ASSIGNMENT: `
-    INSERT INTO assignment
+    INSERT INTO assignments
     (program_plan_id, assignment_date, assignment_file, assignment_instruction, assignment_title)
     VALUES(?, ?, ?, ?, ?)
   `,
@@ -146,8 +146,8 @@ VALUES(?, ?)
 
   QUIZ_SUBMISSION: `
 INSERT INTO quiz_submitted
-(student_id, quiz_id, total_marks, obtained_marks, grade)
-VALUES(?, ?, ?, ?, ?);
+(student_id, quiz_id, total_marks, obtained_marks, grade, quiz_status)
+VALUES(?, ?, ?, ?, ?, ?);
 
 `,
 
@@ -197,35 +197,25 @@ WHERE
 
   GET_QUIZ: `
   SELECT
-    quiz.quiz_date,
-    quiz_question.question,
-    quiz_question.option_1,
-    quiz_question.option_2,
-    quiz_question.option_3,
-    quiz_question.option_4,
-    quiz_question.question_picture,
-    quiz_question.answer
+    *
 FROM
-    student_enrollment
-INNER JOIN program_plan ON student_enrollment.program_plan_id = program_plan.program_plan_id
-INNER JOIN quiz ON quiz.program_plan_id = program_plan.program_plan_id
-INNER JOIN quiz_question ON quiz_question.quiz_question_id = quiz.quiz_id
-WHERE
-    student_enrollment.student_id = ?
+    quiz_submitted
+INNER JOIN student ON quiz_submitted.student_id =student.student_id
+INNER JOIN quiz on quiz.quiz_id=quiz_submitted.quiz_id
+LEFT JOIN program_plan on program_plan.program_plan_id=quiz.program_plan_id
+WHERE quiz_submitted.student_id=? AND program_plan.course_id=?
 `,
 
-GET_ASSIGNMENT: `
-SELECT
-  assignments.assignment_file,assignments.assignment_date,assignments.assignment_instruction,assignments.assignment_title
+  GET_ASSIGNMENT: `
+  SELECT
+  *
 FROM
-  student_enrollment
-INNER JOIN program_plan ON student_enrollment.program_plan_id = program_plan.program_plan_id
-INNER JOIN assignments ON assignments.program_plan_id = program_plan.program_plan_id
-WHERE
-  student_enrollment.student_id = ?
+  assignment_submitted
+INNER JOIN student ON assignment_submitted.student_id =student.student_id
+INNER JOIN assignments on assignments.assignment_id=assignment_submitted.assignment_id
+LEFT JOIN program_plan on program_plan.program_plan_id=assignments.program_plan_id
+WHERE assignment_submitted.student_id=? AND program_plan.course_id=?
 `,
-
-
 
   // ADMIN____________________________________________________________________________________________________________
 

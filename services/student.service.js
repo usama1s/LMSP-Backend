@@ -4,7 +4,7 @@ const pool = require("../db.conn");
 module.exports = {
   // SUBMIT QUIZ
   async submitQuiz(submittedQuizDetails) {
-    const { student_id, quiz_id, total_marks, obtained_marks, grade } =
+    const { student_id, quiz_id, total_marks, obtained_marks, grade, status } =
       submittedQuizDetails;
     await pool.query(sql.QUIZ_SUBMISSION, [
       student_id,
@@ -12,6 +12,7 @@ module.exports = {
       total_marks,
       obtained_marks,
       grade,
+      status,
     ]);
     return { message: "Quiz submitted successfully." };
   },
@@ -59,9 +60,9 @@ module.exports = {
   },
 
   // GET QUIZ
-  async getQuiz(student_id) {
+  async getQuiz(student_id, course_id) {
     try {
-      const [quiz] = await pool.query(sql.GET_QUIZ, student_id);
+      const [quiz] = await pool.query(sql.GET_QUIZ, [student_id, course_id]);
       return { quiz };
     } catch (error) {
       console.log(error);
@@ -69,9 +70,12 @@ module.exports = {
   },
 
   // GET ASSIGNMENT
-  async getAssignment(student_id) {
+  async getAssignment(student_id, course_id) {
     try {
-      const [assignment] = await pool.query(sql.GET_ASSIGNMENT, student_id);
+      const [assignment] = await pool.query(sql.GET_ASSIGNMENT, [
+        student_id,
+        course_id,
+      ]);
       return { assignment };
     } catch (error) {
       console.log(error);
@@ -116,9 +120,10 @@ module.exports = {
   // GET ATTENDENCE FOR PIE CHART
   async getCourseDetailsWithStudentId(course_id) {
     try {
-      const [course] = await pool.query(sql.GET_COURSE_DETAILS_WITH_STUDENT_ID, [
-        student_id,
-      ]);
+      const [course] = await pool.query(
+        sql.GET_COURSE_DETAILS_WITH_STUDENT_ID,
+        [student_id]
+      );
       return course;
     } catch (error) {
       console.log(error);

@@ -137,15 +137,16 @@ module.exports = {
     }
   },
 
-  // ADD PROGRAM
-  async addProgram(programDetails) {
-    try {
-      const programName = programDetails.program_name;
-      return { message: "Program added" };
-    } catch (error) {
-      throw error;
-    }
-  },
+  // // ADD PROGRAM
+  // async addProgram(programDetails) {
+  //   try {
+  //     const { program_name, start_date, end_date } = programDetails;
+  //     await pool.query(sql.ADD_PROGRAM, [program_name, start_date, end_date]);
+  //     return { message: "Program added" };
+  //   } catch (error) {
+  //     throw error;
+  //   }
+  // },
 
   // ADD PROGRAM PLAN
   async addProgramPlan(programDetails) {
