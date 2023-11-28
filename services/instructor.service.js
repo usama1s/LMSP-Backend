@@ -87,4 +87,16 @@ module.exports = {
       console.log(error);
     }
   },
+
+  // GET COURSES BY INSTRUCTOR ID
+  async getCoursesByInstructorId(instructor_id) {
+    try {
+      const [courses] = await pool.query(sql.GET_COURSES_BY_INSTRUCTOR, [
+        instructor_id,
+      ]);
+      return courses;
+    } catch (error) {
+      console.log(error);
+    }
+  },
 };

@@ -18,6 +18,8 @@ router.get('/get-all-item', adminController.getAllItems);
 router.get('/get-all-courses', adminController.getAllCourses);
 router.get('/get-all-instructors', adminController.getAllInstructor);
 router.get('/get-all-program_plan', adminController.getAllProgramPlan);
+router.get('/get-whole-program', adminController.getWholeProgram);
+
 router.get('/get-all-admins', adminController.getAllAdmins);
 
 module.exports = router;

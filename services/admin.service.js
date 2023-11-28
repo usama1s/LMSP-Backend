@@ -137,17 +137,6 @@ module.exports = {
     }
   },
 
-  // // ADD PROGRAM
-  // async addProgram(programDetails) {
-  //   try {
-  //     const { program_name, start_date, end_date } = programDetails;
-  //     await pool.query(sql.ADD_PROGRAM, [program_name, start_date, end_date]);
-  //     return { message: "Program added" };
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // },
-
   // ADD PROGRAM PLAN
   async addProgramPlan(programDetails) {
     try {
@@ -181,7 +170,7 @@ module.exports = {
     }
   },
 
-  //GET ITEM ID
+  // GET ALL PROGRAM PLAN 
   async getAllProgramPlan() {
     try {
       const [results] = await pool.query(sql.GET_PROGRAM_PLAN);
@@ -272,7 +261,7 @@ module.exports = {
     }
   },
 
-  //GET ALL COURSES
+  // GET ALL COURSES
   async getAllInstructor() {
     try {
       const [instructors] = await pool.query(sql.GET_ALL_INSTRUCTORS);
@@ -305,7 +294,7 @@ module.exports = {
     }
   },
 
-  //GET ALL ADMINS
+  // GET ALL ADMINS
   async getAllAdmins() {
     try {
       const [admins] = await pool.query(sql.GET_ALL_ADMINS);
@@ -314,4 +303,51 @@ module.exports = {
       console.log(error);
     }
   },
+
+  //GET WHOLE PROGRAM DETAILS
+  async getWholeProgram() {
+    try {
+      const [results] = await pool.query(sql.GET_WHOLE_PROGRAM);
+      const transformedResults = {};
+      for (const result of results) {
+        const { program_name, start_date, end_date, first_name, last_name, course_name, class_date, class_time } = result;
+        if (!transformedResults[program_name]) {
+          transformedResults[program_name] = {
+            program_name,
+            start_date,
+            end_date,
+            courses: [],
+          };
+        }
+        const course = transformedResults[program_name].courses.find(course => course.course_name === course_name);
+        if (!course) {
+          transformedResults[program_name].courses.push({
+            first_name,
+            last_name,
+            course_name,
+            classes: [
+              {
+                class_date,
+                class_time,
+              },
+            ],
+          });
+        } else {
+          course.classes.push({
+            class_date,
+            class_time,
+          });
+          // Sort the classes array by class_date
+          course.classes.sort((a, b) => new Date(a.class_date) - new Date(b.class_date));
+        }
+      }
+  
+      const finalResults = Object.values(transformedResults);
+  
+      return finalResults;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
 };

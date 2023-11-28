@@ -119,6 +119,17 @@ WHERE program_plan.program_plan_id=?
    (student_id, attendence_status, attendence_date)
    VALUES(?, ?, ?)
 `,
+  GET_COURSES_BY_INSTRUCTOR: `
+SELECT
+    course.course_name,
+    course.course_description
+FROM
+    program_plan
+INNER JOIN instructor ON program_plan.instructor_id = instructor.instructor_id
+INNER JOIN course ON course.course_id = program_plan.course_id
+WHERE
+    instructor.instructor_id = ?
+`,
 
   // STUDENT____________________________________________________________________________________________________________
 
@@ -250,6 +261,28 @@ WHERE
   assignment_submitted.student_id = ? AND program_plan.course_id = ? AND assignment_submitted.assignment_id = ?
 `,
 
+  GET_ALL_GRADES_QUIZES: `
+SELECT
+    *
+FROM
+    quiz_submitted
+INNER JOIN quiz ON quiz.quiz_id = quiz_submitted.quiz_id
+INNER JOIN program_plan ON program_plan.program_plan_id = quiz.program_plan_id
+INNER JOIN course ON course.course_id = program_plan.course_id
+WHERE
+    quiz_submitted.student_id =? AND course.course_id=?`,
+
+  GET_ALL_GRADES_ASSIGNMENTS: `
+  SELECT
+  *
+FROM
+  assignment_submitted
+INNER JOIN assignments ON assignments.assignment_id = assignment_submitted.assignment_id
+INNER JOIN program_plan ON program_plan.program_plan_id = assignments.program_plan_id
+INNER JOIN course ON course.course_id = program_plan.course_id
+WHERE
+  assignment_submitted.student_id =? AND course.course_id=?`,
+
   // ADMIN____________________________________________________________________________________________________________
 
   CHECK_ADMIN_REGISTERED: `
@@ -371,4 +404,25 @@ WHERE
     inner join admin on admin.user_id = users.id 
     where admin.admin_type > 1
   `,
+
+  GET_WHOLE_PROGRAM: `
+  SELECT
+  program.program_name,
+  program.start_date,
+  program.end_date,
+  users.first_name,
+  users.last_name,
+  course.course_name,
+  module.module_name,
+  time_table.class_date,
+  time_table.class_time
+FROM
+  program
+INNER JOIN program_plan ON program_plan.program_id = program.program_id
+INNER JOIN time_table on time_table.program_plan_id=program_plan.program_plan_id
+INNER JOIN instructor ON instructor.instructor_id = program_plan.instructor_id
+RIGHT JOIN users ON users.id = instructor.user_id
+INNER JOIN course ON program_plan.course_id = course.course_id
+INNER JOIN module ON module.course_id = course.course_id
+`,
 };

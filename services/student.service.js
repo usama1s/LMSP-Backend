@@ -2,7 +2,6 @@ const sql = require("../services/sql.service");
 const pool = require("../db.conn");
 
 module.exports = {
-  
   // SUBMIT QUIZ
   async submitQuiz(submittedQuizDetails) {
     const { student_id, quiz_id, total_marks, obtained_marks, grade, status } =
@@ -170,6 +169,23 @@ module.exports = {
         [student_id]
       );
       return course;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  // GET GRADES
+  async getAllGrades(student_id, course_id) {
+    try {
+      const [quizes] = await pool.query(sql.GET_ALL_GRADES_QUIZES, [
+        student_id,
+        course_id,
+      ]);
+      const [assignments] = await pool.query(sql.GET_ALL_GRADES_ASSIGNMENTS, [
+        student_id,
+        course_id,
+      ]);
+      return [{quizes},{assignments}]
     } catch (error) {
       console.log(error);
     }

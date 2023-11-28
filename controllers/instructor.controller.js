@@ -94,4 +94,16 @@ module.exports = {
       return res.status(500).json({ error: "An error occurred" });
     }
   },
+
+  // GET STUDENTS WITH PROGAM PLAN ID
+  async getCoursesByInstructorId(req, res) {
+    try {
+      const { instructor_id } = req.params;
+      const courses = await instructorService.getCoursesByInstructorId(instructor_id);
+      return res.json(courses);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
 };
