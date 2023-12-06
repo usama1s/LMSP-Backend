@@ -229,15 +229,22 @@ LEFT jOIN program_plan ON program_plan.program_plan_id=quiz.program_plan_id
 WHERE program_plan.course_id=?
 `,
 
+  //   GET_QUIZ_STATUS: `
+  // SELECT
+  // *
+  // FROM
+  // quiz_submitted
+  // INNER JOIN student ON quiz_submitted.student_id =student.student_id
+  // INNER JOIN quiz on quiz.quiz_id=quiz_submitted.quiz_id
+  // LEFT JOIN program_plan on program_plan.program_plan_id=quiz.program_plan_id
+  // WHERE quiz_submitted.student_id=? AND program_plan.course_id=? AND quiz_submitted.quiz_id=?
+  // `,
+
   GET_QUIZ_STATUS: `
-SELECT
-*
-FROM
-quiz_submitted
-INNER JOIN student ON quiz_submitted.student_id =student.student_id
-INNER JOIN quiz on quiz.quiz_id=quiz_submitted.quiz_id
-LEFT JOIN program_plan on program_plan.program_plan_id=quiz.program_plan_id
-WHERE quiz_submitted.student_id=? AND program_plan.course_id=? AND quiz_submitted.quiz_id=?
+SELECT *
+FROM quiz_submitted
+WHERE student_id = ? AND quiz_id = ?;
+
 `,
 
   GET_ASSIGNMENTS: `
@@ -249,16 +256,22 @@ LEFT jOIN program_plan ON program_plan.program_plan_id=assignments.program_plan_
 WHERE program_plan.course_id=?
 `,
 
+  //   GET_ASSIGNMENT_STATUS: `
+  //   SELECT
+  //   *
+  // FROM
+  //   assignment_submitted
+  // INNER JOIN student ON assignment_submitted.student_id = student.student_id
+  // INNER JOIN assignments ON assignments.assignment_id = assignment_submitted.assignment_id
+  // LEFT JOIN program_plan ON program_plan.program_plan_id = assignments.program_plan_id
+  // WHERE
+  //   assignment_submitted.student_id = ? AND program_plan.course_id = ? AND assignment_submitted.assignment_id = ?
+  // `,
+
   GET_ASSIGNMENT_STATUS: `
-  SELECT
-  *
-FROM
-  assignment_submitted
-INNER JOIN student ON assignment_submitted.student_id = student.student_id
-INNER JOIN assignments ON assignments.assignment_id = assignment_submitted.assignment_id
-LEFT JOIN program_plan ON program_plan.program_plan_id = assignments.program_plan_id
-WHERE
-  assignment_submitted.student_id = ? AND program_plan.course_id = ? AND assignment_submitted.assignment_id = ?
+SELECT *
+FROM assignment_submitted
+WHERE student_id = ? AND assignment_id = ?;
 `,
 
   GET_ALL_GRADES_QUIZES: `
@@ -306,8 +319,8 @@ WHERE
 
   ADD_MODULE: `
     INSERT INTO module
-    (course_id, module_name)
-    VALUES (?, ?)
+    (course_id, module_name,instructor_id)
+    VALUES (?, ?, ?)
   `,
 
   ADD_TOPIC: `
@@ -398,6 +411,51 @@ WHERE
   VALUES(?, ?, ?, ?)
   `,
 
+  CHECK_EXISTING_ENROLLMENT: `
+  SELECT *
+  FROM student_enrollment
+  WHERE student_id = ? AND program_status = 1
+`,
+  //Get all enrolled students with details
+  GET_ALL_STUDENTS_WITH_ENROLLMENT: `
+  SELECT
+    student_enrollment.*,
+    student.*,
+    program_plan.*,
+    program.*,
+    course.*
+  FROM
+    student_enrollment
+  INNER JOIN student ON student_enrollment.student_id = student.student_id
+  INNER JOIN program_plan ON student_enrollment.program_plan_id = program_plan.program_plan_id
+  INNER JOIN program ON program_plan.program_id = program.program_id
+  INNER JOIN course ON program_plan.course_id = course.course_id
+`,
+
+  // GET ENROLLMENT DETAILS FOR A SPECIFIC STUDENT
+
+  GET_STUDENT_ENROLLMENT_DETAILS: `
+  SELECT
+    student_enrollment.*,
+    program_plan.*,
+    program.*,
+    course.*
+  FROM
+    student_enrollment
+  INNER JOIN program_plan ON student_enrollment.program_plan_id = program_plan.program_plan_id
+  INNER JOIN program ON program_plan.program_id = program.program_id
+  INNER JOIN course ON program_plan.course_id = course.course_id
+  WHERE student_enrollment.student_id = ?
+`,
+
+  // UPDATE ENROLLED STATUS
+
+  UPDATE_STUDENT_STATUS: `
+  UPDATE student_enrollment
+  SET program_status = ?
+  WHERE student_id = ? AND program_plan_id = ?
+`,
+
   GET_ALL_ADMINS: `
     SELECT *
     FROM users
@@ -406,23 +464,44 @@ WHERE
   `,
 
   GET_WHOLE_PROGRAM: `
-  SELECT
-  program.program_name,
-  program.start_date,
-  program.end_date,
-  users.first_name,
-  users.last_name,
-  course.course_name,
-  module.module_name,
-  time_table.class_date,
-  time_table.class_time
-FROM
-  program
-INNER JOIN program_plan ON program_plan.program_id = program.program_id
-INNER JOIN time_table on time_table.program_plan_id=program_plan.program_plan_id
-INNER JOIN instructor ON instructor.instructor_id = program_plan.instructor_id
-RIGHT JOIN users ON users.id = instructor.user_id
-INNER JOIN course ON program_plan.course_id = course.course_id
-INNER JOIN module ON module.course_id = course.course_id
-`,
+    SELECT
+    program.program_name,
+    program.start_date,
+    program.end_date,
+    users.first_name,
+    users.last_name,
+    course.course_name,
+    module.module_name,
+    time_table.class_date,
+    time_table.class_time
+  FROM
+    program
+  INNER JOIN program_plan ON program_plan.program_id = program.program_id
+  INNER JOIN time_table on time_table.program_plan_id=program_plan.program_plan_id
+  INNER JOIN instructor ON instructor.instructor_id = program_plan.instructor_id
+  RIGHT JOIN users ON users.id = instructor.user_id
+  INNER JOIN course ON program_plan.course_id = course.course_id
+  INNER JOIN module ON module.course_id = course.course_id
+  `,
+
+  //   GET_WHOLE_PROGRAM: `
+  //   SELECT
+  //     program.program_id,
+  //     program.program_name,
+  //     program.start_date,
+  //     program.end_date,
+  //     users.first_name,
+  //     users.last_name,
+  //     course.course_name,
+  //     time_table.class_date,
+  //     time_table.class_time
+  //   FROM
+  //     program
+  //   LEFT JOIN program_plan ON program_plan.program_id = program.program_id
+  //   INNER JOIN instructor ON instructor.instructor_id = program_plan.instructor_id
+  //   RIGHT JOIN users ON users.id = instructor.user_id
+  //   INNER JOIN course ON program_plan.course_id = course.course_id
+  //   INNER JOIN module ON module.course_id = course.course_id
+  //   LEFT JOIN time_table ON time_table.program_plan_id = program_plan.program_plan_id
+  // `,
 };

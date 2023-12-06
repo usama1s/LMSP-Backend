@@ -89,7 +89,7 @@ module.exports = {
   async getAllProgramPlan(req, res) {
     try {
       const result = await adminService.getAllProgramPlan();
-      return res.status(200).json( result );
+      return res.status(200).json(result);
     } catch (error) {
       return res.status(500).json({ error: "An error occurred" });
     }
@@ -140,6 +140,32 @@ module.exports = {
     }
   },
 
+  // GET ALL ENROLLED STUDENTS
+  async getAllStudentsWithEnrollment(req, res) {
+    try {
+      const result = await adminService.getAllStudentsWithEnrollment();
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+
+  // UPDATE ENROLLED STUDENT
+
+  async updateStudentStatus(req, res) {
+    const { student_id, program_plan_id, program_status } = req.body;
+    try {
+      const result = await adminService.updateStudentStatus(
+        student_id,
+        program_plan_id,
+        program_status
+      );
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+
   //GET ALL ADMINS
   async getAllAdmins(req, res) {
     try {
@@ -154,7 +180,7 @@ module.exports = {
   async getWholeProgram(req, res) {
     try {
       const result = await adminService.getWholeProgram();
-      return res.status(200).json( result );
+      return res.status(200).json(result);
     } catch (error) {
       return res.status(500).json({ error: "An error occurred" });
     }

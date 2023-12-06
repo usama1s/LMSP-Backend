@@ -69,9 +69,9 @@ module.exports = {
       for (const quiz of quizzes) {
         const [quizStatus] = await pool.query(sql.GET_QUIZ_STATUS, [
           student_id,
-          course_id,
           quiz.quiz_id,
         ]);
+
         if (quizStatus.length === 0) {
           quizToAttempt.push(quiz);
         }
@@ -102,7 +102,7 @@ module.exports = {
       for (const assignment of assignments) {
         const [assignmentStatus] = await pool.query(sql.GET_ASSIGNMENT_STATUS, [
           student_id,
-          course_id,
+          // course_id,
           assignment.assignment_id,
         ]);
         if (assignmentStatus.length == 0) {
@@ -185,7 +185,7 @@ module.exports = {
         student_id,
         course_id,
       ]);
-      return [{quizes},{assignments}]
+      return [{ quizes }, { assignments }];
     } catch (error) {
       console.log(error);
     }

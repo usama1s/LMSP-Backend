@@ -115,9 +115,11 @@ module.exports = {
 
       for (module of modules) {
         const module_name = module.module_name;
+        const instructor_ids = module.instructor_ids;
         const [addModule] = await pool.query(sql.ADD_MODULE, [
           courseId,
           module_name,
+          JSON.stringify(instructor_ids),
         ]);
         const moduleId = addModule.insertId;
         for (topic of module.topics) {
@@ -160,7 +162,7 @@ module.exports = {
         await pool.query(sql.ADD_PROGRAM_PLAN, [
           course_id,
           programId,
-          instructor_id,
+          instructor_id, // have to make this multiple
         ]);
       }
       return { message: "Program plan added" };
@@ -170,7 +172,7 @@ module.exports = {
     }
   },
 
-  // GET ALL PROGRAM PLAN 
+  // GET ALL PROGRAM PLAN
   async getAllProgramPlan() {
     try {
       const [results] = await pool.query(sql.GET_PROGRAM_PLAN);
@@ -222,6 +224,7 @@ module.exports = {
                     lecture_file: course.lecture_file,
                   },
                 ],
+                instructor_ids: JSON.parse(course?.instructor_id),
               },
             ],
           };
@@ -241,6 +244,7 @@ module.exports = {
                   lecture_file: course.lecture_file,
                 },
               ],
+              instructor_ids: JSON.parse(course?.instructor_id),
             });
           } else {
             existingModule.topics.push({
@@ -280,6 +284,17 @@ module.exports = {
       const student_id = enrollmentDetails.student_id;
       const enrollment_date = enrollmentDetails.enrollment_date;
       const program_status = enrollmentDetails.program_status;
+
+      const [existingEnrollment] = await pool.query(
+        sql.CHECK_EXISTING_ENROLLMENT,
+        [student_id]
+      );
+
+      if (existingEnrollment.length > 0) {
+        return {
+          message: "Student is already enrolled in a program",
+        };
+      }
       for (i = 0; i < program_plan_id.length; ++i) {
         await pool.query(sql.ENROLL_STUDENT, [
           program_plan_id[i],
@@ -289,6 +304,45 @@ module.exports = {
         ]);
       }
       return { message: "Student enrolled" };
+    } catch (error) {
+      return { error };
+    }
+  },
+
+  // ENROLLMENT DETAILS OF SPECIFIC STUDENT
+
+  async getStudentEnrollmentDetails(student_id) {
+    try {
+      const [enrollmentDetails] = await pool.query(
+        sql.GET_STUDENT_ENROLLMENT_DETAILS,
+        [student_id]
+      );
+      return { enrollmentDetails };
+    } catch (error) {
+      return { error };
+    }
+  },
+  // GET all enrolled students
+
+  async getAllStudentsWithEnrollment() {
+    try {
+      const [students] = await pool.query(sql.GET_ALL_STUDENTS_WITH_ENROLLMENT);
+      return { students };
+    } catch (error) {
+      return { error };
+    }
+  },
+
+  // UPDATE STATUS OF ENROLLMENT
+
+  async updateStudentStatus(student_id, program_plan_id, program_status) {
+    try {
+      await pool.query(sql.UPDATE_STUDENT_STATUS, [
+        program_status,
+        student_id,
+        program_plan_id,
+      ]);
+      return { message: "Student status updated" };
     } catch (error) {
       return { error };
     }
@@ -309,8 +363,18 @@ module.exports = {
     try {
       const [results] = await pool.query(sql.GET_WHOLE_PROGRAM);
       const transformedResults = {};
+      console.log("results", results);
       for (const result of results) {
-        const { program_name, start_date, end_date, first_name, last_name, course_name, class_date, class_time } = result;
+        const {
+          program_name,
+          start_date,
+          end_date,
+          first_name,
+          last_name,
+          course_name,
+          class_date,
+          class_time,
+        } = result;
         if (!transformedResults[program_name]) {
           transformedResults[program_name] = {
             program_name,
@@ -319,7 +383,9 @@ module.exports = {
             courses: [],
           };
         }
-        const course = transformedResults[program_name].courses.find(course => course.course_name === course_name);
+        const course = transformedResults[program_name].courses.find(
+          (course) => course.course_name === course_name
+        );
         if (!course) {
           transformedResults[program_name].courses.push({
             first_name,
@@ -338,16 +404,17 @@ module.exports = {
             class_time,
           });
           // Sort the classes array by class_date
-          course.classes.sort((a, b) => new Date(a.class_date) - new Date(b.class_date));
+          course.classes.sort(
+            (a, b) => new Date(a.class_date) - new Date(b.class_date)
+          );
         }
       }
-  
+
       const finalResults = Object.values(transformedResults);
-  
+
       return finalResults;
     } catch (error) {
       throw error;
     }
-  }
-  
+  },
 };
