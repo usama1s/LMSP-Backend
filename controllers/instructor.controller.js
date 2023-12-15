@@ -84,9 +84,12 @@ module.exports = {
   // GET STUDENTS WITH PROGAM PLAN ID
   async getStudents(req, res) {
     try {
-      const { program_plan_id } = req.params;
+      const { program_plan_id, date } = req.params;
 
-      const students = await instructorService.getStudents(program_plan_id);
+      const students = await instructorService.getStudents(
+        program_plan_id,
+        date
+      );
 
       return res.json(students);
     } catch (error) {
@@ -99,7 +102,9 @@ module.exports = {
   async getCoursesByInstructorId(req, res) {
     try {
       const { instructor_id } = req.params;
-      const courses = await instructorService.getCoursesByInstructorId(instructor_id);
+      const courses = await instructorService.getCoursesByInstructorId(
+        instructor_id
+      );
       return res.json(courses);
     } catch (error) {
       console.error(error);

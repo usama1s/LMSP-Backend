@@ -15,6 +15,26 @@ module.exports = {
     }
   },
 
+  //EDIT QUIZ
+  async editQuizById(quizId, updatedQuizData) {
+    try {
+      await pool.query(sql.EDIT_QUIZ_BY_ID, [updatedQuizData, quizId]);
+      return "Quiz details updated successfully";
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  //DELETE QUIZ
+  async deleteQuizById(quizId) {
+    try {
+      await pool.query(sql.DELETE_QUIZ_BY_ID, [quizId]);
+      return "Quiz deleted successfully";
+    } catch (error) {
+      throw error;
+    }
+  },
+
   // ADD QUESTION WITH QUIZ ID
   async addQuizQuestion(
     quizId,
@@ -60,6 +80,31 @@ module.exports = {
     }
   },
 
+  //EDIT Assignment
+
+  async editAssignmentById(assignmentId, updatedAssignmentData) {
+    try {
+      await pool.query(sql.EDIT_ASSIGNMENT_BY_ID, [
+        updatedAssignmentData,
+        assignmentId,
+      ]);
+      return "Assignment details updated successfully";
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  //DELETE ASSIGNMENT
+
+  async deleteAssignmentById(assignmentId) {
+    try {
+      await pool.query(sql.DELETE_ASSIGNMENT_BY_ID, [assignmentId]);
+      return "Assignment deleted successfully";
+    } catch (error) {
+      throw error;
+    }
+  },
+
   // MARK ATTENDENCE OF STUDENT
   async markAttendence(students, attendence_date) {
     try {
@@ -77,10 +122,12 @@ module.exports = {
   },
 
   // INSTRUCTOR ADD ASSIGNMENTS
-  async getStudents(program_plan_id) {
+  async getStudents(program_plan_id, date) {
+    console.log("DATE", date);
     try {
       const [students] = await pool.query(sql.GET_STUDENTS_PROGRAM_PLAN, [
         program_plan_id,
+        date,
       ]);
       return students;
     } catch (error) {

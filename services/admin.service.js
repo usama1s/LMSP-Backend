@@ -18,6 +18,41 @@ module.exports = {
     }
   },
 
+  //get User by ID
+  async getUserById(userId) {
+    try {
+      const [user] = await pool.query(sql.GET_USER_BY_ID, [userId]);
+
+      if (user.length === 1) {
+        return user[0];
+      } else {
+        return null; // User not found
+      }
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  //edit User
+  async editUserById(userId, updatedUserData) {
+    try {
+      await pool.query(sql.EDIT_USER_BY_ID, [updatedUserData, userId]);
+      return "User updated successfully";
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  //delete user
+  async deleteUserById(userId) {
+    try {
+      await pool.query(sql.DELETE_USER_BY_ID, [userId]);
+      return "User deleted successfully";
+    } catch (error) {
+      throw error;
+    }
+  },
+
   // ADD ITEM IN INVENTORY TABLE
   async addItem(inventoryItemDetail) {
     try {
@@ -75,7 +110,7 @@ module.exports = {
 
       return { message: "Inventory item and files uploaded successfully" };
     } catch (error) {
-      throw error; // You can choose to throw the error for handling at a higher level
+      throw error;
     }
   },
 
@@ -99,6 +134,27 @@ module.exports = {
     try {
       const [results] = await pool.query(sql.GET_ITEM_BY_ID, inventoryId);
       return results[0];
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  //edit item
+
+  async editItemById(inventoryId, updatedItemData) {
+    try {
+      await pool.query(sql.EDIT_ITEM_BY_ID, [updatedItemData, inventoryId]);
+      return "Item updated successfully";
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  //delete item
+  async deleteItemById(inventoryId) {
+    try {
+      await pool.query(sql.DELETE_ITEM_BY_ID, [inventoryId]);
+      return "Item deleted successfully";
     } catch (error) {
       throw error;
     }
@@ -194,6 +250,50 @@ module.exports = {
         class_link,
       ]);
       return { message: "Class added" };
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  //get classes
+  async getAllClasses() {
+    try {
+      const [classes] = await pool.query(sql.GET_ALL_CLASSES);
+      return classes;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  // get class by id
+  async getClassById(classId) {
+    try {
+      const [classDetails] = await pool.query(sql.GET_CLASS_BY_ID, [classId]);
+
+      if (classDetails.length === 1) {
+        return classDetails[0];
+      } else {
+        return null; // Class not found
+      }
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  //edit class by id
+  async editClassById(classId, updatedClassDetails) {
+    try {
+      await pool.query(sql.EDIT_CLASS_BY_ID, [updatedClassDetails, classId]);
+      return "Class updated successfully";
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async deleteClassById(classId) {
+    try {
+      await pool.query(sql.DELETE_CLASS_BY_ID, [classId]);
+      return "Class deleted successfully";
     } catch (error) {
       throw error;
     }
@@ -348,6 +448,17 @@ module.exports = {
     }
   },
 
+  //DELETE ENROLLMENT
+
+  async deleteEnrollmentById(enrollmentId) {
+    try {
+      await pool.query(sql.DELETE_ENROLLMENT_BY_ID, [enrollmentId]);
+      return { message: "Student enrollment deleted successfully" };
+    } catch (error) {
+      throw error;
+    }
+  },
+
   // GET ALL ADMINS
   async getAllAdmins() {
     try {
@@ -363,7 +474,6 @@ module.exports = {
     try {
       const [results] = await pool.query(sql.GET_WHOLE_PROGRAM);
       const transformedResults = {};
-      console.log("results", results);
       for (const result of results) {
         const {
           program_name,

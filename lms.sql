@@ -75,7 +75,8 @@ CREATE TABLE module (
 	module_id INT AUTO_INCREMENT PRIMARY KEY,
     course_id INT, 
     module_name varchar (50),
-    FOREIGN KEY (course_id) REFERENCES course(course_id)
+    FOREIGN KEY (course_id) REFERENCES course(course_id),
+    FOREIGN KEY (instructor_id) REFERENCES instructor(instructor_id),
 );
 
 CREATE TABLE topic (

@@ -9,6 +9,47 @@ module.exports = {
     LEFT JOIN instructor ON instructor.user_id = users.id;
   `,
 
+  GET_USER_BY_ID: `
+  SELECT *
+  FROM users
+  LEFT JOIN admin ON admin.user_id = users.id
+  LEFT JOIN student ON student.user_id = users.id
+  LEFT JOIN instructor ON instructor.user_id = users.id
+  WHERE users.id = ?;
+`,
+
+  EDIT_USER_BY_ID: `
+  UPDATE users
+  SET ?
+  WHERE id = ?;
+`,
+
+  DELETE_USER_BY_ID: `
+  DELETE FROM users
+  WHERE id = ?;
+`,
+
+  UPDATE_ADMIN_TYPE: `
+  UPDATE admin
+  SET admin_type = ?
+  WHERE user_id = ?;
+`,
+  EDIT_ADMIN_DETAILS: `
+  UPDATE users
+  SET ?, admin_type = ?
+  WHERE id = ?;
+`,
+  EDIT_INSTRUCTOR_DETAILS: `
+  UPDATE users
+  SET ?
+  WHERE id = ?;
+`,
+  EDIT_STUDENT_DETAILS: `
+  UPDATE users
+  SET ?
+  WHERE id = ?;
+`,
+
   REGISTER_USER: `
     INSERT INTO users
     (profile_picture, email, password, role, marital_status, country, organization, designation, qualification, register_date, first_name, last_name)
@@ -72,6 +113,24 @@ module.exports = {
     WHERE users.email=? AND users.role = ?
   `,
 
+  GET_ADMIN_DETAILS: `
+  SELECT users.*, admin.*
+  FROM users
+  INNER JOIN admin ON admin.user_id = users.id
+  WHERE users.id = ?;
+`,
+  GET_INSTRUCTOR_DETAILS: `
+  SELECT users.*, instructor.*
+  FROM users
+  INNER JOIN instructor ON instructor.user_id = users.id
+  WHERE users.id = ?;
+`,
+  GET_STUDENT_DETAILS: `
+  SELECT users.*, student.*
+  FROM users
+  INNER JOIN student ON student.user_id = users.id
+  WHERE users.id = ?;
+`,
   SIGN_IN_INSTRUCTOR: `
     SELECT *
     FROM users
@@ -85,6 +144,17 @@ module.exports = {
     VALUES(?, ?);
   `,
 
+  EDIT_QUIZ_BY_ID: `
+  UPDATE quiz
+  SET ?
+  WHERE quiz_id = ?;
+`,
+
+  DELETE_QUIZ_BY_ID: `
+  DELETE FROM quiz
+  WHERE quiz_id = ?;
+`,
+
   ADD_QUIZ_QUESTION: `
    INSERT INTO quiz_question
    (quiz_id, question, option_1, option_2, option_3, option_4, question_picture, answer)
@@ -97,6 +167,15 @@ module.exports = {
     VALUES(?, ?, ?, ?, ?)
   `,
 
+  EDIT_ASSIGNMENT_BY_ID: `
+  UPDATE assignments
+  SET ?
+  WHERE assignment_id = ?;
+`,
+  DELETE_ASSIGNMENT_BY_ID: `
+  DELETE FROM assignments
+  WHERE assignment_id = ?;
+`,
   ADD_STUDENT_ATTENDENCE: `
     INSERT INTO users
     (profile_picture, email, password, role, marital_status, country, organization, designation, qualification, register_date)
@@ -111,7 +190,9 @@ FROM
 LEFT JOIN student ON student.user_id = users.id
 INNER JOIN student_enrollment ON student_enrollment.student_id = student.student_id
 INNER JOIN program_plan ON program_plan.program_plan_id = student_enrollment.program_plan_id
+INNER JOIN student_attendence ON student_attendence.student_id = student.student_id
 WHERE program_plan.program_plan_id=?
+AND student_attendence.attendence_date = ?
   `,
 
   MARK_ATTENDENCE: `
@@ -124,9 +205,9 @@ SELECT
     course.course_name,
     course.course_description
 FROM
-    program_plan
-INNER JOIN instructor ON program_plan.instructor_id = instructor.instructor_id
-INNER JOIN course ON course.course_id = program_plan.course_id
+    module
+// INNER JOIN instructor ON module.instructor_id = instructor.instructor_id
+INNER JOIN course ON course.course_id = module.course_id
 WHERE
     instructor.instructor_id = ?
 `,
@@ -354,6 +435,28 @@ WHERE
     VALUES(?, ?, ?, ?);
   `,
 
+  GET_ALL_CLASSES: `
+  SELECT *
+  FROM time_table;
+`,
+
+  EDIT_CLASS_BY_ID: `
+  UPDATE time_table
+  SET ?
+  WHERE class_id = ?;
+`,
+
+  DELETE_CLASS_BY_ID: `
+  DELETE FROM time_table
+  WHERE class_id = ?;
+`,
+
+  GET_CLASS_BY_ID: `
+  SELECT *
+  FROM time_table
+  WHERE class_id = ?;
+`,
+
   ADD_STUDENT_COURSE: `
     INSERT INTO users
     (profile_picture, email, password, role, marital_status, country, organization, designation, qualification, register_date)
@@ -392,6 +495,17 @@ WHERE
     WHERE inventory.inventory_id=?
   `,
 
+  EDIT_ITEM_BY_ID: `
+  UPDATE inventory
+  SET ?
+  WHERE inventory_id = ?;
+`,
+
+  DELETE_ITEM_BY_ID: `
+  DELETE FROM inventory
+  WHERE inventory_id = ?;
+`,
+
   GET_ALL_COURSES: `
   SELECT *
   FROM course
@@ -415,6 +529,11 @@ WHERE
   SELECT *
   FROM student_enrollment
   WHERE student_id = ? AND program_status = 1
+`,
+
+  DELETE_ENROLLMENT_BY_ID: `
+  DELETE FROM student_enrollment
+  WHERE enrollment_id = ?;
 `,
   //Get all enrolled students with details
   GET_ALL_STUDENTS_WITH_ENROLLMENT: `
@@ -478,7 +597,7 @@ WHERE
     program
   INNER JOIN program_plan ON program_plan.program_id = program.program_id
   INNER JOIN time_table on time_table.program_plan_id=program_plan.program_plan_id
-  INNER JOIN instructor ON instructor.instructor_id = program_plan.instructor_id
+  // INNER JOIN instructor ON instructor.instructor_id = module.instructor_id
   RIGHT JOIN users ON users.id = instructor.user_id
   INNER JOIN course ON program_plan.course_id = course.course_id
   INNER JOIN module ON module.course_id = course.course_id
