@@ -3,11 +3,13 @@ const pool = require("../db.conn");
 
 module.exports = {
   // INSTRUCTOR ADD QUIZES
-  async addQuiz(program_plan_id, quiz_date) {
+  async addQuiz(subject_id, instructor_id, quiz_date, section) {
     try {
       const [addQuiz] = await pool.query(sql.ADD_QUIZ, [
-        program_plan_id,
+        subject_id,
+        instructor_id,
         quiz_date,
+        section,
       ]);
       return addQuiz.insertId;
     } catch (error) {
@@ -61,19 +63,23 @@ module.exports = {
 
   // INSTRUCTOR ADD ASSIGNMENTS
   async addAssignment(
-    program_plan_id,
     assignment_date,
     assignmentFilePath,
     assignment_instruction,
-    assignment_title
+    assignment_title,
+    subject_id,
+    instructor_id,
+    section
   ) {
     try {
       const [addAssignment] = await pool.query(sql.ADD_ASSIGNMENT, [
-        program_plan_id,
         assignment_date,
         assignmentFilePath,
         assignment_instruction,
         assignment_title,
+        subject_id,
+        instructor_id,
+        section,
       ]);
     } catch (error) {
       console.log(error);
@@ -106,13 +112,15 @@ module.exports = {
   },
 
   // MARK ATTENDENCE OF STUDENT
-  async markAttendence(students, attendence_date) {
+  async markAttendence(students, attendence_date, subject_id, section) {
     try {
       for (const student of students) {
         await pool.query(sql.MARK_ATTENDENCE, [
           student.student_id,
           student.attendence_status,
           attendence_date,
+          subject_id,
+          section,
         ]);
       }
       return { message: "Attendence added successfully." };
@@ -123,7 +131,6 @@ module.exports = {
 
   // INSTRUCTOR ADD ASSIGNMENTS
   async getStudents(program_plan_id, date) {
-    console.log("DATE", date);
     try {
       const [students] = await pool.query(sql.GET_STUDENTS_PROGRAM_PLAN, [
         program_plan_id,
@@ -144,6 +151,128 @@ module.exports = {
       return courses;
     } catch (error) {
       console.log(error);
+    }
+  },
+
+  async addPaper(subject_id, instructor_id, paper_date, section, title) {
+    try {
+      const [addPaper] = await pool.query(sql.ADD_PAPER, [
+        subject_id,
+        instructor_id,
+        paper_date,
+        section,
+        title,
+      ]);
+      return addPaper.insertId;
+    } catch (error) {
+      throw error("error inserting paper");
+    }
+  },
+
+  async addPaperQuestion(
+    paperId,
+    question,
+    options,
+    question_image_path,
+    question_video_path,
+    correctOption,
+    title
+  ) {
+    const option1 = options[0];
+    const option2 = options[1];
+    const option3 = options[2];
+    const option4 = options[3];
+    await pool.query(sql.ADD_PAPER_QUESTION, [
+      paperId,
+      title,
+      question,
+      option1,
+      option2,
+      option3,
+      option4,
+      question_image_path,
+      question_video_path,
+      correctOption,
+    ]);
+  },
+
+  async getInstructorPapersBySubject(subjectId) {
+    try {
+      const [papers] = await pool.query(
+        sql.GET_INSTRUCTOR_PAPERS_BY_SUBJECT_AND_DATE,
+        [subjectId]
+      );
+      return papers;
+    } catch (error) {
+      console.error(error);
+      throw new Error("Error fetching instructor papers");
+    }
+  },
+
+  async editPaper(
+    paper_id,
+    subject_id,
+    instructor_id,
+    paper_date,
+    section,
+    title
+  ) {
+    try {
+      await pool.query(sql.EDIT_PAPER, [
+        subject_id,
+        instructor_id,
+        paper_date,
+        section,
+        title,
+        paper_id,
+      ]);
+    } catch (error) {
+      throw new Error("Error updating paper");
+    }
+  },
+
+  async editPaperQuestion(
+    question_id,
+    title,
+    question,
+    options,
+    question_image_path,
+    question_video_path,
+    correctOption
+  ) {
+    const option1 = options[0];
+    const option2 = options[1];
+    const option3 = options[2];
+    const option4 = options[3];
+
+    await pool.query(sql.EDIT_PAPER_QUESTION, [
+      title,
+      question,
+      option1,
+      option2,
+      option3,
+      option4,
+      question_image_path,
+      question_video_path,
+      correctOption,
+      question_id,
+    ]);
+  },
+  //Delete paper questions
+  async deletePaperQuestions(paper_id) {
+    try {
+      await pool.query(sql.DELETE_PAPER_QUESTIONS, [paper_id]);
+    } catch (error) {
+      throw new Error("Error deleting paper questions");
+    }
+  },
+  // Delete Instructor Paper
+  async deleteInstructorPaper(paperId) {
+    try {
+      await pool.query(sql.DELETE_INSTRUCTOR_PAPER, [paperId]);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Error deleting instructor paper");
     }
   },
 };

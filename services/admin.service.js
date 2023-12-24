@@ -527,4 +527,41 @@ module.exports = {
       throw error;
     }
   },
+
+  async addPaper(subject_id, admin_id, paper_date, section, title) {
+    try {
+      const [addPaper] = await pool.query(sql.ADD_INCHARGE_PAPER, [
+        subject_id,
+        admin_id,
+        paper_date,
+        section,
+        title,
+      ]);
+      return addPaper.insertId;
+    } catch (error) {
+      throw error("error inserting paper");
+    }
+  },
+
+  async addPaperQuestion(paperId, questionId) {
+    await pool.query(sql.ADD_INCHARGE_PAPER_QUESTION, [paperId, questionId]);
+  },
+
+  //Delete paper questions
+  async deletePaperQuestions(paper_id) {
+    try {
+      await pool.query(sql.DELETE_INCHARGE_PAPER_QUESTIONS, [paper_id]);
+    } catch (error) {
+      throw new Error("Error deleting paper questions");
+    }
+  },
+  // Delete Instructor Paper
+  async deleteAdminPaper(paperId) {
+    try {
+      await pool.query(sql.DELETE_INCHARGE_PAPER, [paperId]);
+    } catch (error) {
+      console.error(error);
+      throw new Error("Error deleting instructor paper");
+    }
+  },
 };

@@ -140,9 +140,85 @@ module.exports = {
 
   ADD_QUIZ: `
     INSERT INTO quiz
-    (program_plan_id, quiz_date)
-    VALUES(?, ?);
+    (subject_id,instructor_id, quiz_date, section)
+    VALUES(?, ?, ?, ?);
   `,
+
+  ADD_PAPER: `
+    INSERT INTO instructor_papers
+    (subject_id,instructor_id, paper_date, section,title)
+    VALUES(?, ?, ?, ?);
+  `,
+
+  ADD_INCHARGE_PAPER: `
+    INSERT INTO incharge_papers
+    (subject_id,admin_id, paper_date, section,title)
+    VALUES(?, ?, ?, ?);
+  `,
+
+  // SQL query for retrieving instructor papers by subject and filtering out past papers
+  GET_INSTRUCTOR_PAPERS_BY_SUBJECT_AND_DATE: `
+  SELECT
+    ip.subject_id,
+    ip.instructor_id,
+    ip.section,
+    ip.paper_date,
+    iq.question,
+    iq.options,
+    iq.correctOption,
+    iq.image
+  FROM instructor_papers ip
+  JOIN instructor_paper_questions iq ON ip.paper_id = iq.instructor_paper_id
+  WHERE ip.subject_id = ? AND ip.paper_date >= CURDATE()
+  ORDER BY ip.paper_date ASC;
+`,
+
+  // SQL query for deleting instructor paper
+  DELETE_INSTRUCTOR_PAPER: `
+  DELETE FROM instructor_papers
+  WHERE paper_id = ?;
+`,
+
+  DELETE_INCHARGE_PAPER: `
+  DELETE FROM incharge_papers
+  WHERE id = ?;
+`,
+
+  DELETE_PAPER_QUESTIONS: `
+  DELETE FROM instructor_paper_questions
+  WHERE instructor_paper_id = ?;
+`,
+
+  DELETE_INCHARGE_PAPER_QUESTIONS: `
+  DELETE FROM incharge_paper_questions
+  WHERE incharge_paper_id = ?;
+`,
+
+  EDIT_PAPER: `
+  UPDATE instructor_papers
+  SET
+    subject_id = ?,
+    instructor_id = ?,
+    paper_date = ?,
+    section = ?,
+    title = ?
+  WHERE paper_id = ?;
+`,
+
+  EDIT_PAPER_QUESTION: `
+  UPDATE instructor_paper_questions
+  SET
+    title = ?,
+    question = ?,
+    option_1 = ?,
+    option_2 = ?,
+    option_3 = ?,
+    option_4 = ?,
+    question_picture = ?,
+    question_video = ?,
+    answer = ?
+  WHERE question_id = ?;
+`,
 
   EDIT_QUIZ_BY_ID: `
   UPDATE quiz
@@ -161,10 +237,22 @@ module.exports = {
    VALUES(?, ?, ?, ?, ?, ?, ?,?)
 `,
 
+  ADD_PAPER_QUESTION: `
+   INSERT INTO instructor_paper_questions
+   (instructor_paper_id	,title, question, option_1, option_2, option_3, option_4, question_picture, question_video,answer)
+   VALUES(?, ?, ?, ?, ?, ?, ?,?,?,?)
+`,
+
+  ADD_INCHARGE_PAPER_QUESTION: `
+   INSERT INTO incharge_paper_questions
+   (incharge_paper_id	,question_id)
+   VALUES(?, ?)
+`,
+
   ADD_ASSIGNMENT: `
     INSERT INTO assignments
-    (program_plan_id, assignment_date, assignment_file, assignment_instruction, assignment_title)
-    VALUES(?, ?, ?, ?, ?)
+    ( assignment_date, assignment_file, assignment_instruction, assignment_title,subject_id,instructor_id,section)
+    VALUES(?, ?, ?, ?, ?, ?, ?)
   `,
 
   EDIT_ASSIGNMENT_BY_ID: `
@@ -197,8 +285,8 @@ AND student_attendence.attendence_date = ?
 
   MARK_ATTENDENCE: `
    INSERT INTO student_attendence
-   (student_id, attendence_status, attendence_date)
-   VALUES(?, ?, ?)
+   (student_id, attendence_status, attendence_date,subject_id,section)
+   VALUES(?, ?, ?, ?. ?)
 `,
   GET_COURSES_BY_INSTRUCTOR: `
 SELECT

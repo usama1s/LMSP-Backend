@@ -31,6 +31,9 @@ router.put(
   adminController.updateStudentStatus
 );
 
+router.post("/addPaper", adminController.addPaper);
+router.post("/deletePaper/:id", adminController.deleteAdminPaper);
+
 router.post("/addCourse", async (req, res) => {
   const data = req.body;
 
@@ -102,6 +105,7 @@ router.post("/addCourse", async (req, res) => {
 // -------------------------------------      GET COURSE BY ID ---------------------------------- //
 
 router.get("/getCourse/:courseId", async (req, res) => {
+  console.log("HIIII");
   const courseId = req.params.courseId;
 
   try {
@@ -137,7 +141,7 @@ router.get("/getCourse/:courseId", async (req, res) => {
           subject.subject_id,
         ]);
         const teachers = teachersResult[0];
-
+        console.log(teachers);
         // Populate details for each teacher
         for (const teacher of teachers) {
           // Add more details about the teacher if needed

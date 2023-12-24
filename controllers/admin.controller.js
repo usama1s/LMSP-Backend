@@ -186,4 +186,48 @@ module.exports = {
       return res.status(500).json({ error: "An error occurred" });
     }
   },
+
+  //ADd paper by instructor
+
+  async addPaper(req, res) {
+    try {
+      const paperDetails = req.body;
+      const {
+        paper_date,
+        paper_questions,
+        admin_id,
+        subject_id,
+        section,
+        title,
+      } = paperDetails;
+
+      const paperId = await adminService.addPaper(
+        subject_id,
+        admin_id,
+        paper_date,
+        section,
+        title
+      );
+
+      for (const { questionId } of paper_questions) {
+        await adminService.addPaperQuestion(paperId, questionId);
+      }
+
+      return res.json("Paper added successfully");
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+
+  async deleteAdminPaper(req, res) {
+    try {
+      const { paper_id } = req.params;
+      await adminService.deleteAdminPaper(paper_id);
+      return res.json({ message: "Admin paper deleted successfully." });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
 };
