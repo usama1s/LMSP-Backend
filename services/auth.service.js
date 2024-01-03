@@ -329,6 +329,7 @@ module.exports = {
             employee_id: user[0].employment_id,
             profile_image_type: user[0].profile_image_type,
             profile_image: user[0].profile_image,
+            instructor_id: user[0].instructor_id,
           };
           return transformedUser;
         } else {

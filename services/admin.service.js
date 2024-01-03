@@ -241,10 +241,9 @@ module.exports = {
   // ADD CLASS
   async addClass(classDetails) {
     try {
-      const { program_plan_id, class_date, class_time, class_link } =
-        classDetails;
+      const { subject_id, class_date, class_time, class_link } = classDetails;
       await pool.query(sql.ADD_CLASS, [
-        program_plan_id,
+        subject_id,
         class_date,
         class_time,
         class_link,
@@ -378,12 +377,13 @@ module.exports = {
 
   // ENROLLMENT DETAILS
   async enrollStudent(enrollmentDetails) {
+    console.log({ enrollmentDetails });
     try {
       let i;
-      const program_plan_id = enrollmentDetails.program_plan_id;
+      const course_id = enrollmentDetails.course_id;
       const student_id = enrollmentDetails.student_id;
       const enrollment_date = enrollmentDetails.enrollment_date;
-      const program_status = enrollmentDetails.program_status;
+      const enrollment_status = enrollmentDetails.enrollment_status;
 
       const [existingEnrollment] = await pool.query(
         sql.CHECK_EXISTING_ENROLLMENT,
@@ -395,14 +395,14 @@ module.exports = {
           message: "Student is already enrolled in a program",
         };
       }
-      for (i = 0; i < program_plan_id.length; ++i) {
-        await pool.query(sql.ENROLL_STUDENT, [
-          program_plan_id[i],
-          student_id,
-          enrollment_date,
-          program_status,
-        ]);
-      }
+
+      await pool.query(sql.ENROLL_STUDENT, [
+        course_id,
+        student_id,
+        enrollment_date,
+        enrollment_status,
+      ]);
+
       return { message: "Student enrolled" };
     } catch (error) {
       return { error };
@@ -426,7 +426,7 @@ module.exports = {
 
   async getAllStudentsWithEnrollment() {
     try {
-      const [students] = await pool.query(sql.GET_ALL_STUDENTS_WITH_ENROLLMENT);
+      const [students] = await pool.query(sql.GET_ALL_ENROLLED_STUDENTS);
       return { students };
     } catch (error) {
       return { error };
@@ -435,12 +435,11 @@ module.exports = {
 
   // UPDATE STATUS OF ENROLLMENT
 
-  async updateStudentStatus(student_id, program_plan_id, program_status) {
+  async updateStudentStatus(status, student_enrollment_id) {
     try {
       await pool.query(sql.UPDATE_STUDENT_STATUS, [
-        program_status,
-        student_id,
-        program_plan_id,
+        status,
+        student_enrollment_id,
       ]);
       return { message: "Student status updated" };
     } catch (error) {

@@ -120,7 +120,6 @@ module.exports = {
           student.attendence_status,
           attendence_date,
           subject_id,
-          section,
         ]);
       }
       return { message: "Attendence added successfully." };
@@ -130,11 +129,12 @@ module.exports = {
   },
 
   // INSTRUCTOR ADD ASSIGNMENTS
-  async getStudents(program_plan_id, date) {
+  async getStudents(subject_id, date) {
+    console.log(date, subject_id);
     try {
-      const [students] = await pool.query(sql.GET_STUDENTS_PROGRAM_PLAN, [
-        program_plan_id,
+      const [students] = await pool.query(sql.GET_STUDENTS_BY_SUBJECT_ID, [
         date,
+        subject_id,
       ]);
       return students;
     } catch (error) {
@@ -153,6 +153,20 @@ module.exports = {
       console.log(error);
     }
   },
+
+  // GET PAPERS BY SUBJECT ID
+  async getPaperBySubjectId(subject_id) {
+    try {
+      const [papers] = await pool.query(sql.GET_PAPER_BY_SUBJECT_ID, [
+        subject_id,
+      ]);
+      return papers;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  // ADD PAPER
 
   async addPaper(subject_id, instructor_id, paper_date, section, title) {
     try {

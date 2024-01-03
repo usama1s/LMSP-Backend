@@ -270,23 +270,33 @@ module.exports = {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `,
 
-  GET_STUDENTS_PROGRAM_PLAN: `
-  SELECT
-  *
+  GET_STUDENTS_BY_SUBJECT_ID: `
+SELECT
+  u.*,
+  sa.*,
+  s.student_id
 FROM
-  users
-LEFT JOIN student ON student.user_id = users.id
-INNER JOIN student_enrollment ON student_enrollment.student_id = student.student_id
-INNER JOIN program_plan ON program_plan.program_plan_id = student_enrollment.program_plan_id
-INNER JOIN student_attendence ON student_attendence.student_id = student.student_id
-WHERE program_plan.program_plan_id=?
-AND student_attendence.attendence_date = ?
+  users u
+JOIN
+  student s ON u.id = s.user_id
+JOIN
+  student_enrollment se ON s.student_id = se.student_id
+JOIN
+  courses c ON se.course_id = c.course_id
+JOIN
+  modules m ON c.course_id = m.course_id
+JOIN
+  subjects sub ON m.module_id = sub.module_id
+  LEFT JOIN
+  student_attendence sa ON s.student_id = sa.student_id AND sa.attendence_date =?
+WHERE
+  sa.subject_id = ?
   `,
 
   MARK_ATTENDENCE: `
    INSERT INTO student_attendence
-   (student_id, attendence_status, attendence_date,subject_id,section)
-   VALUES(?, ?, ?, ?. ?)
+   (student_id, attendence_status, attendence_date,subject_id)
+   VALUES(?, ?, ?, ?)
 `,
   GET_COURSES_BY_INSTRUCTOR: `
 SELECT
@@ -300,6 +310,26 @@ WHERE
     instructor.instructor_id = ?
 `,
 
+  //GET PAPERS BY SUBJECT ID
+  GET_PAPER_BY_SUBJECT_ID: `
+SELECT
+  ip.subject_id,
+  ip.instructor_id,
+  ip.section,
+  ip.paper_date,
+  iq.question,
+  iq.options,
+  iq.correctOption,
+  iq.image
+FROM
+  instructor_papers ip
+JOIN
+  instructor_paper_questions iq ON ip.paper_id = iq.instructor_paper_id
+WHERE
+  ip.subject_id = ?
+ORDER BY
+  ip.paper_date ASC;
+`,
   // STUDENT____________________________________________________________________________________________________________
 
   ADD_STUDENT: `
@@ -519,7 +549,7 @@ WHERE
 
   ADD_CLASS: `
     INSERT INTO time_table
-    (program_plan_id, class_date, class_time, class_link)
+    (subject_id, class_date, class_time, class_link)
     VALUES(?, ?, ?, ?);
   `,
 
@@ -609,34 +639,26 @@ WHERE
 
   ENROLL_STUDENT: `
   INSERT INTO student_enrollment
-  (program_plan_id, student_id, enrollment_date, program_status)
+  (course_id, student_id, enrollment_date, enrollment_status)
   VALUES(?, ?, ?, ?)
   `,
 
   CHECK_EXISTING_ENROLLMENT: `
   SELECT *
   FROM student_enrollment
-  WHERE student_id = ? AND program_status = 1
+  WHERE student_id = ? AND enrollment_status = 1
 `,
 
   DELETE_ENROLLMENT_BY_ID: `
   DELETE FROM student_enrollment
-  WHERE enrollment_id = ?;
+  WHERE student_enrollment_id = ?;
 `,
   //Get all enrolled students with details
-  GET_ALL_STUDENTS_WITH_ENROLLMENT: `
-  SELECT
-    student_enrollment.*,
-    student.*,
-    program_plan.*,
-    program.*,
-    course.*
-  FROM
-    student_enrollment
-  INNER JOIN student ON student_enrollment.student_id = student.student_id
-  INNER JOIN program_plan ON student_enrollment.program_plan_id = program_plan.program_plan_id
-  INNER JOIN program ON program_plan.program_id = program.program_id
-  INNER JOIN course ON program_plan.course_id = course.course_id
+  GET_ALL_ENROLLED_STUDENTS: `
+  SELECT student_enrollment.*,courses.*,users.* from student_enrollment
+  join users on student_enrollment.student_id= users.id
+  join courses on student_enrollment.course_id=courses.course_id
+
 `,
 
   // GET ENROLLMENT DETAILS FOR A SPECIFIC STUDENT
@@ -659,8 +681,8 @@ WHERE
 
   UPDATE_STUDENT_STATUS: `
   UPDATE student_enrollment
-  SET program_status = ?
-  WHERE student_id = ? AND program_plan_id = ?
+  SET enrollment_status = ?
+  WHERE student_enrollment_id = ?
 `,
 
   GET_ALL_ADMINS: `

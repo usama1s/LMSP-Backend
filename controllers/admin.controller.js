@@ -132,15 +132,17 @@ module.exports = {
   // ENROLL STUDENT
   async enrollStudent(req, res) {
     try {
+      console.log("I am ind");
       const enrollmentDetails = req.body;
       const result = await adminService.enrollStudent(enrollmentDetails);
       return res.status(200).json(result);
     } catch (error) {
+      console.log(error);
       return res.status(500).json({ error: "An error occurred" });
     }
   },
 
-  // GET ALL ENROLLED STUDENTS
+  //GET ALL ENROLLED STUDENTS
   async getAllStudentsWithEnrollment(req, res) {
     try {
       const result = await adminService.getAllStudentsWithEnrollment();
@@ -153,12 +155,25 @@ module.exports = {
   // UPDATE ENROLLED STUDENT
 
   async updateStudentStatus(req, res) {
-    const { student_id, program_plan_id, program_status } = req.body;
+    const { status, student_enrollment_id } = req.body;
+    console.log(status, student_enrollment_id);
     try {
       const result = await adminService.updateStudentStatus(
-        student_id,
-        program_plan_id,
-        program_status
+        status,
+        student_enrollment_id
+      );
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+
+  async deleteStudentEnrollment(req, res) {
+    const { student_enrollment_id } = req.body;
+
+    try {
+      const result = await adminService.deleteEnrollmentById(
+        student_enrollment_id
       );
       return res.status(200).json(result);
     } catch (error) {

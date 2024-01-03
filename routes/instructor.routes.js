@@ -9,7 +9,7 @@ const router = express.Router();
 router.post("/add-quiz", instructorController.addQuiz);
 router.post("/add-assignment", instructorController.addAssignment);
 router.get(
-  "/get-students-by-program-plan/:program_plan_id/:date",
+  "/get-students-by-subject-id/:subject_id/:date",
   instructorController.getStudents
 );
 router.get(
@@ -19,6 +19,11 @@ router.get(
 
 router.post("/mark-attendence", instructorController.markAttendence);
 router.post("/add-paper", instructorController.addPaper);
+router.get(
+  "/get-papers-by-subject-id/:subject_id",
+  instructorController.getPaperBySubjectId
+);
+
 router.get(
   "/papers/instructors/:subject_id/:paper_date",
   instructorController.getInstructorPapersBySubject
@@ -50,6 +55,25 @@ router.get("/:instructorId/subjects", async (req, res) => {
     res.status(200).json({ subjects });
   } catch (error) {
     console.error("Error getting subjects of an instructor:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+//get All Subjects
+router.get("/subjects", async (req, res) => {
+  try {
+    const subjectsQuery = `
+      SELECT 
+        subjects.subject_id, 
+        subjects.subject_name
+      FROM subjects
+    `;
+    const subjectsResult = await pool.query(subjectsQuery);
+    const subjects = subjectsResult[0];
+
+    res.status(200).json({ subjects });
+  } catch (error) {
+    console.error("Error getting subjects:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });

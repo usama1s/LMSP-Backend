@@ -21,7 +21,10 @@ module.exports = {
         correctOption,
         image,
       } of quiz_questions) {
-        const quizPath = await convertBase64.base64ToJpg(image);
+        var quizPath = "";
+        if (image) {
+          quizPath = await convertBase64.base64ToJpg(image);
+        }
         await instructorService.addQuizQuestion(
           quizId,
           question,
@@ -33,7 +36,7 @@ module.exports = {
 
       return res.json("Quiz added successfully");
     } catch (error) {
-      console.error(error);
+      console.log(error.message);
       return res.status(500).json({ error: "An error occurred" });
     }
   },
@@ -96,12 +99,9 @@ module.exports = {
   // GET STUDENTS WITH PROGAM PLAN ID
   async getStudents(req, res) {
     try {
-      const { program_plan_id, date } = req.params;
+      const { subject_id, date } = req.params;
 
-      const students = await instructorService.getStudents(
-        program_plan_id,
-        date
-      );
+      const students = await instructorService.getStudents(subject_id, date);
 
       return res.json(students);
     } catch (error) {
@@ -133,6 +133,7 @@ module.exports = {
         subject_id,
         section,
         title,
+        paper_title,
       } = paperDetails;
 
       const paperId = await instructorService.addPaper(
@@ -140,7 +141,8 @@ module.exports = {
         instructor_id,
         paper_date,
         section,
-        title
+        title,
+        paper_title
       );
 
       for (const {
@@ -164,6 +166,21 @@ module.exports = {
       }
 
       return res.json("Paper added successfully");
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+
+  //get Papers by subject Id
+  async getPaperBySubjectId(req, res) {
+    try {
+      const paperDetails = req.params;
+      const { subject_id } = paperDetails;
+
+      const papers = await instructorService.getPaperBySubjectId(subject_id);
+
+      return res.json({ papers: papers });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "An error occurred" });

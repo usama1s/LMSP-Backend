@@ -31,6 +31,11 @@ router.put(
   adminController.updateStudentStatus
 );
 
+router.post(
+  "/delete-student-enrollment",
+  adminController.deleteStudentEnrollment
+);
+
 router.post("/addPaper", adminController.addPaper);
 router.post("/deletePaper/:id", adminController.deleteAdminPaper);
 
@@ -105,7 +110,6 @@ router.post("/addCourse", async (req, res) => {
 // -------------------------------------      GET COURSE BY ID ---------------------------------- //
 
 router.get("/getCourse/:courseId", async (req, res) => {
-  console.log("HIIII");
   const courseId = req.params.courseId;
 
   try {
@@ -141,7 +145,6 @@ router.get("/getCourse/:courseId", async (req, res) => {
           subject.subject_id,
         ]);
         const teachers = teachersResult[0];
-        console.log(teachers);
         // Populate details for each teacher
         for (const teacher of teachers) {
           // Add more details about the teacher if needed
@@ -167,6 +170,71 @@ router.get("/getCourse/:courseId", async (req, res) => {
   }
 });
 module.exports = router;
+
+// ======================================  EDIT COURSE ======================================//
+
+router.put("/editCourse/:courseId", async (req, res) => {
+  const courseId = req.params.courseId;
+  const data = req.body;
+
+  try {
+    const checkCourseQuery = "SELECT * FROM courses WHERE course_id = ?";
+    const [courseResult] = await pool.query(checkCourseQuery, [courseId]);
+
+    if (courseResult.length === 0) {
+      return res.status(404).json({ error: "Course not found" });
+    }
+
+    const editCourseQuery =
+      "UPDATE courses SET course_name = ?, course_description = ?, outline_file = ?, prerequisites = ?, learning_outcomes = ?, classroom_material = ?, reference_books = ? WHERE course_id = ?";
+    const editCourseValues = [
+      data.course_name,
+      data.course_description,
+      data.outline_file,
+      data.prerequisites,
+      data.learning_outcomes,
+      data.classroom_material,
+      data.reference_books,
+      courseId,
+    ];
+    await pool.query(editCourseQuery, editCourseValues);
+
+    res.status(200).json({ message: "Course updated successfully" });
+  } catch (error) {
+    console.error("Error during course updation:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  GET ALL COURSES ======================================//
+
+router.get("/getAllCourses", async (req, res) => {
+  try {
+    const coursesQuery = "SELECT * FROM courses";
+    const coursesResult = await pool.query(coursesQuery);
+    const courses = coursesResult[0];
+
+    res.status(200).json({ courses });
+  } catch (error) {
+    console.error("Error during database retrieval:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  GET ALL COURSES NAMES WITH IDS ====================================//
+
+router.get("/getAllCoursesNamesWithIds", async (req, res) => {
+  try {
+    const coursesQuery = "SELECT course_id, course_name FROM courses";
+    const coursesResult = await pool.query(coursesQuery);
+    const courses = coursesResult[0];
+
+    res.status(200).json({ courses });
+  } catch (error) {
+    console.error("Error during database retrieval:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 // ======================================  DELETE COURSE ======================================//
 
@@ -200,6 +268,116 @@ router.delete("/deleteCourse/:courseId", async (req, res) => {
     res.status(200).json({ message: "Course deleted successfully" });
   } catch (error) {
     console.error("Error during course deletion:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  ADD FAQ ======================================//
+router.post("/addFaq", async (req, res) => {
+  const data = req.body;
+
+  try {
+    const faqQuery = "INSERT INTO faqs (question,answer) VALUES (?, ?)";
+    const faqValues = [data.question, data.answer];
+    const faqesult = await pool.query(faqQuery, faqValues);
+
+    res.status(200).json({ message: "Faq added successfully" });
+  } catch (error) {
+    console.error("Error during database insertion:", error);
+    res.status(200).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  GET FAQ ======================================//
+router.get("/getFaq", async (req, res) => {
+  try {
+    const faqQuery = "SELECT * FROM faqs";
+    const faqResult = await pool.query(faqQuery);
+    const faqs = faqResult[0];
+    res.status(200).json({ faqs });
+  } catch (error) {
+    console.error("Error during database retrieval:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  DELETE FAQ ======================================//
+router.delete("/deleteFaq/:faqId", async (req, res) => {
+  const faqId = req.params.faqId;
+
+  try {
+    const checkFaqQuery = "SELECT * FROM faqs WHERE id = ?";
+    const [faqResult] = await pool.query(checkFaqQuery, [faqId]);
+
+    if (faqResult.length === 0) {
+      return res.status(404).json({ error: "Faq not found" });
+    }
+
+    const deleteFaqQuery = "DELETE FROM faqs WHERE id = ?";
+    await pool.query(deleteFaqQuery, [faqId]);
+
+    res.status(200).json({ message: "Faq deleted successfully" });
+  } catch (error) {
+    console.error("Error during faq deletion:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  EDIT FAQ ======================================//
+router.put("/editFaq/:faqId", async (req, res) => {
+  const faqId = req.params.faqId;
+  const data = req.body;
+
+  try {
+    const checkFaqQuery = "SELECT * FROM faqs WHERE id = ?";
+    const [faqResult] = await pool.query(checkFaqQuery, [faqId]);
+
+    if (faqResult.length === 0) {
+      return res.status(404).json({ error: "Faq not found" });
+    }
+
+    const editFaqQuery =
+      "UPDATE faqs SET question = ?, answer = ? WHERE id = ?";
+    const editFaqValues = [data.question, data.answer, faqId];
+    await pool.query(editFaqQuery, editFaqValues);
+
+    res.status(200).json({ message: "Faq updated successfully" });
+  } catch (error) {
+    console.error("Error during faq updation:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  ADD CONTACT US ======================================//
+
+router.post("/addContactUs", async (req, res) => {
+  const data = req.body;
+
+  try {
+    const contactUsQuery =
+      "INSERT INTO contact_us (name, email, subject, message) VALUES (?, ?, ?, ?)";
+    const contactUsValues = [data.name, data.email, data.subject, data.message];
+    const contactUsresult = await pool.query(contactUsQuery, contactUsValues);
+
+    res
+      .status(200)
+      .json({ message: "Your message has been sent successfully" });
+  } catch (error) {
+    console.error("Error during database insertion:", error);
+    res.status(200).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  GET CONTACT US ======================================//
+router.get("/getContactUs", async (req, res) => {
+  try {
+    const contactUsQuery = "SELECT * FROM contact_us";
+    const contactUsResult = await pool.query(contactUsQuery);
+    const contactUs = contactUsResult[0];
+
+    res.status(200).json({ contactUs });
+  } catch (error) {
+    console.error("Error during database retrieval:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
