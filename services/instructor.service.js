@@ -179,7 +179,7 @@ module.exports = {
       ]);
       return addPaper.insertId;
     } catch (error) {
-      throw error("error inserting paper");
+      console.log(error);
     }
   },
 
@@ -192,22 +192,26 @@ module.exports = {
     correctOption,
     title
   ) {
-    const option1 = options[0];
-    const option2 = options[1];
-    const option3 = options[2];
-    const option4 = options[3];
-    await pool.query(sql.ADD_PAPER_QUESTION, [
-      paperId,
-      title,
-      question,
-      option1,
-      option2,
-      option3,
-      option4,
-      question_image_path,
-      question_video_path,
-      correctOption,
-    ]);
+    try {
+      const option1 = options[0];
+      const option2 = options[1];
+      const option3 = options[2];
+      const option4 = options[3];
+      await pool.query(sql.ADD_PAPER_QUESTION, [
+        paperId,
+        title,
+        question,
+        option1,
+        option2,
+        option3,
+        option4,
+        question_image_path,
+        question_video_path,
+        correctOption,
+      ]);
+    } catch (error) {
+      console.log(error);
+    }
   },
 
   async getInstructorPapersBySubject(subjectId) {

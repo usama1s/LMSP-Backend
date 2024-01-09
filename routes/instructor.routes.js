@@ -78,4 +78,70 @@ router.get("/subjects", async (req, res) => {
   }
 });
 
+//get all students by course id
+router.get("/students-by-courseId/:courseId", async (req, res) => {
+  const courseId = req.params.courseId;
+
+  try {
+    const studentsQuery = `
+      SELECT 
+        student.*,
+        users.*,
+        student_enrollment.*
+      FROM student
+      JOIN student_enrollment ON student.student_id = student_enrollment.student_id
+      JOIN users ON student.user_id = users.id
+      WHERE student_enrollment.course_id = ? AND student_enrollment.enrollment_status=1
+    `;
+    const studentsResult = await pool.query(studentsQuery, [courseId]);
+    const students = studentsResult[0];
+
+    res.status(200).json({ students });
+  } catch (error) {
+    console.error("Error getting students of a course:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// get papers by subject_id
+router.get("/instructor-papers/:subject_id", async (req, res) => {
+  const subject_id = req.params.subject_id;
+
+  try {
+    const papersQuery = `
+      SELECT
+    ip.id AS paper_id,
+    ip.title AS paper_title,
+    ip.paper_date,
+    ip.subject_id,
+    ip.section,
+    ip.instructor_id,
+    ipq.id AS question_id,
+    ipq.title AS question_title,
+    ipq.question,
+    ipq.option_1,
+    ipq.option_2,
+    ipq.option_3,
+    ipq.option_4,
+    ipq.answer,
+    ipq.question_picture,
+    ipq.question_video
+FROM
+    instructor_papers ip
+JOIN
+    instructor_paper_questions ipq ON ip.id = ipq.instructor_paper_id
+WHERE
+    ip.subject_id = ?;
+
+    `;
+    const papersResult = await pool.query(papersQuery, [subject_id]);
+    const papers = papersResult[0];
+
+    res.status(200).json({ papers });
+  } catch (error) {
+    console.error("Error getting papers of a subject:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 module.exports = router;

@@ -39,6 +39,7 @@ router.post(
 router.post("/addPaper", adminController.addPaper);
 router.post("/deletePaper/:id", adminController.deleteAdminPaper);
 
+//add course
 router.post("/addCourse", async (req, res) => {
   const data = req.body;
 
@@ -75,7 +76,7 @@ router.post("/addCourse", async (req, res) => {
         const subjectId = subjectResult[0].insertId;
 
         for (const teacher of subject.teachers) {
-          const teacherId = teacher.teacherID;
+          const teacherId = teacher.teacherID || teacher.instructor_id;
 
           const teacherSubjectQuery =
             "INSERT INTO instructor_subject (instructor_id, subject_id, section) VALUES (?, ?, ?)";
@@ -104,6 +105,136 @@ router.post("/addCourse", async (req, res) => {
   } catch (error) {
     console.error("Error during database insertion:", error);
     res.status(200).json({ error: "Internal Server Error" });
+  }
+});
+
+//edit course
+router.put("/editCourse", async (req, res) => {
+  const data = req.body;
+
+  try {
+    const outlineFilePath = await convertBase64.base64ToPdf(data.outline_file);
+    const courseQuery =
+      "UPDATE courses SET course_name = ?, course_description = ?, outline_file = ?, prerequisites = ?, learning_outcomes = ?, classroom_material = ?, reference_books = ? WHERE course_id = ?";
+    const courseValues = [
+      data.course_name,
+      data.course_description,
+      outlineFilePath,
+      data.prerequisites,
+      data.learning_outcomes,
+      data.classroom_material,
+      data.reference_books,
+      data.course_id,
+    ];
+    const courseResult = await pool.query(courseQuery, courseValues);
+
+    for (const module of data.modules) {
+      const moduleQuery =
+        "UPDATE modules SET module_name = ? WHERE module_id = ?";
+      const moduleValues = [module.module_name, module.module_id];
+
+      const moduleResult = await pool.query(moduleQuery, moduleValues);
+
+      for (const subject of module.subjects) {
+        const subjectQuery =
+          "UPDATE subjects SET subject_name = ? WHERE subject_id = ?";
+        const subjectValues = [subject.subject_name, subject.subject_id];
+
+        const subjectResult = await pool.query(subjectQuery, subjectValues);
+
+        for (const teacher of subject.teachers) {
+          const teacherId = teacher.teacherID || teacher.instructor_id;
+
+          const teacherSubjectQuery =
+            "UPDATE instructor_subject SET section = ? WHERE instructor_id = ? AND subject_id = ?";
+          const teacherSubjectValues = [
+            teacher.section,
+            teacherId,
+            subject.subject_id,
+          ];
+
+          await pool.query(teacherSubjectQuery, teacherSubjectValues);
+        }
+
+        for (const topic of subject.topics) {
+          const topicQuery =
+            "UPDATE topics SET topic_name = ?, lecture_file_name = ?, lecture_file_type = ?, lecture_file = ? WHERE topic_id = ?";
+          const topicValues = [
+            topic.topic_name,
+            topic.lecture_file_name,
+            topic.lecture_file_type,
+            topic.lecture_file,
+            topic.topic_id,
+          ];
+
+          await pool.query(topicQuery, topicValues);
+        }
+      }
+    }
+
+    res.status(200).json({ message: "Data updated successfully" });
+  } catch (error) {
+    console.error("Error during database insertion:", error);
+    res.status(200).json({ error: "Internal Server Error" });
+  }
+});
+
+// get all courses with modules,subjects, instructor, instructor
+router.get("/getCourses", async (req, res) => {
+  try {
+    // Get coursess
+    const coursesQuery = "SELECT * FROM courses";
+    const coursesResult = await pool.query(coursesQuery);
+    const courses = coursesResult[0];
+
+    // Get modules for each course
+    for (const course of courses) {
+      const modulesQuery = "SELECT * FROM modules WHERE course_id = ?";
+      const modulesResult = await pool.query(modulesQuery, [course.course_id]);
+      const modules = modulesResult[0];
+
+      // Get subjects for each module
+      for (const module of modules) {
+        const subjectsQuery = "SELECT * FROM subjects WHERE module_id = ?";
+        const subjectsResult = await pool.query(subjectsQuery, [
+          module.module_id,
+        ]);
+        const subjects = subjectsResult[0];
+
+        // Get teachers for each subject
+        for (const subject of subjects) {
+          const teachersQuery = `
+            SELECT instructor.*, instructor_subject.section
+            FROM instructor
+            JOIN instructor_subject ON instructor.instructor_id = instructor_subject.instructor_id
+            WHERE instructor_subject.subject_id = ?
+          `;
+          const teachersResult = await pool.query(teachersQuery, [
+            subject.subject_id,
+          ]);
+          const teachers = teachersResult[0];
+          // Populate details for each teacher
+          for (const teacher of teachers) {
+            // Add more details about the teacher if needed
+          }
+          const topicsQuery = "SELECT * FROM topics WHERE subject_id = ?";
+          const topicsResult = await pool.query(topicsQuery, [
+            subject.subject_id,
+          ]);
+          const topics = topicsResult[0];
+          for (const topic of topics) {
+          }
+          subject.teachers = teachers;
+          subject.topics = topics;
+        }
+        module.subjects = subjects;
+      }
+      course.modules = modules;
+    }
+
+    res.status(200).json({ courses });
+  } catch (err) {
+    console.log(err);
   }
 });
 
@@ -171,41 +302,6 @@ router.get("/getCourse/:courseId", async (req, res) => {
 });
 module.exports = router;
 
-// ======================================  EDIT COURSE ======================================//
-
-router.put("/editCourse/:courseId", async (req, res) => {
-  const courseId = req.params.courseId;
-  const data = req.body;
-
-  try {
-    const checkCourseQuery = "SELECT * FROM courses WHERE course_id = ?";
-    const [courseResult] = await pool.query(checkCourseQuery, [courseId]);
-
-    if (courseResult.length === 0) {
-      return res.status(404).json({ error: "Course not found" });
-    }
-
-    const editCourseQuery =
-      "UPDATE courses SET course_name = ?, course_description = ?, outline_file = ?, prerequisites = ?, learning_outcomes = ?, classroom_material = ?, reference_books = ? WHERE course_id = ?";
-    const editCourseValues = [
-      data.course_name,
-      data.course_description,
-      data.outline_file,
-      data.prerequisites,
-      data.learning_outcomes,
-      data.classroom_material,
-      data.reference_books,
-      courseId,
-    ];
-    await pool.query(editCourseQuery, editCourseValues);
-
-    res.status(200).json({ message: "Course updated successfully" });
-  } catch (error) {
-    console.error("Error during course updation:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
 // ======================================  GET ALL COURSES ======================================//
 
 router.get("/getAllCourses", async (req, res) => {
@@ -256,12 +352,12 @@ router.delete("/deleteCourse/:courseId", async (req, res) => {
     const deleteInstructorSubjectQuery =
       "DELETE FROM instructor_subject WHERE subject_id IN (SELECT subject_id FROM subjects WHERE module_id IN (SELECT module_id FROM modules WHERE course_id = ?))";
     await pool.query(deleteInstructorSubjectQuery, [courseId]);
-    const deleteModulesQuery = "DELETE FROM modules WHERE course_id = ?";
-    await pool.query(deleteModulesQuery, [courseId]);
 
     const deleteSubjectsQuery =
       "DELETE FROM subjects WHERE module_id IN (SELECT module_id FROM modules WHERE course_id = ?)";
     await pool.query(deleteSubjectsQuery, [courseId]);
+    const deleteModulesQuery = "DELETE FROM modules WHERE course_id = ?";
+    await pool.query(deleteModulesQuery, [courseId]);
     const deleteCourseQuery = "DELETE FROM courses WHERE course_id = ?";
     await pool.query(deleteCourseQuery, [courseId]);
 
@@ -378,6 +474,153 @@ router.get("/getContactUs", async (req, res) => {
     res.status(200).json({ contactUs });
   } catch (error) {
     console.error("Error during database retrieval:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  GENERATE CERTIFICATE ======================================//
+// INSERT INTO `Certificates`(`certificate_id`, `course_id`, `student_id`, `issued_by`, `date`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]')
+router.post("/generateCertificate", async (req, res) => {
+  const data = req.body;
+
+  try {
+    const certificateQuery =
+      "INSERT INTO Certificates (course_id, user_id, issued_by, date,title) VALUES (?, ?, ?, ?,?)";
+    const certificateValues = [
+      data.course_id,
+      data.student_id,
+      data.issued_by,
+      data.date,
+      data.title,
+    ];
+    const certificateResult = await pool.query(
+      certificateQuery,
+      certificateValues
+    );
+
+    res.status(200).json({ message: "Certificate generated successfully" });
+  } catch (error) {
+    console.error("Error during database insertion:", error);
+    res.status(200).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  GET ALL CERTIFICATES ======================================//
+router.get("/getAllCertificates", async (req, res) => {
+  try {
+    const certificateQuery = "SELECT * FROM Certificates";
+    const certificateResult = await pool.query(certificateQuery);
+    const certificates = certificateResult[0];
+
+    res.status(200).json({ certificates });
+  } catch (error) {
+    console.error("Error during database retrieval:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  DELETE CERTIFICATE ======================================//
+router.delete("/deleteCertificate/:certificateId", async (req, res) => {
+  const certificateId = req.params.certificateId;
+
+  try {
+    const checkCertificateQuery =
+      "SELECT * FROM Certificates WHERE certificate_id = ?";
+    const [certificateResult] = await pool.query(checkCertificateQuery, [
+      certificateId,
+    ]);
+
+    if (certificateResult.length === 0) {
+      return res.status(404).json({ error: "Certificate not found" });
+    }
+
+    const deleteCertificateQuery =
+      "DELETE FROM Certificates WHERE certificate_id = ?";
+    await pool.query(deleteCertificateQuery, [certificateId]);
+
+    res.status(200).json({ message: "Certificate deleted successfully" });
+  } catch (error) {
+    console.error("Error during certificate deletion:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  EDIT CERTIFICATE ======================================//
+router.put("/editCertificate/:certificateId", async (req, res) => {
+  const certificateId = req.params.certificateId;
+  const data = req.body;
+
+  try {
+    const checkCertificateQuery =
+      "SELECT * FROM Certificates WHERE certificate_id = ?";
+    const [certificateResult] = await pool.query(checkCertificateQuery, [
+      certificateId,
+    ]);
+
+    if (certificateResult.length === 0) {
+      return res.status(404).json({ error: "Certificate not found" });
+    }
+
+    const editCertificateQuery =
+      "UPDATE Certificates SET course_id = ?, student_id = ?, issued_by = ?, date = ? WHERE certificate_id = ?";
+    const editCertificateValues = [
+      data.course_id,
+      data.student_id,
+      data.issued_by,
+      data.date,
+      certificateId,
+    ];
+    await pool.query(editCertificateQuery, editCertificateValues);
+
+    res.status(200).json({ message: "Certificate updated successfully" });
+  } catch (error) {
+    console.error("Error during certificate updation:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  GET CERTIFICATE BY ID ======================================//
+router.get("/getCertificateById/:certificateId", async (req, res) => {
+  const certificateId = req.params.certificateId;
+
+  try {
+    const certificateQuery =
+      "SELECT * FROM Certificates WHERE certificate_id = ?";
+    const [certificateResult] = await pool.query(certificateQuery, [
+      certificateId,
+    ]);
+
+    if (certificateResult.length === 0) {
+      return res.status(404).json({ error: "Certificate not found" });
+    }
+
+    const certificate = certificateResult[0];
+
+    res.status(200).json({ certificate });
+  } catch (error) {
+    console.error("Error during certificate retrieval:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+// ======================================  GET CERTIFICATE BY STUDENT ID ===============================//
+router.get("/getCertificateByStudentId/:studentId", async (req, res) => {
+  const studentId = req.params.studentId;
+
+  try {
+    // get student details as well with certificate details
+    const certificateQuery = "SELECT * FROM Certificates WHERE student_id = ?";
+    const [certificateResult] = await pool.query(certificateQuery, [studentId]);
+
+    if (certificateResult.length === 0) {
+      return res.status(404).json({ error: "Certificate not found" });
+    }
+
+    const certificates = certificateResult[0];
+
+    res.status(200).json({ certificates });
+  } catch (error) {
+    console.error("Error during certificate retrieval:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });

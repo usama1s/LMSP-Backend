@@ -147,13 +147,13 @@ module.exports = {
   ADD_PAPER: `
     INSERT INTO instructor_papers
     (subject_id,instructor_id, paper_date, section,title)
-    VALUES(?, ?, ?, ?);
+    VALUES(?, ?, ?, ?,?);
   `,
 
   ADD_INCHARGE_PAPER: `
     INSERT INTO incharge_papers
     (subject_id,admin_id, paper_date, section,title)
-    VALUES(?, ?, ?, ?);
+    VALUES(?, ?, ?, ?,?);
   `,
 
   // SQL query for retrieving instructor papers by subject and filtering out past papers
@@ -287,10 +287,11 @@ JOIN
   modules m ON c.course_id = m.course_id
 JOIN
   subjects sub ON m.module_id = sub.module_id
-  LEFT JOIN
+ JOIN
   student_attendence sa ON s.student_id = sa.student_id AND sa.attendence_date =?
 WHERE
   sa.subject_id = ?
+  
   `,
 
   MARK_ATTENDENCE: `

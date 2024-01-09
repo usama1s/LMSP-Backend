@@ -300,6 +300,8 @@ module.exports = {
             employee_id: users[0].employment_id,
             profile_image_type: users[0].profile_image_type,
             profile_image: users[0].profile_image,
+            user_id: users[0]?.id,
+            admin_id: users[0]?.admin_id,
           };
           return transformedUser;
         } else {

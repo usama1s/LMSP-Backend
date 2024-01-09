@@ -133,7 +133,6 @@ module.exports = {
         subject_id,
         section,
         title,
-        paper_title,
       } = paperDetails;
 
       const paperId = await instructorService.addPaper(
@@ -141,8 +140,7 @@ module.exports = {
         instructor_id,
         paper_date,
         section,
-        title,
-        paper_title
+        title
       );
 
       for (const {
@@ -152,16 +150,22 @@ module.exports = {
         image,
         video,
       } of paper_questions) {
-        const questionImagePath = await convertBase64.base64ToJpg(image);
-        const questionVideoPath = await convertBase64.base64ToMp4(video);
+        var questionImagePath;
+        var questionVideoPath;
+        if (image) {
+          questionImagePath = await convertBase64.base64ToJpg(image);
+        }
+        if (video) {
+          questionVideoPath = await convertBase64.base64ToMp4(video);
+        }
         await instructorService.addPaperQuestion(
           paperId,
-          title,
           question,
           options,
           questionImagePath,
           questionVideoPath,
-          correctOption
+          correctOption,
+          title
         );
       }
 
