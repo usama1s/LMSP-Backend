@@ -110,34 +110,91 @@ router.get("/instructor-papers/:subject_id", async (req, res) => {
   try {
     const papersQuery = `
       SELECT
-    ip.id AS paper_id,
-    ip.title AS paper_title,
-    ip.paper_date,
-    ip.subject_id,
-    ip.section,
-    ip.instructor_id,
-    ipq.id AS question_id,
-    ipq.title AS question_title,
-    ipq.question,
-    ipq.option_1,
-    ipq.option_2,
-    ipq.option_3,
-    ipq.option_4,
-    ipq.answer,
-    ipq.question_picture,
-    ipq.question_video
-FROM
-    instructor_papers ip
-JOIN
-    instructor_paper_questions ipq ON ip.id = ipq.instructor_paper_id
-WHERE
-    ip.subject_id = ?;
-
+        ip.id AS paper_id,
+        ip.title AS paper_title,
+        ip.paper_date,
+        ip.subject_id,
+        ip.section,
+        ip.instructor_id,
+        CONCAT(u.first_name, ' ', u.last_name) AS instructor_name,
+        ipq.id AS question_id,
+        ipq.title AS question_title,
+        ipq.question,
+        ipq.option_1,
+        ipq.option_2,
+        ipq.option_3,
+        ipq.option_4,
+        ipq.answer,
+        ipq.question_picture,
+        ipq.question_video
+      FROM
+        instructor_papers ip
+      JOIN
+        instructor_paper_questions ipq ON ip.id = ipq.instructor_paper_id
+      JOIN
+        instructor i ON ip.instructor_id = i.instructor_id
+      JOIN
+        users u ON i.user_id = u.id
+      WHERE
+        ip.subject_id = ?;
     `;
+
     const papersResult = await pool.query(papersQuery, [subject_id]);
     const papers = papersResult[0];
 
-    res.status(200).json({ papers });
+    // Organize the data into the desired structure
+    const organizedData = papers.reduce((acc, paper) => {
+      const existingPaper = acc.find((p) => p.paper_id === paper.paper_id);
+
+      if (!existingPaper) {
+        const newPaper = {
+          paper_id: paper.paper_id,
+          paper_title: paper.paper_title,
+          paper_date: paper.paper_date,
+          subject_id: paper.subject_id,
+          section: paper.section,
+          instructor_id: paper.instructor_id,
+          instructor_name: paper.instructor_name,
+          questions: [
+            {
+              question_id: paper.question_id,
+              question_title: paper.question_title,
+              question: paper.question,
+              answer: paper.answer,
+              question_picture: paper.question_picture,
+              question_video: paper.question_video,
+              options: [
+                paper.option_1,
+                paper.option_2,
+                paper.option_3,
+                paper.option_4,
+              ],
+            },
+          ],
+        };
+
+        acc.push(newPaper);
+      } else {
+        existingPaper.questions.push({
+          question_id: paper.question_id,
+          question_title: paper.question_title,
+          question: paper.question,
+          answer: paper.answer,
+          question_picture: paper.question_picture,
+          question_video: paper.question_video,
+          options: [
+            paper.option_1,
+            paper.option_2,
+            paper.option_3,
+            paper.option_4,
+          ],
+        });
+      }
+
+      return acc;
+    }, []);
+
+    res.status(200).json({ papers: organizedData });
   } catch (error) {
     console.error("Error getting papers of a subject:", error);
     res.status(500).json({ error: "Internal Server Error" });

@@ -152,8 +152,8 @@ module.exports = {
 
   ADD_INCHARGE_PAPER: `
     INSERT INTO incharge_papers
-    (subject_id,admin_id, paper_date, section,title)
-    VALUES(?, ?, ?, ?,?);
+    (subject_id,admin_id, paper_date,title)
+    VALUES(?, ?, ?,?);
   `,
 
   // SQL query for retrieving instructor papers by subject and filtering out past papers
@@ -270,29 +270,53 @@ module.exports = {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `,
 
+  //   GET_STUDENTS_BY_SUBJECT_ID: `
+  // SELECT
+  //   u.*,
+  //   sa.*,
+  //   s.student_id
+  // FROM
+  //   users u
+  // JOIN
+  //   student s ON u.id = s.user_id
+  // JOIN
+  //   student_enrollment se ON s.student_id = se.student_id
+  // JOIN
+  //   courses c ON se.course_id = c.course_id
+  // JOIN
+  //   modules m ON c.course_id = m.course_id
+  // JOIN
+  //   subjects sub ON m.module_id = sub.module_id
+  //  JOIN
+  //   student_attendence sa ON s.student_id = sa.student_id AND sa.attendence_date =?
+  // WHERE
+  //   sa.subject_id = ?
+
+  //   `,
+
   GET_STUDENTS_BY_SUBJECT_ID: `
-SELECT
-  u.*,
-  sa.*,
-  s.student_id
-FROM
-  users u
-JOIN
-  student s ON u.id = s.user_id
-JOIN
-  student_enrollment se ON s.student_id = se.student_id
-JOIN
-  courses c ON se.course_id = c.course_id
-JOIN
-  modules m ON c.course_id = m.course_id
-JOIN
-  subjects sub ON m.module_id = sub.module_id
- JOIN
-  student_attendence sa ON s.student_id = sa.student_id AND sa.attendence_date =?
-WHERE
-  sa.subject_id = ?
-  
-  `,
+SELECT 
+    u.first_name,
+    u.last_name,
+    u.email,
+    sa.attendence_status
+FROM 
+    users u
+JOIN 
+    student s ON u.id = s.user_id
+JOIN 
+    student_enrollment se ON s.student_id = se.student_id
+JOIN 
+    student_attendence sa ON s.student_id = sa.student_id
+WHERE 
+    sa.subject_id = ?
+    AND sa.attendence_date = ?
+    AND se.enrollment_status = '1'
+    AND sa.subject_id IS NOT NULL
+ORDER BY 
+    u.last_name, u.first_name;
+
+`,
 
   MARK_ATTENDENCE: `
    INSERT INTO student_attendence
@@ -402,17 +426,10 @@ WHERE program_plan.course_id = ?
 
   GET_COURSE_DETAILS_WITH_STUDENT_ID: `
   SELECT
-  course.course_id,
-  course.course_name,
-  course.course_description,
-  users.first_name,
-  users.last_name
+  *
 FROM
-  student_enrollment
-LEFT JOIN program_plan ON program_plan.program_plan_id = student_enrollment.program_plan_id
-INNER JOIN instructor ON instructor.instructor_id = program_plan.instructor_id
-INNER JOIN users ON users.id = instructor.user_id
-LEFT JOIN course ON course.course_id = program_plan.course_id
+  courses
+ JOIN student_enrollment ON student_enrollment.course_id = courses.course_id
 WHERE
   student_enrollment.student_id = ?
 ;

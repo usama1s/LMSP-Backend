@@ -133,8 +133,8 @@ module.exports = {
     console.log(date, subject_id);
     try {
       const [students] = await pool.query(sql.GET_STUDENTS_BY_SUBJECT_ID, [
-        date,
         subject_id,
+        date,
       ]);
       return students;
     } catch (error) {

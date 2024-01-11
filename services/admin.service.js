@@ -527,18 +527,18 @@ module.exports = {
     }
   },
 
-  async addPaper(subject_id, admin_id, paper_date, section, title) {
+  async addPaper(subject_id, admin_id, paper_date, title) {
     try {
       const [addPaper] = await pool.query(sql.ADD_INCHARGE_PAPER, [
         subject_id,
         admin_id,
         paper_date,
-        section,
+
         title,
       ]);
       return addPaper.insertId;
     } catch (error) {
-      throw error("error inserting paper");
+      console.log(error);
     }
   },
 

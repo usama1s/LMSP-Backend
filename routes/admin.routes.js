@@ -204,8 +204,9 @@ router.get("/getCourses", async (req, res) => {
         // Get teachers for each subject
         for (const subject of subjects) {
           const teachersQuery = `
-            SELECT instructor.*, instructor_subject.section
+            SELECT instructor.*, instructor_subject.section,users.first_name,users.last_name,users.email,users.phone_number
             FROM instructor
+            JOIN users ON instructor.user_id = users.id
             JOIN instructor_subject ON instructor.instructor_id = instructor_subject.instructor_id
             WHERE instructor_subject.subject_id = ?
           `;
@@ -267,16 +268,17 @@ router.get("/getCourse/:courseId", async (req, res) => {
 
       for (const subject of subjects) {
         const teachersQuery = `
-          SELECT instructor.*, instructor_subject.section
-          FROM instructor
-          JOIN instructor_subject ON instructor.instructor_id = instructor_subject.instructor_id
-          WHERE instructor_subject.subject_id = ?
+          SELECT instructor.*, instructor_subject.section,users.first_name,users.last_name,users.email
+            FROM instructor
+            JOIN users ON instructor.user_id = users.id
+            JOIN instructor_subject ON instructor.instructor_id = instructor_subject.instructor_id
+            WHERE instructor_subject.subject_id = ?
         `;
         const teachersResult = await pool.query(teachersQuery, [
           subject.subject_id,
         ]);
         const teachers = teachersResult[0];
-        // Populate details for each teacher
+        // Populate details for each teachers
         for (const teacher of teachers) {
           // Add more details about the teacher if needed
         }

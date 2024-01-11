@@ -212,7 +212,7 @@ module.exports = {
         paper_questions,
         admin_id,
         subject_id,
-        section,
+
         title,
       } = paperDetails;
 
@@ -220,18 +220,18 @@ module.exports = {
         subject_id,
         admin_id,
         paper_date,
-        section,
+
         title
       );
 
-      for (const { questionId } of paper_questions) {
-        await adminService.addPaperQuestion(paperId, questionId);
+      for (const { question_id } of paper_questions) {
+        await adminService.addPaperQuestion(paperId, question_id);
       }
 
       return res.json("Paper added successfully");
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: "An error occurred" });
+      console.log(error);
+      return res.status(200).json({ error: "An error occurred" });
     }
   },
 

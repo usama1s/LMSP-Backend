@@ -69,14 +69,11 @@ module.exports = {
     }
   },
 
-  // GET QUIZ 
+  // GET QUIZ
   async getQuiz(req, res) {
     try {
       const { student_id, course_id } = req.params;
-      const quiz = await studentService.getQuiz(
-        student_id,
-        course_id,
-      );
+      const quiz = await studentService.getQuiz(student_id, course_id);
       res.status(200).json(quiz);
     } catch (error) {
       console.error(error);
@@ -145,10 +142,7 @@ module.exports = {
   async getAllGrades(req, res) {
     try {
       const { student_id, course_id } = req.params;
-      const grades = await studentService.getAllGrades(
-        student_id,
-        course_id
-      );
+      const grades = await studentService.getAllGrades(student_id, course_id);
       res.status(200).json(grades);
     } catch (error) {
       console.error(error);
