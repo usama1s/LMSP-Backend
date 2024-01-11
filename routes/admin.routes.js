@@ -624,3 +624,8 @@ router.get("/getCertificateByStudentId/:studentId", async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
+
+
+router.get("/get-stats/:studentId", adminController.getAllStats);
+router.get("/get-stats-by-subjects/:studentId/:subjectId", adminController.getAllStatsBySubjects);
+
