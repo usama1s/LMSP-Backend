@@ -295,26 +295,33 @@ module.exports = {
   //   `,
 
   GET_STUDENTS_BY_SUBJECT_ID: `
-SELECT 
+SELECT
     u.first_name,
     u.last_name,
     u.email,
-    sa.attendence_status
-FROM 
+    s.*,
+    COALESCE(sa.attendence_status, 0) AS attendence_status,
+    sa.attendence_date
+FROM
     users u
-JOIN 
+JOIN
     student s ON u.id = s.user_id
-JOIN 
+LEFT JOIN
     student_enrollment se ON s.student_id = se.student_id
-JOIN 
+LEFT JOIN
+    courses c ON se.course_id = c.course_id
+LEFT JOIN
+    modules m ON c.course_id = m.course_id
+LEFT JOIN
+    subjects sub ON m.module_id = sub.module_id
+LEFT JOIN
     student_attendence sa ON s.student_id = sa.student_id
-WHERE 
-    sa.subject_id = ?
-    AND sa.attendence_date = ?
-    AND se.enrollment_status = '1'
-    AND sa.subject_id IS NOT NULL
-ORDER BY 
-    u.last_name, u.first_name;
+                         AND sub.subject_id = sa.subject_id
+                         AND sa.attendence_date = ?
+WHERE
+    sub.subject_id = ?
+
+
 
 `,
 
@@ -323,6 +330,18 @@ ORDER BY
    (student_id, attendence_status, attendence_date,subject_id)
    VALUES(?, ?, ?, ?)
 `,
+
+  CHECK_ATTENDENCE_EXISTENCE: `
+  SELECT * FROM student_attendence
+  WHERE student_id = ? AND attendence_date = ? AND subject_id = ?
+`,
+
+  UPDATE_ATTENDENCE: `
+  UPDATE student_attendence
+  SET attendence_status = ?
+  WHERE attendence_date = ? AND subject_id = ? AND student_id = ?
+`,
+
   GET_COURSES_BY_INSTRUCTOR: `
 SELECT
     course.course_name,
