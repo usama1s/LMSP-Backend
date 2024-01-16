@@ -563,4 +563,43 @@ module.exports = {
       throw new Error("Error deleting instructor paper");
     }
   },
+
+  async getAllStats(studentId) {
+    try {
+      const [avgAssignmentMarks] = await pool.query(sql.GET_AVG_ASSIGNMENT_MARKS, [studentId]);
+      const [avgQuizMarks] = await pool.query(sql.GET_AVG_QUIZ_MARKS, [studentId]);
+      const [avgAttendance] = await pool.query(sql.GET_AVG_ATTENDANCE, [studentId, 1]);
+
+      // Creating an object with the obtained average values
+      const stats = {
+        avgAssignmentMarks: avgAssignmentMarks[0].average_assignment_marks,
+        avgQuizMarks: avgQuizMarks[0].average_quiz_marks,
+        avgAttendance: avgAttendance[0].average_attendance
+      };
+
+      return stats;
+    } catch (error) {
+      throw new Error("Error getting student statistics");
+    }
+  },
+
+  async getAllStatsBySubjects(studentId, subjectId) {
+    try {
+      const [avgAssignmentMarks] = await pool.query(sql.GET_AVG_ASSIGNMENT_MARKS_PER_SUBJECT, [studentId, subjectId]);
+      const [avgQuizMarks] = await pool.query(sql.GET_AVG_QUIZ_MARKS_PER_SUBJECT, [studentId, subjectId]);
+      const [avgAttendance] = await pool.query(sql.GET_AVG_ATTENDANCE_PER_SUBJECT, [studentId, 1, subjectId]);
+
+      // Creating an object with the obtained average values
+      const statsPerSubject = {
+        avgSubjectAssignmentMarks: avgAssignmentMarks[0].average_subject_assignment_marks,
+        avgSubjectQuizMarks: avgQuizMarks[0].average_subject_quiz_marks,
+        avgSubjectAttendance: avgAttendance[0].average_subject_attendance
+      };
+
+      return statsPerSubject;
+    } catch (error) {
+      throw new Error("Error getting student statistics");
+    }
+  }
+
 };

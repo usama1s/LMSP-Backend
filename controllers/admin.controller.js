@@ -203,7 +203,6 @@ module.exports = {
   },
 
   //ADd paper by instructor
-
   async addPaper(req, res) {
     try {
       const paperDetails = req.body;
@@ -240,6 +239,28 @@ module.exports = {
       const { paper_id } = req.params;
       await adminService.deleteAdminPaper(paper_id);
       return res.json({ message: "Admin paper deleted successfully." });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+
+  async getAllStats(req, res) {
+    try {
+      const { studentId } = req.params;
+      const stats = await adminService.getAllStats(studentId);
+      return res.json(stats);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+
+  async getAllStatsBySubjects(req, res) {
+    try {
+      const { studentId, subjectId } = req.params;
+      const statsPerSubject = await adminService.getAllStatsBySubjects(studentId, subjectId);
+      return res.json(statsPerSubject);
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "An error occurred" });

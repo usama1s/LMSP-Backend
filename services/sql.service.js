@@ -750,7 +750,66 @@ WHERE
   INNER JOIN module ON module.course_id = course.course_id
   `,
 
-  //   GET_WHOLE_PROGRAM: `
+
+  GET_AVG_ATTENDANCE: `
+  select
+	AVG(attendence_status) as average_attendance
+  from
+	student_attendence
+  where
+	student_id = ?
+	and attendence_status = ?;
+  `,
+  GET_AVG_QUIZ_MARKS: `
+  select
+	AVG(total_marks) as average_quiz_marks
+  from
+	quiz_submitted 
+  where
+	student_id = ?;`,
+
+  GET_AVG_ASSIGNMENT_MARKS: `
+  select
+	AVG(marks) as average_assignment_marks
+from
+	assignment_submitted 
+where
+	student_id = ?;`,
+
+  GET_AVG_QUIZ_MARKS_PER_SUBJECT: `
+  select
+	AVG(total_marks) as average_subject_quiz_marks
+from
+	quiz_submitted
+inner join quiz on
+	quiz.quiz_id = quiz_submitted.quiz_id
+where
+	student_id = ?
+	and quiz.subject_id = ?;`,
+
+  GET_AVG_ASSIGNMENT_MARKS_PER_SUBJECT: `
+  select
+	AVG(marks) as average_subject_assignment_marks
+from
+	assignment_submitted 
+inner join assignments on
+	assignments.assignment_id  = assignment_submitted.assignment_id 
+where
+	student_id = ?
+	and assignments.subject_id = ?;`,
+
+  GET_AVG_ATTENDANCE_PER_SUBJECT: `
+  select
+	AVG(attendence_status) as average_subject_attendance
+from
+	student_attendence
+where
+	student_id = ?
+	and attendence_status = ?
+	and subject_id = ?;
+  `,
+
+
   //   SELECT
   //     program.program_id,
   //     program.program_name,
