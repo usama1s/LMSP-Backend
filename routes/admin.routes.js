@@ -246,8 +246,9 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
   const studentId = req.params.studentId;
   const subjectsWithAttendance = [];
   const finalPapers = [];
-  const quizes = [];
-  const assignments = [];
+  const QzAzAgainstSubjects = [];
+  const quizes = {};
+  const assignments = {};
 
   try {
     // Get course details
@@ -296,12 +297,16 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
         const [paper] = await pool.query(sql.GET_FINAL_PAPERS, [subject.subject_id,]);
         const [quiz] = await pool.query(sql.GET_QUIZ_BY_SUBJECT_ID, [subject.subject_id,]);
         const [assignment] = await pool.query(sql.GET_ASSIGNMENT_BY_SUBJECT_ID, [subject.subject_id,]);
+        if (quiz[0]?.subjectId === assignment[0]?.subjectId) {
+          QzAzAgainstSubjects.push(subject.subject_name, { quiz: quiz[0], assignment: assignment[0] });
+        }
+
         subject.teachers = teachers;
         subject.topics = topics;
         pushIfNotNullOrUndefined(studentAttendence[0], subjectsWithAttendance);
         pushIfNotNullOrUndefined(paper[0], finalPapers);
-        pushIfNotNullOrUndefined(quiz[0], quizes);
-        pushIfNotNullOrUndefined(assignment[0], assignments);
+        // pushIfNotNullOrUndefined(quiz[0], quizes);
+        // pushIfNotNullOrUndefined(assignment[0], assignments);
         function pushIfNotNullOrUndefined(value, array) {
           if (value !== null && value !== undefined) {
             array.push(value);
@@ -312,7 +317,7 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
     }
     course.modules = modules;
 
-    res.status(200).json({ course, subjectsWithAttendance, finalPapers, quizes, assignments });
+    res.status(200).json({ course, subjectsWithAttendance, finalPapers, QzAzAgainstSubjects });
   } catch (error) {
     console.error("Error during database retrieval:", error);
     res.status(500).json({ error: "Internal Server Error" });
