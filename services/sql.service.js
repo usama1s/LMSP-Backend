@@ -427,6 +427,10 @@ VALUES(?, ?);
   SELECT * FROM student_attendence WHERE student_id=?;
 `,
 
+  GET_ATTENDENCE_SUBJECT_AND_STUDENT_ID: `
+SELECT * FROM student_attendence WHERE student_id=? and subject_id=?;
+`,
+
   GET_ATTENDENCE_FOR_CHART: `
   SELECT COUNT(student_attendence.attendence_status) AS total_attendance_count,
        student_attendence.*,
@@ -482,6 +486,42 @@ FROM quiz_submitted
 WHERE student_id = ? AND quiz_id = ?;
 
 `,
+
+  GET_FINAL_PAPERS: `
+  select
+	incharge_papers.title,
+	incharge_papers.subject_id,
+	subjects.subject_name 
+from
+	incharge_papers
+inner join 
+subjects on
+	subjects.subject_id = incharge_papers.subject_id
+where
+	incharge_papers.subject_id = ?;
+`,
+
+  GET_QUIZ_BY_SUBJECT_ID: `
+  select
+  *
+from
+quiz_submitted  
+inner join quiz  on
+quiz.quiz_id = quiz_submitted.quiz_id 
+where
+quiz.subject_id = ?;
+`,
+
+  GET_ASSIGNMENT_BY_SUBJECT_ID: `
+select
+*
+from
+assignment_submitted 
+inner join assignments on
+assignments.assignment_id  = assignment_submitted.assignment_id 
+where assignments.subject_id = ?;
+`,
+
 
   GET_ASSIGNMENTS: `
 SELECT

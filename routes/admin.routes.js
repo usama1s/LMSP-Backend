@@ -241,8 +241,13 @@ router.get("/getCourses", async (req, res) => {
 
 // -------------------------------------      GET COURSE BY ID ---------------------------------- //
 
-router.get("/getCourse/:courseId", async (req, res) => {
+router.get("/getCourse/:courseId/:studentId", async (req, res) => {
   const courseId = req.params.courseId;
+  const studentId = req.params.studentId;
+  const subjectsWithAttendance = [];
+  const finalPapers = [];
+  const quizes = [];
+  const assignments = [];
 
   try {
     // Get course details
@@ -264,7 +269,7 @@ router.get("/getCourse/:courseId", async (req, res) => {
       const subjectsResult = await pool.query(subjectsQuery, [
         module.module_id,
       ]);
-      const subjects = subjectsResult[0];
+      subjects = subjectsResult[0];
 
       for (const subject of subjects) {
         const teachersQuery = `
@@ -287,16 +292,27 @@ router.get("/getCourse/:courseId", async (req, res) => {
           subject.subject_id,
         ]);
         const topics = topicsResult[0];
-        for (const topic of topics) {
-        }
+        const [studentAttendence] = await pool.query(sql.GET_ATTENDENCE_SUBJECT_AND_STUDENT_ID, [studentId, subject.subject_id,]);
+        const [paper] = await pool.query(sql.GET_FINAL_PAPERS, [subject.subject_id,]);
+        const [quiz] = await pool.query(sql.GET_QUIZ_BY_SUBJECT_ID, [subject.subject_id,]);
+        const [assignment] = await pool.query(sql.GET_ASSIGNMENT_BY_SUBJECT_ID, [subject.subject_id,]);
         subject.teachers = teachers;
         subject.topics = topics;
+        pushIfNotNullOrUndefined(studentAttendence[0], subjectsWithAttendance);
+        pushIfNotNullOrUndefined(paper[0], finalPapers);
+        pushIfNotNullOrUndefined(quiz[0], quizes);
+        pushIfNotNullOrUndefined(assignment[0], assignments);
+        function pushIfNotNullOrUndefined(value, array) {
+          if (value !== null && value !== undefined) {
+            array.push(value);
+          }
+        }
       }
       module.subjects = subjects;
     }
     course.modules = modules;
 
-    res.status(200).json({ course });
+    res.status(200).json({ course, subjectsWithAttendance, finalPapers, quizes, assignments });
   } catch (error) {
     console.error("Error during database retrieval:", error);
     res.status(500).json({ error: "Internal Server Error" });
