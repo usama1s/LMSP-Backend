@@ -204,7 +204,7 @@ router.get("/getCourses", async (req, res) => {
         // Get teachers for each subject
         for (const subject of subjects) {
           const teachersQuery = `
-            SELECT instructor.*, instructor_subject.section,users.first_name,users.last_name,users.email,users.phone_number
+            SELECT instructor.*, instructor_subject.section,users.first_name,users.last_name,users.email
             FROM instructor
             JOIN users ON instructor.user_id = users.id
             JOIN instructor_subject ON instructor.instructor_id = instructor_subject.instructor_id
