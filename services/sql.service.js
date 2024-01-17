@@ -391,12 +391,40 @@ WHERE
 ORDER BY
   ip.paper_date ASC;
 `,
+
+  GET_SUBMITTED_ASSIGNMENTS: `
+select
+		*
+from
+	assignment_submitted
+inner join assignments on
+	assignments.assignment_id = assignment_submitted.assignment_id
+inner join subjects on
+	assignments.subject_id = subjects.subject_id
+where
+	assignments.instructor_id = ?;
+`,
+
+
   // STUDENT____________________________________________________________________________________________________________
 
   ADD_STUDENT: `
     INSERT INTO student
     (user_id, register_id, status)
     VALUES (?, ?, ?)
+  `,
+
+  GET_USER_BY_STUDENT_ID: `
+  SELECT
+  users.first_name,
+  users.last_name,
+  CONCAT(users.first_name, ' ', users.last_name) AS full_name
+FROM
+  users
+INNER JOIN
+  student ON student.user_id = users.id
+WHERE
+  student.student_id = ?;
   `,
 
   CHECK_STUDENT_REGISTERED: `
