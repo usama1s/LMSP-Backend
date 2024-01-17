@@ -293,7 +293,11 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
           subject.subject_id,
         ]);
         const topics = topicsResult[0];
-        const [studentAttendence] = await pool.query(sql.GET_ATTENDENCE_SUBJECT_AND_STUDENT_ID, [studentId, subject.subject_id,]);
+        const [studentAttendance] = await pool.query(sql.GET_ATTENDENCE_SUBJECT_AND_STUDENT_ID, [studentId, subject.subject_id,]);
+        for (const attendance of studentAttendance) {
+          subjectsWithAttendance.push(attendance);
+        }
+
         const [paper] = await pool.query(sql.GET_FINAL_PAPERS, [subject.subject_id,]);
         const [quiz] = await pool.query(sql.GET_QUIZ_BY_SUBJECT_ID, [subject.subject_id,]);
         const [assignment] = await pool.query(sql.GET_ASSIGNMENT_BY_SUBJECT_ID, [subject.subject_id,]);
@@ -303,7 +307,6 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
 
         subject.teachers = teachers;
         subject.topics = topics;
-        pushIfNotNullOrUndefined(studentAttendence[0], subjectsWithAttendance);
         pushIfNotNullOrUndefined(paper[0], finalPapers);
         // pushIfNotNullOrUndefined(quiz[0], quizes);
         // pushIfNotNullOrUndefined(assignment[0], assignments);
