@@ -473,7 +473,15 @@ VALUES(?, ?);
 `,
 
   GET_ATTENDENCE_SUBJECT_AND_STUDENT_ID: `
-SELECT * FROM student_attendence WHERE student_id=? and subject_id=?;
+  select
+	*
+from
+	student_attendence
+	inner join subjects on
+	subjects.subject_id = student_attendence.subject_id
+where
+	student_attendence.student_id = ?
+	and student_attendence.subject_id =?;
 `,
 
   GET_ATTENDENCE_FOR_CHART: `

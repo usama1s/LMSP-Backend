@@ -298,17 +298,6 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
         }
         const [quizes] = await pool.query(sql.GET_QUIZ_BY_SUBJECT_ID, [subject.subject_id,]);
         const [assignments] = await pool.query(sql.GET_ASSIGNMENT_BY_SUBJECT_ID, [subject.subject_id,]);
-        // for (let i = 0; i < quizes.length; i++) {
-        //   const quiz = quizes[i];
-        //   const assignment = assignments[i];
-        //   if (quiz[i]?.subjectId === assignment[i]?.subjectId) {
-        //     QzAzAgainstSubjects.push({
-        //       subjectName: subject.subject_name,
-        //       quiz: quiz[i],
-        //       assignment: assignment[i]
-        //     });
-        //   }
-        // }
         for (const quiz of quizes) {
           for (const assignment of assignments) {
             if (quiz?.subjectId === assignment?.subjectId) {
@@ -321,15 +310,9 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
           }
         }
         const [paper] = await pool.query(sql.GET_FINAL_PAPERS, [subject.subject_id,]);
-        // if (quiz[0]?.subjectId === assignment[0]?.subjectId) {
-        //   QzAzAgainstSubjects.push(subject.subject_name, { quiz: quiz[0], assignment: assignment[0] });
-        // }
-
         subject.teachers = teachers;
         subject.topics = topics;
         pushIfNotNullOrUndefined(paper[0], finalPapers);
-        // pushIfNotNullOrUndefined(quiz[0], quizes);
-        // pushIfNotNullOrUndefined(assignment[0], assignments);
         function pushIfNotNullOrUndefined(value, array) {
           if (value !== null && value !== undefined) {
             array.push(value);
