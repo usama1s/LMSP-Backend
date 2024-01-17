@@ -542,6 +542,18 @@ module.exports = {
     }
   },
 
+  // GET PAPER BY ID
+  async getPaperByPaperId(paperId) {
+    try {
+      const [paper] = await pool.query(sql.GET_INCHARGE_PAPER_BY_PAPER_ID, [
+        paperId,
+      ]);
+      return paper;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
   async addPaperQuestion(paperId, questionId) {
     await pool.query(sql.ADD_INCHARGE_PAPER_QUESTION, [paperId, questionId]);
   },

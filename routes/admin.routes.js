@@ -37,6 +37,8 @@ router.post(
 );
 
 router.post("/addPaper", adminController.addPaper);
+router.post("/getPaper/:id", adminController.getPaperByPaperId);
+
 router.post("/deletePaper/:id", adminController.deleteAdminPaper);
 
 //add course

@@ -173,6 +173,23 @@ module.exports = {
   ORDER BY ip.paper_date ASC;
 `,
 
+  // GET INCHARGE PAPERS BY PAPER ID
+  GET_INCHARGE_PAPER_BY_PAPER_ID: `
+  SELECT
+    ip.subject_id,
+    ip.instructor_id,
+    ip.section,
+    ip.paper_date,
+    iq.question,
+    iq.options,
+    iq.correctOption,
+    iq.image
+  FROM incharge_papers ip
+  JOIN incharge_paper_questions iq ON ip.paper_id = iq.incharge_paper_id
+  WHERE ip.paper_id = ?
+  ORDER BY ip.paper_date ASC;
+`,
+
   // SQL query for deleting instructor paper
   DELETE_INSTRUCTOR_PAPER: `
   DELETE FROM instructor_papers

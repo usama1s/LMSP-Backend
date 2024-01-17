@@ -234,6 +234,18 @@ module.exports = {
     }
   },
 
+  //GET PAPER BY PAPER ID
+  async getPaperByPaperId(req, res) {
+    try {
+      const { id } = req.params;
+      const paper = await adminService.getPaperByPaperId(id);
+      return res.json(paper);
+    } catch (error) {
+      console.log(error);
+      return res.status(200).json({ error: "An error occurred" });
+    }
+  },
+
   async deleteAdminPaper(req, res) {
     try {
       const { paper_id } = req.params;
