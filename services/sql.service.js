@@ -533,17 +533,30 @@ INNER JOIN quiz ON quiz.quiz_id = quiz_question.quiz_id
 LEFT jOIN program_plan ON program_plan.program_plan_id=quiz.program_plan_id
 WHERE program_plan.course_id=?
 `,
+  GET_QUIZ_SUBMITTED: `
+SELECT
+* 
+FROM
+quiz_submitted
+WHERE quiz_id =? and student_id=? 
+`,
 
-  //   GET_QUIZ_STATUS: `
-  // SELECT
-  // *
-  // FROM
-  // quiz_submitted
-  // INNER JOIN student ON quiz_submitted.student_id =student.student_id
-  // INNER JOIN quiz on quiz.quiz_id=quiz_submitted.quiz_id
-  // LEFT JOIN program_plan on program_plan.program_plan_id=quiz.program_plan_id
-  // WHERE quiz_submitted.student_id=? AND program_plan.course_id=? AND quiz_submitted.quiz_id=?
-  // `,
+  GET_ASSIGNMENT_SUBMITTED: `
+SELECT
+*
+FROM
+assignment_submitted 
+WHERE  assignment_id  =? and student_id=? 
+`,
+
+  GET_PAPER_SUBMITTED: `
+SELECT
+*
+FROM
+paper_submitted ps  
+WHERE  paper_id  =? and student_id=?;
+`,
+
 
   GET_QUIZ_STATUS: `
 SELECT *
@@ -567,13 +580,25 @@ where
 	incharge_papers.subject_id = ?;
 `,
 
+GET_FINAL_PAPERS_BY_SUBJECT_ID: `
+select
+	*
+from
+	incharge_papers
+	inner join 
+	incharge_paper_questions on incharge_paper_questions.incharge_paper_id =incharge_papers.id 
+	inner join instructor_paper_questions on instructor_paper_questions.id =incharge_paper_questions.question_id 
+where
+	incharge_papers.subject_id  =?;
+`,
+
   GET_QUIZ_BY_SUBJECT_ID: `
   select
   *
 from
-quiz_submitted  
-inner join quiz  on
-quiz.quiz_id = quiz_submitted.quiz_id 
+quiz  
+inner join quiz_question on
+quiz.quiz_id = quiz_question.quiz_id 
 where
 quiz.subject_id = ?;
 `,
@@ -582,10 +607,8 @@ quiz.subject_id = ?;
 select
 *
 from
-assignment_submitted 
-inner join assignments on
-assignments.assignment_id  = assignment_submitted.assignment_id 
-where assignments.subject_id = ?;
+ assignments
+where subject_id = ?;
 `,
 
   GET_ASSIGNMENTS: `

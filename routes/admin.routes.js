@@ -248,7 +248,9 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
   const studentId = req.params.studentId;
   const subjectsWithAttendance = [];
   const finalPapers = [];
-  const QzAzAgainstSubjects = [];
+  const quizesObj = [];
+  const assignmentsObj = [];
+
   try {
     // Get course details
     const courseQuery = "SELECT * FROM courses WHERE course_id = ?";
@@ -297,33 +299,41 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
           subjectsWithAttendance.push(attendance);
         }
         const [quizes] = await pool.query(sql.GET_QUIZ_BY_SUBJECT_ID, [subject.subject_id,]);
-        const [assignments] = await pool.query(sql.GET_ASSIGNMENT_BY_SUBJECT_ID, [subject.subject_id,]);
-        for (const quiz of quizes) {
-          for (const assignment of assignments) {
-            if (quiz?.subjectId === assignment?.subjectId) {
-              QzAzAgainstSubjects.push({
-                subjectName: subject.subject_name,
-                quiz,
-                assignment
-              });
+        if (quizes.length > 0) {
+          for (const quiz of quizes) {
+            const [quiz_submitted] = await pool.query(sql.GET_QUIZ_SUBMITTED, [quiz.quiz_Id, studentId]);
+            if (quiz_submitted.length == 0) {
+              quizesObj.push(quiz);
             }
           }
         }
-        const [paper] = await pool.query(sql.GET_FINAL_PAPERS, [subject.subject_id,]);
-        subject.teachers = teachers;
-        subject.topics = topics;
-        pushIfNotNullOrUndefined(paper[0], finalPapers);
-        function pushIfNotNullOrUndefined(value, array) {
-          if (value !== null && value !== undefined) {
-            array.push(value);
+        const [assignments] = await pool.query(sql.GET_ASSIGNMENT_BY_SUBJECT_ID, [subject.subject_id,]);
+        if (assignments.length > 0) {
+          for (const assignment of assignments) {
+            const [assigment_submitted] = await pool.query(sql.GET_ASSIGNMENT_SUBMITTED, [assignment.assignment_id, studentId]);
+            if (assigment_submitted.length == 0) {
+              assignmentsObj.push(assignment);
+            }
           }
         }
+        const [paper] = await pool.query(sql.GET_FINAL_PAPERS_BY_SUBJECT_ID, [subject.subject_id,]);
+        const [paper_submitted] = await pool.query(sql.GET_PAPER_SUBMITTED, [paper.paper_id, studentId]);
+        if (paper_submitted.length == 0) {
+          finalPapers.push(paper[0]);
+        }
+        subject.teachers = teachers;
+        subject.topics = topics;
+        // function pushIfNotNullOrUndefined(value, array) {
+        //   if (value !== null && value !== undefined) {
+        //     array.push(value);
+        //   }
+        // }
       }
       module.subjects = subjects;
     }
     course.modules = modules;
 
-    res.status(200).json({ course, subjectsWithAttendance, finalPapers, QzAzAgainstSubjects });
+    res.status(200).json({ course, subjectsWithAttendance, finalPapers, quizesObj, assignmentsObj });
   } catch (error) {
     console.error("Error during database retrieval:", error);
     res.status(500).json({ error: "Internal Server Error" });
