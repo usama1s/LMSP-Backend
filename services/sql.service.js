@@ -268,8 +268,8 @@ module.exports = {
 
   ADD_ASSIGNMENT: `
     INSERT INTO assignments
-    ( assignment_date, assignment_file, assignment_instruction, assignment_title,subject_id,instructor_id,section)
-    VALUES(?, ?, ?, ?, ?, ?, ?)
+    ( assignment_date, assignment_file, assignment_instruction, assignment_title,subject_id,instructor_id)
+    VALUES(?, ?, ?, ?, ?, ?)
   `,
 
   EDIT_ASSIGNMENT_BY_ID: `
@@ -405,7 +405,7 @@ where
 	assignments.instructor_id = ?;
 `,
 
-GET_SUBMITTED_ASSIGNMENTS_BY_STUDENT_ID: `
+  GET_SUBMITTED_ASSIGNMENTS_BY_STUDENT_ID: `
 select
 *
 from
@@ -417,7 +417,6 @@ assignments.subject_id = subjects.subject_id
 where
 assignments.instructor_id =? and assignment_submitted.student_id =?;
 `,
-
 
   // STUDENT____________________________________________________________________________________________________________
 
@@ -588,7 +587,6 @@ inner join assignments on
 assignments.assignment_id  = assignment_submitted.assignment_id 
 where assignments.subject_id = ?;
 `,
-
 
   GET_ASSIGNMENTS: `
 SELECT
@@ -857,7 +855,6 @@ WHERE
   INNER JOIN module ON module.course_id = course.course_id
   `,
 
-
   GET_AVG_ATTENDANCE: `
   select
 	AVG(attendence_status) as average_attendance
@@ -915,7 +912,6 @@ where
 	and attendence_status = ?
 	and subject_id = ?;
   `,
-
 
   //   SELECT
   //     program.program_id,
