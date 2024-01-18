@@ -1,5 +1,7 @@
 const studentService = require("../services/student.service");
 const convertBase64 = require("../util/convert.base64.js");
+const sql = require("../services/sql.service");
+const pool = require("../db.conn");
 
 module.exports = {
   // SUBMIT QUIZ
@@ -36,6 +38,25 @@ module.exports = {
       res.status(500).json({ error: "Internal Server Error" });
     }
   },
+
+
+  async submitPaper(req, res) {
+    try {
+      const submittedPaperDetails = req.body;
+      const { student_id, paper_id, total_marks, obtained_marks, grade, percentage } = submittedPaperDetails;
+      await pool.query(sql.PAPER_SUBMISSION, [student_id, paper_id, total_marks, obtained_marks, grade, percentage]);
+      res.status(200).json({ message: "Paper submitted successfully." });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+
+
+
+
+
+
 
   // ASSIGNMENT NOT SUBMITTED
   async quizNotSubmit(req, res) {

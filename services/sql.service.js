@@ -473,6 +473,13 @@ WHERE
    VALUES(?, ?, ?, ?, ?)
   
 `,
+
+  PAPER_SUBMISSION: `
+INSERT INTO paper_submitted
+(student_id, paper_id, total_marks, obtained_marks, grade, percentage)
+VALUES(?, ?, ?, ?, ?, ?)
+
+`,
   ASSIGNMENT_NOT_SUBMISSION: `
 INSERT INTO assignment_submitted
 (student_id, assignment_id)

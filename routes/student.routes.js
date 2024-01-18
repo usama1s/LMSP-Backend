@@ -6,6 +6,8 @@ const router = express.Router();
 
 router.post('/submit-quiz', studentController.submitQuiz);
 router.post('/submit-assignment', studentController.submitAssignment);
+router.post('/submit-paper', studentController.submitPaper);
+
 router.get('/get-quiz/:student_id/:course_id', studentController.getQuiz);
 router.get('/get-assignment/:student_id/:course_id', studentController.getAssignment);
 router.get('/get-attendence/:student_id', studentController.getAttendence);
