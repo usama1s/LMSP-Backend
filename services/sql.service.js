@@ -405,6 +405,20 @@ where
 	assignments.instructor_id = ?;
 `,
 
+  GET_SUBMITTED_ASSIGNMENTS_BY_SUBJECT_ID: `
+select
+*
+from
+assignment_submitted
+inner join assignments on
+assignments.assignment_id = assignment_submitted.assignment_id
+inner join subjects on
+assignments.subject_id = subjects.subject_id
+where
+assignments.instructor_id =?
+and assignments.subject_id =?;
+`,
+
   GET_SUBMITTED_ASSIGNMENTS_BY_STUDENT_ID: `
 select
 *
@@ -580,7 +594,7 @@ where
 	incharge_papers.subject_id = ?;
 `,
 
-GET_FINAL_PAPERS_BY_SUBJECT_ID: `
+  GET_FINAL_PAPERS_BY_SUBJECT_ID: `
 select
 	*
 from

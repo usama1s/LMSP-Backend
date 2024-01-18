@@ -201,7 +201,7 @@ router.get("/instructor-papers/:subject_id", async (req, res) => {
   }
 });
 
-router.get("/get-submitted-assignments/:instructorId", instructorController.getSubmittedAssignment);
+router.get("/get-submitted-assignments/:instructorId/:subjectId", instructorController.getSubmittedAssignment);
 
 
 module.exports = router;
