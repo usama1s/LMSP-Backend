@@ -289,6 +289,7 @@ module.exports = {
 
   async getSubmittedAssignment(req, res) {
     const instructorId = req.params.instructorId;
+    const studentId = req.params.studentId;
     const allSubmittedAssignments = {
       subject_name: "",
       assignments: []

@@ -405,6 +405,19 @@ where
 	assignments.instructor_id = ?;
 `,
 
+GET_SUBMITTED_ASSIGNMENTS_BY_STUDENT_ID: `
+select
+*
+from
+assignment_submitted
+inner join assignments on
+assignments.assignment_id = assignment_submitted.assignment_id
+inner join subjects on
+assignments.subject_id = subjects.subject_id
+where
+assignments.instructor_id =? and assignment_submitted.student_id =?;
+`,
+
 
   // STUDENT____________________________________________________________________________________________________________
 
@@ -542,6 +555,7 @@ WHERE student_id = ? AND quiz_id = ?;
 
   GET_FINAL_PAPERS: `
   select
+	incharge_papers.id,
 	incharge_papers.title,
 	incharge_papers.subject_id,
 	subjects.subject_name 
