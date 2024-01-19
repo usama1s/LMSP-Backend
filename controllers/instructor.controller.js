@@ -3,7 +3,6 @@ const convertBase64 = require("../util/convert.base64.js");
 const sql = require("../services/sql.service");
 const pool = require("../db.conn");
 
-
 module.exports = {
   // INSTRUCTOR ADD QUIZES
   async addQuiz(req, res) {
@@ -307,21 +306,30 @@ module.exports = {
     const subjectId = req.params.subjectId.val ? req.params.subjectId.val : null;
     const allSubmittedAssignments = {
       subject_name: "",
-      assignments: []
+      assignments: [],
     };
     try {
       if (subjectId != null) {
+<<<<<<< Updated upstream
         const [submittedAssignment] = await pool.query(sql.GET_SUBMITTED_ASSIGNMENTS_BY_SUBJECT_ID, [instructorId, subjectId]);
+=======
+        const [submittedAssignment] = await pool.query(
+          sql.GET_SUBMITTED_ASSIGNMENTS,
+          [instructorId, subjectId]
+        );
+>>>>>>> Stashed changes
         let currentSubject = null;
-        const [studentdata] = await pool.query(sql.GET_USER_BY_STUDENT_ID, [submittedAssignment.student_id]);
+        const [studentdata] = await pool.query(sql.GET_USER_BY_STUDENT_ID, [
+          submittedAssignment.student_id,
+        ]);
         if (currentSubject !== submittedAssignment.subject_name) {
           currentSubject = submittedAssignment.subject_name;
-          allSubmittedAssignments.subject_name = currentSubject
+          allSubmittedAssignments.subject_name = currentSubject;
         }
 
         const assignmentObject = {
           assignment_title: submittedAssignment.assignment_title, // Replace this with the actual assignment title
-          submitted_by: []
+          submitted_by: [],
         };
         const submittedByObject = {
           student_id: submittedAssignment?.student_id,
@@ -329,26 +337,32 @@ module.exports = {
           student_name: studentdata[0]?.full_name,
           submitted_file: submittedAssignment?.assignment_file,
           grade: submittedAssignment?.grade,
-          date: submittedAssignment?.assignment_date
+          date: submittedAssignment?.assignment_date,
+          regId: submittedAssignment?.register_id,
         };
         assignmentObject.submitted_by.push(submittedByObject);
         allSubmittedAssignments.assignments.push(assignmentObject);
 
         res.status(200).json({ allSubmittedAssignments });
-        return
+        return;
       }
-      const [submittedAssignments] = await pool.query(sql.GET_SUBMITTED_ASSIGNMENTS, [instructorId]);
+      const [submittedAssignments] = await pool.query(
+        sql.GET_SUBMITTED_ASSIGNMENTS,
+        [instructorId]
+      );
       let currentSubject = null;
       for (const submittedAssignment of submittedAssignments) {
-        const [studentdata] = await pool.query(sql.GET_USER_BY_STUDENT_ID, [submittedAssignment.student_id]);
+        const [studentdata] = await pool.query(sql.GET_USER_BY_STUDENT_ID, [
+          submittedAssignment.student_id,
+        ]);
         if (currentSubject !== submittedAssignment.subject_name) {
           currentSubject = submittedAssignment.subject_name;
-          allSubmittedAssignments.subject_name = currentSubject
+          allSubmittedAssignments.subject_name = currentSubject;
         }
 
         const assignmentObject = {
           assignment_title: submittedAssignment.assignment_title, // Replace this with the actual assignment title
-          submitted_by: []
+          submitted_by: [],
         };
         const submittedByObject = {
           student_id: submittedAssignment.student_id,
@@ -356,18 +370,15 @@ module.exports = {
           student_name: studentdata[0].full_name,
           submitted_file: submittedAssignment.assignment_file,
           grade: submittedAssignment.grade,
-          date: submittedAssignment.assignment_date
+          date: submittedAssignment.assignment_date,
         };
         assignmentObject.submitted_by.push(submittedByObject);
         allSubmittedAssignments.assignments.push(assignmentObject);
       }
       res.status(200).json({ allSubmittedAssignments });
-    }
-
-    catch (error) {
+    } catch (error) {
       console.error("Error during database retrieval:", error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   },
-
-}
+};

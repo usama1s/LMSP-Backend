@@ -115,11 +115,35 @@ module.exports = {
   async markAttendence(students, attendence_date, subject_id, section) {
     try {
       for (const student of students) {
+<<<<<<< Updated upstream
         const [existingRecord] = await pool.query(sql.CHECK_ATTENDENCE_EXISTENCE, [student.student_id, attendence_date, subject_id]);
         if (existingRecord.length > 0) {
           await pool.query(sql.UPDATE_ATTENDENCE, [student.attendence_status, attendence_date, subject_id, student.student_id,]);
         } else {
           await pool.query(sql.MARK_ATTENDENCE, [student.student_id, student.attendence_status, attendence_date, subject_id,]);
+=======
+        const [existingRecord] = await pool.query(
+          sql.CHECK_ATTENDENCE_EXISTENCE,
+          [student.student_id, attendence_date, subject_id]
+        );
+
+        if (existingRecord.length > 0) {
+          // Record already exists, update attendence_status
+          await pool.query(sql.UPDATE_ATTENDENCE, [
+            student.attendence_status,
+            attendence_date,
+            subject_id,
+            student.student_id,
+          ]);
+        } else {
+          // Record doesn't exist, insert a new one
+          await pool.query(sql.MARK_ATTENDENCE, [
+            student.student_id,
+            student.attendence_status,
+            attendence_date,
+            subject_id,
+          ]);
+>>>>>>> Stashed changes
         }
       }
       return { message: "Attendance updated successfully." };

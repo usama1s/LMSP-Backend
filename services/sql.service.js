@@ -451,7 +451,8 @@ assignments.instructor_id =? and assignment_submitted.student_id =?;
   SELECT
   users.first_name,
   users.last_name,
-  CONCAT(users.first_name, ' ', users.last_name) AS full_name
+  CONCAT(users.first_name, ' ', users.last_name) AS full_name,
+  student.register_id
 FROM
   users
 INNER JOIN
@@ -584,7 +585,6 @@ FROM
 paper_submitted ps  
 WHERE  paper_id  =? and student_id=?;
 `,
-
 
   GET_QUIZ_STATUS: `
 SELECT *

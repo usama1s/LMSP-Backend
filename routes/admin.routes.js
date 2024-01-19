@@ -294,32 +294,53 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
           subject.subject_id,
         ]);
         const topics = topicsResult[0];
-        const [studentAttendance] = await pool.query(sql.GET_ATTENDENCE_SUBJECT_AND_STUDENT_ID, [studentId, subject.subject_id,]);
+        const [studentAttendance] = await pool.query(
+          sql.GET_ATTENDENCE_SUBJECT_AND_STUDENT_ID,
+          [studentId, subject.subject_id]
+        );
         for (const attendance of studentAttendance) {
           subjectsWithAttendance.push(attendance);
         }
-        const [quizes] = await pool.query(sql.GET_QUIZ_BY_SUBJECT_ID, [subject.subject_id,]);
+        const [quizes] = await pool.query(sql.GET_QUIZ_BY_SUBJECT_ID, [
+          subject.subject_id,
+        ]);
         if (quizes.length > 0) {
           for (const quiz of quizes) {
-            const [quiz_submitted] = await pool.query(sql.GET_QUIZ_SUBMITTED, [quiz.quiz_Id, studentId]);
+            const [quiz_submitted] = await pool.query(sql.GET_QUIZ_SUBMITTED, [
+              quiz.quiz_Id,
+              studentId,
+            ]);
             if (quiz_submitted.length == 0) {
               quizesObj.push(quiz);
             }
           }
         }
-        const [assignments] = await pool.query(sql.GET_ASSIGNMENT_BY_SUBJECT_ID, [subject.subject_id,]);
+        const [assignments] = await pool.query(
+          sql.GET_ASSIGNMENT_BY_SUBJECT_ID,
+          [subject.subject_id]
+        );
         if (assignments.length > 0) {
           for (const assignment of assignments) {
-            const [assigment_submitted] = await pool.query(sql.GET_ASSIGNMENT_SUBMITTED, [assignment.assignment_id, studentId]);
+            const [assigment_submitted] = await pool.query(
+              sql.GET_ASSIGNMENT_SUBMITTED,
+              [assignment.assignment_id, studentId]
+            );
             if (assigment_submitted.length == 0) {
               assignmentsObj.push(assignment);
             }
           }
         }
-        const [paper] = await pool.query(sql.GET_FINAL_PAPERS_BY_SUBJECT_ID, [subject.subject_id,]);
-        const [paper_submitted] = await pool.query(sql.GET_PAPER_SUBMITTED, [paper.paper_id, studentId]);
+        const [paper] = await pool.query(sql.GET_FINAL_PAPERS_BY_SUBJECT_ID, [
+          subject.subject_id,
+        ]);
+        const [paper_submitted] = await pool.query(sql.GET_PAPER_SUBMITTED, [
+          paper.paper_id,
+          studentId,
+        ]);
         if (paper_submitted.length == 0) {
-          finalPapers.push(paper[0]);
+          if (paper.length > 0) {
+            finalPapers.push(paper[0]);
+          }
         }
         subject.teachers = teachers;
         subject.topics = topics;
@@ -333,7 +354,36 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
     }
     course.modules = modules;
 
-    res.status(200).json({ course, subjectsWithAttendance, finalPapers, quizesObj, assignmentsObj });
+    // modifying Quiz structure
+    const modifiedQuiz = {
+      quizes: {
+        ...quizesObj.reduce((acc, quiz) => {
+          const quizId = quiz.quiz_id;
+          acc[quizId] = acc[quizId] || [];
+          acc[quizId].push(quiz);
+          return acc;
+        }, {}),
+      },
+    };
+
+    const modifiedPaper = {
+      papers: {
+        ...finalPapers.reduce((acc, paper) => {
+          console.log("Paper", paper);
+          const paperId = paper.id;
+          acc[paperId] = acc[paperId] || [];
+          acc[paperId].push(paper);
+          return acc;
+        }, {}),
+      },
+    };
+    res.status(200).json({
+      course,
+      subjectsWithAttendance,
+      modifiedPaper,
+      modifiedQuiz,
+      assignmentsObj,
+    });
   } catch (error) {
     console.error("Error during database retrieval:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -664,7 +714,8 @@ router.get("/getCertificateByStudentId/:studentId", async (req, res) => {
   }
 });
 
-
 router.get("/get-stats/:studentId", adminController.getAllStats);
-router.get("/get-stats-by-subjects/:studentId/:subjectId", adminController.getAllStatsBySubjects);
-
+router.get(
+  "/get-stats-by-subjects/:studentId/:subjectId",
+  adminController.getAllStatsBySubjects
+);
