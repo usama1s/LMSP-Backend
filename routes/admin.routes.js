@@ -307,7 +307,7 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
         if (quizes.length > 0) {
           for (const quiz of quizes) {
             const [quiz_submitted] = await pool.query(sql.GET_QUIZ_SUBMITTED, [
-              quiz.quiz_Id,
+              quiz.quiz_id,
               studentId,
             ]);
             if (quiz_submitted.length == 0) {
