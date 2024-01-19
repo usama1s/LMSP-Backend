@@ -672,26 +672,33 @@ WHERE student_id = ? AND assignment_id = ?;
 `,
 
   GET_ALL_GRADES_QUIZES: `
-SELECT
-    *
-FROM
-    quiz_submitted
-INNER JOIN quiz ON quiz.quiz_id = quiz_submitted.quiz_id
-INNER JOIN program_plan ON program_plan.program_plan_id = quiz.program_plan_id
-INNER JOIN course ON course.course_id = program_plan.course_id
-WHERE
-    quiz_submitted.student_id =? AND course.course_id=?`,
+  select
+	*
+from
+	quiz_submitted
+inner join quiz on
+	quiz.quiz_id = quiz_submitted.quiz_id 
+where quiz_submitted.student_id = ?`,
 
   GET_ALL_GRADES_ASSIGNMENTS: `
-  SELECT
-  *
-FROM
-  assignment_submitted
-INNER JOIN assignments ON assignments.assignment_id = assignment_submitted.assignment_id
-INNER JOIN program_plan ON program_plan.program_plan_id = assignments.program_plan_id
-INNER JOIN course ON course.course_id = program_plan.course_id
-WHERE
-  assignment_submitted.student_id =? AND course.course_id=?`,
+  select
+	*
+from
+	assignment_submitted
+inner join assignments on
+	assignments.assignment_id = assignment_submitted.assignment_id
+where
+	assignment_submitted.student_id = ?`,
+
+  GET_ALL_GRADES_PAPERS: `
+  select
+	*
+from
+	paper_submitted 
+inner join incharge_papers on
+	paper_submitted.paper_id  = incharge_papers.id 
+where
+	paper_submitted.student_id =?`,
 
   // ADMIN____________________________________________________________________________________________________________
 

@@ -162,8 +162,8 @@ module.exports = {
   // GET GRADES
   async getAllGrades(req, res) {
     try {
-      const { student_id, course_id } = req.params;
-      const grades = await studentService.getAllGrades(student_id, course_id);
+      const { student_id } = req.params;
+      const grades = await studentService.getAllGrades(student_id);
       res.status(200).json(grades);
     } catch (error) {
       console.error(error);

@@ -175,17 +175,55 @@ module.exports = {
   },
 
   // GET GRADES
-  async getAllGrades(student_id, course_id) {
+  async getAllGrades(student_id) {
     try {
-      const [quizes] = await pool.query(sql.GET_ALL_GRADES_QUIZES, [
-        student_id,
-        course_id,
-      ]);
-      const [assignments] = await pool.query(sql.GET_ALL_GRADES_ASSIGNMENTS, [
-        student_id,
-        course_id,
-      ]);
-      return [{ quizes }, { assignments }];
+      quizGrades = [];
+      assignmentGrades = [];
+
+      const [quizes] = await pool.query(sql.GET_ALL_GRADES_QUIZES, [student_id]);
+      for (quiz of quizes) {
+        quizGrades.push(quiz);
+      }
+
+      const modifiedQuizGrades = quizGrades.map((quiz) => ({
+        quiz_submitted_id: quiz.quiz_submitted_id,
+        student_id: quiz.student_id,
+        quiz_id: quiz.quiz_id,
+        total_marks: quiz.total_marks,
+        obtained_marks: quiz.obtained_marks,
+        grade: quiz.grade,
+        quiz_status: quiz.quiz_status,
+        percentage: quiz.percentage,
+        quiz_date: quiz.quiz_date,
+        subject_id: quiz.subject_id,
+        instructor_id: quiz.instructor_id,
+        section: quiz.section,
+      }));
+
+      const [assignments] = await pool.query(sql.GET_ALL_GRADES_ASSIGNMENTS, [student_id]);
+      for (assignment of assignments) {
+        assignmentGrades.push(assignment);
+      }
+
+      const modifiedAssignmentGrades = assignmentGrades.map((assignment) => ({
+        assignment_submitted_id: assignment.assignment_submitted_id,
+        student_id: assignment.student_id,
+        assignment_id: assignment.assignment_id,
+        submitted_file: assignment.submitted_file,
+        marks: assignment.marks,
+        grade: assignment.grade,
+        assignment_status: assignment.assignment_status,
+        percentage: assignment.percentage,
+        assignment_date: assignment.assignment_date,
+        assignment_file: assignment.assignment_file,
+        assignment_instruction: assignment.assignment_instruction,
+        assignment_title: assignment.assignment_title,
+        subject_id: assignment.subject_id,
+        instructor_id: assignment.instructor_id,
+      }));
+      
+
+      return { quizGrades: modifiedQuizGrades, assignmentGrades: modifiedAssignmentGrades };
     } catch (error) {
       console.log(error);
     }
