@@ -711,3 +711,6 @@ router.get(
   "/get-stats-by-subjects/:studentId/:subjectId",
   adminController.getAllStatsBySubjects
 );
+
+
+router.get("/get-stats-by-subjects/:courseId", adminController.getAllStudentStatsByCourse);

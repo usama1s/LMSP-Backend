@@ -612,6 +612,15 @@ module.exports = {
     } catch (error) {
       throw new Error("Error getting student statistics");
     }
+  },
+
+  async getAllStudentStatsByCourse(courseId) {
+    try {
+      const [studentCountPerCourse] = await pool.query(sql.GET_STUDENT_COUNT_PER_COURSE, [courseId]);
+      return studentCountPerCourse;
+    } catch (error) {
+      throw new Error("Error getting student statistics");
+    }
   }
 
 };

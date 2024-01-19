@@ -278,4 +278,15 @@ module.exports = {
       return res.status(500).json({ error: "An error occurred" });
     }
   },
+
+  async getAllStudentStatsByCourse(req, res) {
+    try {
+      const { courseId } = req.params;
+      const studentCountPerCourse = await adminService.getAllStudentStatsByCourse(courseId);
+      return res.json(studentCountPerCourse);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
 };

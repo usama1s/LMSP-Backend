@@ -976,6 +976,14 @@ where
 	and subject_id = ?;
   `,
 
+  GET_STUDENT_COUNT_PER_COURSE: `
+  SELECT COUNT(student_enrollment.student_id) AS row_count
+FROM student
+INNER JOIN student_enrollment ON student.student_id = student_enrollment.student_id
+WHERE student_enrollment.course_id = ?;
+;
+  `,
+
   //   SELECT
   //     program.program_id,
   //     program.program_name,
