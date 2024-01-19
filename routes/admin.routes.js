@@ -360,7 +360,7 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
       papers: {
         ...finalPapers.reduce((acc, paper) => {
           console.log("Paper", paper);
-          const paperId = paper.id;
+          const paperId = paper.paper_id;
           acc[paperId] = acc[paperId] || [];
           acc[paperId].push(paper);
           return acc;
