@@ -310,14 +310,7 @@ module.exports = {
     };
     try {
       if (subjectId != null) {
-<<<<<<< Updated upstream
         const [submittedAssignment] = await pool.query(sql.GET_SUBMITTED_ASSIGNMENTS_BY_SUBJECT_ID, [instructorId, subjectId]);
-=======
-        const [submittedAssignment] = await pool.query(
-          sql.GET_SUBMITTED_ASSIGNMENTS,
-          [instructorId, subjectId]
-        );
->>>>>>> Stashed changes
         let currentSubject = null;
         const [studentdata] = await pool.query(sql.GET_USER_BY_STUDENT_ID, [
           submittedAssignment.student_id,
