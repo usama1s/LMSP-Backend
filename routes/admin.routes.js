@@ -327,16 +327,17 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
             }
           }
         }
-        const [paper] = await pool.query(sql.GET_FINAL_PAPERS_BY_SUBJECT_ID, [
+        const [papers] = await pool.query(sql.GET_FINAL_PAPERS_BY_SUBJECT_ID, [
           subject.subject_id,
         ]);
-        const [paper_submitted] = await pool.query(sql.GET_PAPER_SUBMITTED, [
-          paper.paper_id,
-          studentId,
-        ]);
-        if (paper_submitted.length == 0) {
-          if (paper.length > 0) {
-            finalPapers.push(paper[0]);
+        if (papers.length > 0) {
+          for (const paper of papers) {
+            const [paper_submitted] = await pool.query(sql.GET_PAPER_SUBMITTED, [paper.id, studentId,]);
+            if (paper_submitted.length == 0) {
+              if (paper.length > 0) {
+                finalPapers.push(paper[0]);
+              }
+            }
           }
         }
         subject.teachers = teachers;
