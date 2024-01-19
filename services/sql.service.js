@@ -615,6 +615,7 @@ from
 	incharge_papers
 	inner join 
 	incharge_paper_questions on incharge_paper_questions.incharge_paper_id =incharge_papers.id 
+  inner join subjects on subjects.subject_id = incharge_papers.subject_id 
 	inner join instructor_paper_questions on instructor_paper_questions.id =incharge_paper_questions.question_id 
 where
 	incharge_papers.subject_id  =?;
@@ -622,21 +623,25 @@ where
 
   GET_QUIZ_BY_SUBJECT_ID: `
   select
-  *
+	*
 from
-quiz  
-inner join quiz_question on
-quiz.quiz_id = quiz_question.quiz_id 
+	quiz_question
+inner join quiz on
+	quiz.quiz_id = quiz_question.quiz_id
+inner join subjects on
+	subjects.subject_id = quiz.subject_id
 where
-quiz.subject_id = ?;
+	quiz.subject_id = ?;
 `,
 
   GET_ASSIGNMENT_BY_SUBJECT_ID: `
-select
-*
-from
- assignments
-where subject_id = ?;
+  SELECT
+  *
+  FROM
+  assignment_submitted 
+  inner join assignments on assignments.assignment_id = assignment_submitted.assignment_id 
+  inner join subjects on subjects.subject_id = assignments.subject_id 
+  WHERE assignments.subject_id = ?;
 `,
 
   GET_ASSIGNMENTS: `

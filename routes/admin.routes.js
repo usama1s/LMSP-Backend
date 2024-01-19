@@ -315,10 +315,7 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
             }
           }
         }
-        const [assignments] = await pool.query(
-          sql.GET_ASSIGNMENT_BY_SUBJECT_ID,
-          [subject.subject_id]
-        );
+        const [assignments] = await pool.query(sql.GET_ASSIGNMENT_BY_SUBJECT_ID, [subject.subject_id]);
         if (assignments.length > 0) {
           for (const assignment of assignments) {
             const [assigment_submitted] = await pool.query(
@@ -344,11 +341,6 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
         }
         subject.teachers = teachers;
         subject.topics = topics;
-        // function pushIfNotNullOrUndefined(value, array) {
-        //   if (value !== null && value !== undefined) {
-        //     array.push(value);
-        //   }
-        // }
       }
       module.subjects = subjects;
     }
