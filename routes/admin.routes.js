@@ -335,7 +335,9 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
           studentId,
         ]);
         if (paper_submitted.length == 0) {
+          if (paper.length > 0) {
             finalPapers.push(paper[0]);
+          }
         }
         subject.teachers = teachers;
         subject.topics = topics;
@@ -360,7 +362,7 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
       papers: {
         ...finalPapers.reduce((acc, paper) => {
           console.log("Paper", paper);
-          const paperId = paper.paper_id;
+          const paperId = paper.id;
           acc[paperId] = acc[paperId] || [];
           acc[paperId].push(paper);
           return acc;
