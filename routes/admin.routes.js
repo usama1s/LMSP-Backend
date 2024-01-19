@@ -335,9 +335,7 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
           studentId,
         ]);
         if (paper_submitted.length == 0) {
-          if (paper.length > 0) {
             finalPapers.push(paper[0]);
-          }
         }
         subject.teachers = teachers;
         subject.topics = topics;
