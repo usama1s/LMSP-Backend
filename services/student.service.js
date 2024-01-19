@@ -179,6 +179,7 @@ module.exports = {
     try {
       quizGrades = [];
       assignmentGrades = [];
+      paperGrades = [];
 
       const [quizes] = await pool.query(sql.GET_ALL_GRADES_QUIZES, [student_id]);
       for (quiz of quizes) {
@@ -221,9 +222,28 @@ module.exports = {
         subject_id: assignment.subject_id,
         instructor_id: assignment.instructor_id,
       }));
-      
 
-      return { quizGrades: modifiedQuizGrades, assignmentGrades: modifiedAssignmentGrades };
+      const [papers] = await pool.query(sql.GET_ALL_GRADES_PAPERS, [student_id]);
+      for (paper of papers) {
+        paperGrades.push(paper);
+      }
+
+      const modifiedPaperGrades = paperGrades.map((paper) => ({
+        paper_submitted_id: paper.paper_submitted_id,
+        student_id: paper.student_id,
+        paper_id: paper.paper_id,
+        total_marks: paper.total_marks,
+        obtained_marks: paper.obtained_marks,
+        grade: paper.grade,
+        percentage: paper.percentage,
+        paper_date: paper.paper_date,
+        subject_id: paper.subject_id,
+        instructor_id: paper.instructor_id,
+        section: paper.section,
+      }));
+
+
+      return { quizGrades: modifiedQuizGrades, assignmentGrades: modifiedAssignmentGrades, paperGrades: modifiedPaperGrades };
     } catch (error) {
       console.log(error);
     }
