@@ -100,6 +100,21 @@ module.exports = {
     }
   },
 
+  async markAssignment(req, res) {
+    try {
+      const assignmentDetails = req.body;
+      const { marks, grade, percentage, assignment_id, student_id } = assignmentDetails;
+
+      await pool.query(sql.MARK_ASSIGNMENT, [marks, grade, percentage, assignment_id, student_id]);
+
+      return res.json({ message: "Assignment marked successfully." });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+
+
   // GET STUDENTS WITH PROGAM PLAN ID
   async getStudents(req, res) {
     try {
@@ -289,14 +304,14 @@ module.exports = {
 
   async getSubmittedAssignment(req, res) {
     const instructorId = req.params.instructorId;
-    const subjectId = req.params.subjectId;
+    const subjectId = req.params.subjectId.val ? req.params.subjectId.val : null;
     const allSubmittedAssignments = {
       subject_name: "",
       assignments: []
     };
     try {
       if (subjectId != null) {
-        const [submittedAssignment] = await pool.query(sql.GET_SUBMITTED_ASSIGNMENTS, [instructorId, subjectId]);
+        const [submittedAssignment] = await pool.query(sql.GET_SUBMITTED_ASSIGNMENTS_BY_SUBJECT_ID, [instructorId, subjectId]);
         let currentSubject = null;
         const [studentdata] = await pool.query(sql.GET_USER_BY_STUDENT_ID, [submittedAssignment.student_id]);
         if (currentSubject !== submittedAssignment.subject_name) {

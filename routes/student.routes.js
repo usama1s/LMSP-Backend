@@ -15,7 +15,6 @@ router.get('/get-attendence-for-chart/:student_id/:course_id/:program_id', stude
 router.get('/get-course/:student_id', studentController.getCourseDetailsWithStudentId);
 router.post('/quiz-not-submitted', studentController.quizNotSubmit);
 router.get('/get-my-grades/:student_id/:course_id', studentController.getAllGrades);
-
 router.post('/assignment-not-submitted', studentController.assignmentNotSubmitted);
 
 

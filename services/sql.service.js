@@ -348,6 +348,13 @@ WHERE
    VALUES(?, ?, ?, ?)
 `,
 
+
+  MARK_ASSIGNMENT: `
+UPDATE assignment_submitted
+SET marks=?, grade=?, percentage=?
+WHERE assignment_id=? and student_id=?;
+`,
+
   CHECK_ATTENDENCE_EXISTENCE: `
   SELECT * FROM student_attendence
   WHERE student_id = ? AND attendence_date = ? AND subject_id = ?

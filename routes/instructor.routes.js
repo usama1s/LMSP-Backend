@@ -18,6 +18,7 @@ router.get(
 );
 
 router.post("/mark-attendence", instructorController.markAttendence);
+router.post("/mark-assignment", instructorController.markAssignment);
 router.post("/add-paper", instructorController.addPaper);
 router.get(
   "/get-papers-by-subject-id/:subject_id",
