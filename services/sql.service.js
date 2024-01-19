@@ -638,8 +638,7 @@ where
   SELECT
   *
   FROM
-  assignment_submitted 
-  inner join assignments on assignments.assignment_id = assignment_submitted.assignment_id 
+  assignments 
   inner join subjects on subjects.subject_id = assignments.subject_id 
   WHERE assignments.subject_id = ?;
 `,
