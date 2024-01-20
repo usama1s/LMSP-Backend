@@ -316,41 +316,49 @@ module.exports = {
     };
     try {
       if (subjectId != null) {
-        const [submittedAssignment] = await pool.query(
+        const submittedAssignments = await pool.query(
           sql.GET_SUBMITTED_ASSIGNMENTS_BY_SUBJECT_ID,
           [instructorId, subjectId]
         );
+
         let currentSubject = null;
-        const [studentdata] = await pool.query(sql.GET_USER_BY_STUDENT_ID, [
-          submittedAssignment.student_id,
-        ]);
-        if (currentSubject !== submittedAssignment.subject_name) {
-          currentSubject = submittedAssignment.subject_name;
-          allSubmittedAssignments.subject_name = currentSubject;
+        const allSubmittedAssignments = { subject_name: null, assignments: [] };
+
+        for (const submittedAssignment of submittedAssignments) {
+          const [studentdata] = await pool.query(sql.GET_USER_BY_STUDENT_ID, [
+            submittedAssignment.student_id,
+          ]);
+
+          if (currentSubject !== submittedAssignment.subject_name) {
+            currentSubject = submittedAssignment.subject_name;
+            allSubmittedAssignments.subject_name = currentSubject;
+          }
+
+          const assignmentObject = {
+            assignment_title: submittedAssignment.assignment_title,
+            submitted_by: [],
+            assignment_id: submittedAssignment.assignment_id,
+          };
+
+          const submittedByObject = {
+            student_id: submittedAssignment?.student_id,
+            subject_id: submittedAssignment?.subject_id,
+            student_name: studentdata[0]?.full_name,
+            submitted_file: submittedAssignment?.assignment_file,
+            grade: submittedAssignment?.grade,
+            marks: submittedAssignment?.marks,
+            date: submittedAssignment?.assignment_date,
+            regId: submittedAssignment?.register_id,
+          };
+
+          assignmentObject.submitted_by.push(submittedByObject);
+          allSubmittedAssignments.assignments.push(assignmentObject);
         }
-
-        const assignmentObject = {
-          assignment_title: submittedAssignment.assignment_title, // Replace this with the actual assignment title
-          submitted_by: [],
-          assignment_id: submittedAssignment.assignment_id,
-        };
-        const submittedByObject = {
-          student_id: submittedAssignment?.student_id,
-          subject_id: submittedAssignment?.subject_id,
-          student_name: studentdata[0]?.full_name,
-          submitted_file: submittedAssignment?.assignment_file,
-          grade: submittedAssignment?.grade,
-          marks: submittedAssignment?.marks,
-
-          date: submittedAssignment?.assignment_date,
-          regId: submittedAssignment?.register_id,
-        };
-        assignmentObject.submitted_by.push(submittedByObject);
-        allSubmittedAssignments.assignments.push(assignmentObject);
 
         res.status(200).json({ allSubmittedAssignments });
         return;
       }
+
       const [submittedAssignments] = await pool.query(
         sql.GET_SUBMITTED_ASSIGNMENTS,
         [instructorId]
