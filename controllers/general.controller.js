@@ -63,4 +63,18 @@ module.exports = {
       res.status(500).json({ error: "Internal Server Error" });
     }
   },
+
+
+  getFile: (req, res) => {
+    try {
+      const { filename } = req.params;
+      const filePath = path.join(__dirname, '..', 'uploads', filename);
+  
+      // Send the file as an attachment
+      res.sendFile(filePath);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
 };
