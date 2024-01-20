@@ -303,7 +303,7 @@ module.exports = {
 
   async getSubmittedAssignment(req, res) {
     const instructorId = req.params.instructorId;
-    const subjectId = req.params.subjectId.val ? req.params.subjectId.val : null;
+    const subjectId = req.params.subjectId;
     const allSubmittedAssignments = {
       subject_name: "",
       assignments: [],
