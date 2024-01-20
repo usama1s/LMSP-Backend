@@ -316,7 +316,7 @@ module.exports = {
     };
     try {
       if (subjectId != null) {
-        const submittedAssignments = await pool.query(
+        const [submittedAssignments] = await pool.query(
           sql.GET_SUBMITTED_ASSIGNMENTS_BY_SUBJECT_ID,
           [instructorId, subjectId]
         );
