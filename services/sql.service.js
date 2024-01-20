@@ -799,10 +799,9 @@ where
   `,
 
   ADD_IMAGES_OF_ITEM: `
-    INSERT INTO inventory_image 
-    (inventory_id, image_1, image_2, image_3, image_4, image_5, image_6, image_7, image_8, image_9, image_10) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `,
+  INSERT INTO inventory_image 
+  (inventory_id, image_1, image_2, image_3, image_4, image_5, image_6, image_7, image_8, image_9, image_10) 
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 
   GET_ALL_ITEMS: `
     SELECT *

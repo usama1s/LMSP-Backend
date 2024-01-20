@@ -56,57 +56,46 @@ module.exports = {
   // ADD ITEM IN INVENTORY TABLE
   async addItem(inventoryItemDetail) {
     try {
-      const {
-        admin_id,
-        title,
-        description,
-        expiry,
-        induction,
-        make,
-        model,
-        failure_reason,
-        attachments,
-      } = inventoryItemDetail;
-      const videoFilePath = await convertBase64.base64ToMp4(
-        attachments.video_file
-      );
-      const infoFilePath = await convertBase64.base64ToPdf(
-        attachments.info_file
-      );
+      const { admin_id, title, description, expiry, induction, make, model, failure_reason, attachments } = inventoryItemDetail;
+      let videoFilePath;
+      if (attachments.video_file) {
+        videoFilePath = await convertBase64.base64ToMp4(attachments.video_file);
+      }
+      let infoFilePath;
+      if (attachments.info_file) {
+        infoFilePath = await convertBase64.base64ToPdf(attachments.info_file);
+      }
       const images = attachments.images;
-      const [result] = await pool.query(sql.ADD_INVENTORY_ITEM, [
-        admin_id,
-        title,
-        description,
-        expiry,
-        induction,
-        make,
-        model,
-        infoFilePath,
-        videoFilePath,
-        failure_reason,
-      ]);
+      const [result] = await pool.query(sql.ADD_INVENTORY_ITEM, [admin_id, title, description, expiry, induction, make, model, infoFilePath, videoFilePath, failure_reason]);
       const inventoryId = result.insertId;
       const imageFilePaths = [];
 
-      for (let i = 1; i <= 10; i++) {
-        const key = `image_${i}`;
-        const imageBase64 = images[key] || null;
+      // for (let i = 1; i <= 10; i++) {
+      //   const key = `image_${i}`;
+      //   const imageBase64 = images[key] || null;
+      //   if (imageBase64) {
+      //     const imageFilePath = await convertBase64.base64ToJpg(imageBase64);
+      //     imageFilePaths.push(imageFilePath);
+      //   } else {
+      //     imageFilePaths.push(null);
+      //   }
+      // }
 
-        if (imageBase64) {
-          const imageFilePath = await convertBase64.base64ToJpg(imageBase64);
-          imageFilePaths.push(imageFilePath);
-        } else {
-          // If image doesn't exist, push null
-          imageFilePaths.push(null);
-        }
+      for (const image of images) {
+        const imageFilePath = await convertBase64.base64ToJpg(image);
+        imageFilePaths.push(imageFilePath);
       }
+      const placeholders = Array.from({ length: imageFilePaths.length }, (_, index) => `?`).join(', ');
 
-      // Now you have the array of imageFilePaths, and you can use it in your SQL query
-      await pool.query(sql.ADD_IMAGES_OF_ITEM, [
-        inventoryId,
-        ...imageFilePaths,
-      ]);
+      // Build the SQL query with the dynamic number of placeholders
+      const sqlQuery = `
+        INSERT INTO inventory_image 
+        (inventory_id, ${Array.from({ length: imageFilePaths.length }, (_, index) => `image_${index + 1}`).join(', ')})
+        VALUES (?, ${placeholders})
+      `;
+      
+      // Execute the query with the inventoryId and imageFilePaths array
+      await pool.query(sqlQuery, [inventoryId, ...imageFilePaths]);
 
       return { message: "Inventory item and files uploaded successfully" };
     } catch (error) {
