@@ -101,10 +101,17 @@ module.exports = {
 
   async markAssignment(req, res) {
     try {
-      const assignmentDetails = req.body;
-      const { marks, grade, percentage, assignment_id, student_id } = assignmentDetails;
+      const { assignments } = req.body;
 
-      await pool.query(sql.MARK_ASSIGNMENT, [marks, grade, percentage, assignment_id, student_id]);
+      assignments.forEach(async (assignment) => {
+        await pool.query(sql.MARK_ASSIGNMENT, [
+          assignment.marks,
+          assignment.grade,
+          assignment.percentage,
+          assignment.assignment_id,
+          assignment.student_id,
+        ]);
+      });
 
       return res.json({ message: "Assignment marked successfully." });
     } catch (error) {
@@ -112,7 +119,6 @@ module.exports = {
       return res.status(500).json({ error: "An error occurred" });
     }
   },
-
 
   // GET STUDENTS WITH PROGAM PLAN ID
   async getStudents(req, res) {
@@ -310,7 +316,10 @@ module.exports = {
     };
     try {
       if (subjectId != null) {
-        const [submittedAssignment] = await pool.query(sql.GET_SUBMITTED_ASSIGNMENTS_BY_SUBJECT_ID, [instructorId, subjectId]);
+        const [submittedAssignment] = await pool.query(
+          sql.GET_SUBMITTED_ASSIGNMENTS_BY_SUBJECT_ID,
+          [instructorId, subjectId]
+        );
         let currentSubject = null;
         const [studentdata] = await pool.query(sql.GET_USER_BY_STUDENT_ID, [
           submittedAssignment.student_id,
@@ -323,6 +332,7 @@ module.exports = {
         const assignmentObject = {
           assignment_title: submittedAssignment.assignment_title, // Replace this with the actual assignment title
           submitted_by: [],
+          assignment_id: submittedAssignment.assignment_id,
         };
         const submittedByObject = {
           student_id: submittedAssignment?.student_id,
@@ -330,6 +340,8 @@ module.exports = {
           student_name: studentdata[0]?.full_name,
           submitted_file: submittedAssignment?.assignment_file,
           grade: submittedAssignment?.grade,
+          marks: submittedAssignment?.marks,
+
           date: submittedAssignment?.assignment_date,
           regId: submittedAssignment?.register_id,
         };
@@ -356,6 +368,7 @@ module.exports = {
         const assignmentObject = {
           assignment_title: submittedAssignment.assignment_title, // Replace this with the actual assignment title
           submitted_by: [],
+          assignment_id: submittedAssignment.assignment_id,
         };
         const submittedByObject = {
           student_id: submittedAssignment.student_id,
@@ -364,6 +377,8 @@ module.exports = {
           submitted_file: submittedAssignment.assignment_file,
           grade: submittedAssignment.grade,
           date: submittedAssignment.assignment_date,
+          regId: studentdata[0].register_id,
+          marks: submittedAssignment?.marks,
         };
         assignmentObject.submitted_by.push(submittedByObject);
         allSubmittedAssignments.assignments.push(assignmentObject);

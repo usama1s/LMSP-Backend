@@ -15,6 +15,7 @@ module.exports = {
   async addItem(req, res) {
     try {
       const inventoryItemDetail = req.body;
+      console.log(inventoryItemDetail.attachments.images);
       const result = await adminService.addItem(inventoryItemDetail);
       return res.status(201).json({ message: result.message });
     } catch (error) {
@@ -271,7 +272,10 @@ module.exports = {
   async getAllStatsBySubjects(req, res) {
     try {
       const { studentId, subjectId } = req.params;
-      const statsPerSubject = await adminService.getAllStatsBySubjects(studentId, subjectId);
+      const statsPerSubject = await adminService.getAllStatsBySubjects(
+        studentId,
+        subjectId
+      );
       return res.json(statsPerSubject);
     } catch (error) {
       console.error(error);
@@ -282,7 +286,8 @@ module.exports = {
   async getAllStudentStatsByCourse(req, res) {
     try {
       const { courseId } = req.params;
-      const studentCountPerCourse = await adminService.getAllStudentStatsByCourse(courseId);
+      const studentCountPerCourse =
+        await adminService.getAllStudentStatsByCourse(courseId);
       return res.json(studentCountPerCourse);
     } catch (error) {
       console.error(error);

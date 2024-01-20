@@ -62,7 +62,11 @@ module.exports = {
         ]);
         const userId = result.insertId;
         for (const admin_type of admin_types) {
-          await pool.query(sql.ADD_ADMIN, [userId, employee_id, admin_type]);
+          await pool.query(sql.ADD_ADMIN, [
+            userId,
+            employee_id || "",
+            admin_type,
+          ]);
         }
 
         return { message: "Admin registered successfully" };

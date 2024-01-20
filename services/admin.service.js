@@ -56,17 +56,39 @@ module.exports = {
   // ADD ITEM IN INVENTORY TABLE
   async addItem(inventoryItemDetail) {
     try {
-      const { admin_id, title, description, expiry, induction, make, model, failure_reason, attachments } = inventoryItemDetail;
-      let videoFilePath;
+      const {
+        admin_id,
+        title,
+        description,
+        expiry,
+        induction,
+        make,
+        model,
+        failure_reason,
+        attachments,
+      } = inventoryItemDetail;
+      var videoFilePath = "";
       if (attachments.video_file) {
         videoFilePath = await convertBase64.base64ToMp4(attachments.video_file);
       }
-      let infoFilePath;
+      var infoFilePath = "";
       if (attachments.info_file) {
         infoFilePath = await convertBase64.base64ToPdf(attachments.info_file);
       }
+
       const images = attachments.images;
-      const [result] = await pool.query(sql.ADD_INVENTORY_ITEM, [admin_id, title, description, expiry, induction, make, model, infoFilePath, videoFilePath, failure_reason]);
+      const [result] = await pool.query(sql.ADD_INVENTORY_ITEM, [
+        admin_id,
+        title,
+        description,
+        expiry,
+        induction,
+        make,
+        model,
+        infoFilePath,
+        videoFilePath,
+        failure_reason,
+      ]);
       const inventoryId = result.insertId;
       const imageFilePaths = [];
 
@@ -85,15 +107,21 @@ module.exports = {
         const imageFilePath = await convertBase64.base64ToJpg(image);
         imageFilePaths.push(imageFilePath);
       }
-      const placeholders = Array.from({ length: imageFilePaths.length }, (_, index) => `?`).join(', ');
+      const placeholders = Array.from(
+        { length: imageFilePaths.length },
+        (_, index) => `?`
+      ).join(", ");
 
       // Build the SQL query with the dynamic number of placeholders
       const sqlQuery = `
         INSERT INTO inventory_image 
-        (inventory_id, ${Array.from({ length: imageFilePaths.length }, (_, index) => `image_${index + 1}`).join(', ')})
+        (inventory_id, ${Array.from(
+          { length: imageFilePaths.length },
+          (_, index) => `image_${index + 1}`
+        ).join(", ")})
         VALUES (?, ${placeholders})
       `;
-      
+
       // Execute the query with the inventoryId and imageFilePaths array
       await pool.query(sqlQuery, [inventoryId, ...imageFilePaths]);
 
@@ -567,15 +595,23 @@ module.exports = {
 
   async getAllStats(studentId) {
     try {
-      const [avgAssignmentMarks] = await pool.query(sql.GET_AVG_ASSIGNMENT_MARKS, [studentId]);
-      const [avgQuizMarks] = await pool.query(sql.GET_AVG_QUIZ_MARKS, [studentId]);
-      const [avgAttendance] = await pool.query(sql.GET_AVG_ATTENDANCE, [studentId, 1]);
+      const [avgAssignmentMarks] = await pool.query(
+        sql.GET_AVG_ASSIGNMENT_MARKS,
+        [studentId]
+      );
+      const [avgQuizMarks] = await pool.query(sql.GET_AVG_QUIZ_MARKS, [
+        studentId,
+      ]);
+      const [avgAttendance] = await pool.query(sql.GET_AVG_ATTENDANCE, [
+        studentId,
+        1,
+      ]);
 
       // Creating an object with the obtained average values
       const stats = {
         avgAssignmentMarks: avgAssignmentMarks[0].average_assignment_marks,
         avgQuizMarks: avgQuizMarks[0].average_quiz_marks,
-        avgAttendance: avgAttendance[0].average_attendance
+        avgAttendance: avgAttendance[0].average_attendance,
       };
 
       return stats;
@@ -586,15 +622,25 @@ module.exports = {
 
   async getAllStatsBySubjects(studentId, subjectId) {
     try {
-      const [avgAssignmentMarks] = await pool.query(sql.GET_AVG_ASSIGNMENT_MARKS_PER_SUBJECT, [studentId, subjectId]);
-      const [avgQuizMarks] = await pool.query(sql.GET_AVG_QUIZ_MARKS_PER_SUBJECT, [studentId, subjectId]);
-      const [avgAttendance] = await pool.query(sql.GET_AVG_ATTENDANCE_PER_SUBJECT, [studentId, 1, subjectId]);
+      const [avgAssignmentMarks] = await pool.query(
+        sql.GET_AVG_ASSIGNMENT_MARKS_PER_SUBJECT,
+        [studentId, subjectId]
+      );
+      const [avgQuizMarks] = await pool.query(
+        sql.GET_AVG_QUIZ_MARKS_PER_SUBJECT,
+        [studentId, subjectId]
+      );
+      const [avgAttendance] = await pool.query(
+        sql.GET_AVG_ATTENDANCE_PER_SUBJECT,
+        [studentId, 1, subjectId]
+      );
 
       // Creating an object with the obtained average values
       const statsPerSubject = {
-        avgSubjectAssignmentMarks: avgAssignmentMarks[0].average_subject_assignment_marks,
+        avgSubjectAssignmentMarks:
+          avgAssignmentMarks[0].average_subject_assignment_marks,
         avgSubjectQuizMarks: avgQuizMarks[0].average_subject_quiz_marks,
-        avgSubjectAttendance: avgAttendance[0].average_subject_attendance
+        avgSubjectAttendance: avgAttendance[0].average_subject_attendance,
       };
 
       return statsPerSubject;
@@ -605,11 +651,13 @@ module.exports = {
 
   async getAllStudentStatsByCourse(courseId) {
     try {
-      const [studentCountPerCourse] = await pool.query(sql.GET_STUDENT_COUNT_PER_COURSE, [courseId]);
+      const [studentCountPerCourse] = await pool.query(
+        sql.GET_STUDENT_COUNT_PER_COURSE,
+        [courseId]
+      );
       return studentCountPerCourse;
     } catch (error) {
       throw new Error("Error getting student statistics");
     }
-  }
-
+  },
 };

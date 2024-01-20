@@ -315,7 +315,10 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
             }
           }
         }
-        const [assignments] = await pool.query(sql.GET_ASSIGNMENT_BY_SUBJECT_ID, [subject.subject_id]);
+        const [assignments] = await pool.query(
+          sql.GET_ASSIGNMENT_BY_SUBJECT_ID,
+          [subject.subject_id]
+        );
         if (assignments.length > 0) {
           for (const assignment of assignments) {
             const [assigment_submitted] = await pool.query(
@@ -332,7 +335,10 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
         ]);
         if (papers.length > 0) {
           for (const paper of papers) {
-            const [paper_submitted] = await pool.query(sql.GET_PAPER_SUBMITTED, [paper.id, studentId,]);
+            const [paper_submitted] = await pool.query(
+              sql.GET_PAPER_SUBMITTED,
+              [paper.id, studentId]
+            );
             if (paper_submitted.length == 0) {
               if (paper.length > 0) {
                 finalPapers.push(paper[0]);
@@ -588,13 +594,47 @@ router.post("/generateCertificate", async (req, res) => {
 });
 
 // ======================================  GET ALL CERTIFICATES ======================================//
+
 router.get("/getAllCertificates", async (req, res) => {
   try {
     const certificateQuery = "SELECT * FROM Certificates";
     const certificateResult = await pool.query(certificateQuery);
     const certificates = certificateResult[0];
+    var allCertificates = [];
 
-    res.status(200).json({ certificates });
+    await Promise.all(
+      certificates.map(async (item) => {
+        var getCourseName = "Select course_name from courses where course_id=?";
+        var getCourseNameResult = await pool.query(getCourseName, [
+          item.course_id,
+        ]);
+        var getUserName = "Select first_name,last_name from users where id=?";
+        var getUserNameResult = await pool.query(getUserName, [item.user_id]);
+        var getIssuedByName = "Select user_id from admin where admin_id=?";
+        var getIssuedByNameResult = await pool.query(getIssuedByName, [
+          item.issued_by,
+        ]);
+        var getIssuedBy = "Select first_name,last_name from users where id=?";
+        var getIssuedByResult = await pool.query(getIssuedBy, [
+          getIssuedByNameResult[0][0].user_id,
+        ]);
+
+        allCertificates.push({
+          ...item,
+          course_name: getCourseNameResult[0][0].course_name,
+          user_name:
+            getUserNameResult[0][0].first_name +
+            " " +
+            getUserNameResult[0][0].last_name,
+          issued_by_name:
+            getIssuedByResult[0][0].first_name +
+            " " +
+            getIssuedByResult[0][0].last_name,
+        });
+      })
+    );
+
+    res.status(200).json({ allCertificates });
   } catch (error) {
     console.error("Error during database retrieval:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -713,5 +753,7 @@ router.get(
   adminController.getAllStatsBySubjects
 );
 
-
-router.get("/get-stats-by-subjects/:courseId", adminController.getAllStudentStatsByCourse);
+router.get(
+  "/get-stats-by-subjects/:courseId",
+  adminController.getAllStudentStatsByCourse
+);
