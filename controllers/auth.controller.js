@@ -1,5 +1,5 @@
 const authService = require("../services/auth.service");
-const convertBase64 = require('../util/convert.base64.js')
+const convertBase64 = require("../util/convert.base64.js");
 const mime = require("mime");
 const fs = require("fs").promises;
 const path = require("path");
@@ -9,8 +9,14 @@ module.exports = {
   async register(req, res) {
     try {
       const userDetail = req.body;
-      const profileFilePath = await convertBase64.base64ToJpg(userDetail.profile_image);
-      const registrationResult = await authService.register(userDetail,profileFilePath);
+      console.log(userDetail);
+      const profileFilePath = await convertBase64.base64ToJpg(
+        userDetail.profile_image
+      );
+      const registrationResult = await authService.register(
+        userDetail,
+        profileFilePath
+      );
 
       return res.status(201).json({ message: registrationResult.message });
     } catch (error) {
