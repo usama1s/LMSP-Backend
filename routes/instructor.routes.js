@@ -202,7 +202,66 @@ router.get("/instructor-papers/:subject_id", async (req, res) => {
   }
 });
 
-router.get("/get-submitted-assignments/:instructorId/:subjectId", instructorController.getSubmittedAssignment);
+// INSERT INTO `schedule_class`(`schedule_id`, `subject_id`, `classeLink`, `classDate`, `classTime`) VALUES ('[value-1]','[value-2]','[value-3]','[value-4]','[value-5]')
+// scheduleClass
+router.post("/schedule-class", async (req, res) => {
+  const { subject_id, classeLink, classDate, classTime } = req.body;
+  try {
+    const query =
+      "Insert into schedule_class(subject_id,classeLink,classDate,classTime) values(?,?,?,?)";
+    const [scheduleClass] = await pool.query(query, [
+      subject_id,
+      classeLink,
+      classDate,
+      classTime,
+    ]);
+    res.status(200).json({ response: "Class scheduled sucessfully" });
+  } catch (error) {
+    console.log("Error scheduling class:", error);
+    res.status(200).json({ error: "Internal Server Error" });
+  }
+});
 
+// get scheduled classes by student id  We have a student relation with course that has relation with modules and then modules have relation with subjects
+router.get("/get-scheduled-classes/:studentId", async (req, res) => {
+  const studentId = req.params.studentId;
+  try {
+    const query = `
+      SELECT
+        sc.schedule_id,
+        sc.subject_id,
+        sc.classeLink,
+        sc.classDate,
+        sc.classTime,
+        s.subject_name,
+        m.module_name,
+        c.course_name
+      FROM
+        schedule_class sc
+      JOIN
+        subjects s ON sc.subject_id = s.subject_id
+      JOIN
+        modules m ON s.module_id = m.module_id
+      JOIN
+        courses c ON m.course_id = c.course_id
+      JOIN
+        student_enrollment se ON c.course_id = se.course_id
+      WHERE
+        se.student_id = ?
+    `;
+    const [scheduledClasses] = await pool.query(query, [studentId]);
+    res.status(200).json({ scheduledClasses });
+  } catch (error) {
+    console.log("Error getting scheduled classes:", error);
+    res.status(200).json({ error: "Internal Server Error" });
+  }
+});
+
+// Get all submitted assignments
+
+router.get(
+  "/get-submitted-assignments/:instructorId/:subjectId",
+  instructorController.getSubmittedAssignment
+);
 
 module.exports = router;
