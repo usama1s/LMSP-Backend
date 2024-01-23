@@ -505,9 +505,9 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
     const modifiedPaper = {
       papers: Object.values(
         finalPapers.reduce((acc, paper) => {
-          const paperTitle = paper.title;
-          acc[paperTitle] = acc[paperTitle] || { title: paperTitle, papers: [] };
-          acc[paperTitle].papers.push(paper);
+          const paperSubject = paper.subject_id;
+          acc[paperSubject] = acc[paperSubject] || { subject_id: paperSubject, questions: [] };
+          acc[paperSubject].questions.push(paper);
           return acc;
         }, {})
       ),
