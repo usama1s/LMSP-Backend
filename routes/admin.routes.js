@@ -479,11 +479,7 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
               [paper.id, studentId]
             );
             if (paper_submitted.length == 0) {
-              console.log("Paper submitted", paper);
-
-              if (paper.length > 0) {
-                finalPapers.push(paper);
-              }
+              finalPapers.push(paper);
             }
           }
         }
@@ -507,16 +503,16 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
     };
 
     const modifiedPaper = {
-      papers: {
-        ...finalPapers.reduce((acc, paper) => {
-          console.log("Paper", paper);
-          const paperId = paper.id;
-          acc[paperId] = acc[paperId] || [];
-          acc[paperId].push(paper);
+      papers: Object.values(
+        finalPapers.reduce((acc, paper) => {
+          const paperTitle = paper.title;
+          acc[paperTitle] = acc[paperTitle] || { title: paperTitle, papers: [] };
+          acc[paperTitle].papers.push(paper);
           return acc;
-        }, {}),
-      },
+        }, {})
+      ),
     };
+
     res.status(200).json({
       course,
       subjectsWithAttendance,
