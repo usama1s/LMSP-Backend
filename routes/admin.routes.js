@@ -111,6 +111,76 @@ router.post("/addCourse", async (req, res) => {
 });
 
 //edit course
+// router.put("/editCourse", async (req, res) => {
+//   const data = req.body;
+
+//   try {
+//     const outlineFilePath = await convertBase64.base64ToPdf(data.outline_file);
+//     const courseQuery =
+//       "UPDATE courses SET course_name = ?, course_description = ?, outline_file = ?, prerequisites = ?, learning_outcomes = ?, classroom_material = ?, reference_books = ? WHERE course_id = ?";
+//     const courseValues = [
+//       data.course_name,
+//       data.course_description,
+//       outlineFilePath,
+//       data.prerequisites,
+//       data.learning_outcomes,
+//       data.classroom_material,
+//       data.reference_books,
+//       data.course_id,
+//     ];
+//     const courseResult = await pool.query(courseQuery, courseValues);
+
+//     for (const module of data.modules) {
+//       const moduleQuery =
+//         "UPDATE modules SET module_name = ? WHERE module_id = ?";
+//       const moduleValues = [module.module_name, module.module_id];
+
+//       const moduleResult = await pool.query(moduleQuery, moduleValues);
+
+//       for (const subject of module.subjects) {
+//         const subjectQuery =
+//           "UPDATE subjects SET subject_name = ? WHERE subject_id = ?";
+//         const subjectValues = [subject.subject_name, subject.subject_id];
+
+//         const subjectResult = await pool.query(subjectQuery, subjectValues);
+
+//         for (const teacher of subject.teachers) {
+//           const teacherId = teacher.teacherID || teacher.instructor_id;
+
+//           const teacherSubjectQuery =
+//             "UPDATE instructor_subject SET section = ? WHERE instructor_id = ? AND subject_id = ?";
+//           const teacherSubjectValues = [
+//             teacher.section,
+//             teacherId,
+//             subject.subject_id,
+//           ];
+
+//           await pool.query(teacherSubjectQuery, teacherSubjectValues);
+//         }
+
+//         for (const topic of subject.topics) {
+//           const topicQuery =
+//             "UPDATE topics SET topic_name = ?, lecture_file_name = ?, lecture_file_type = ?, lecture_file = ? WHERE topic_id = ?";
+//           const topicValues = [
+//             topic.topic_name,
+//             topic.lecture_file_name,
+//             topic.lecture_file_type,
+//             topic.lecture_file,
+//             topic.topic_id,
+//           ];
+
+//           await pool.query(topicQuery, topicValues);
+//         }
+//       }
+//     }
+
+//     res.status(200).json({ message: "Data updated successfully" });
+//   } catch (error) {
+//     console.error("Error during database insertion:", error);
+//     res.status(200).json({ error: "Internal Server Error" });
+//   }
+// });
+
 router.put("/editCourse", async (req, res) => {
   const data = req.body;
 
@@ -131,53 +201,121 @@ router.put("/editCourse", async (req, res) => {
     const courseResult = await pool.query(courseQuery, courseValues);
 
     for (const module of data.modules) {
-      const moduleQuery =
-        "UPDATE modules SET module_name = ? WHERE module_id = ?";
-      const moduleValues = [module.module_name, module.module_id];
-
-      const moduleResult = await pool.query(moduleQuery, moduleValues);
+      if (module.module_id) {
+        // Update existing module
+        const updateModuleQuery =
+          "UPDATE modules SET module_name = ? WHERE module_id = ?";
+        const updateModuleValues = [module.module_name, module.module_id];
+        await pool.query(updateModuleQuery, updateModuleValues);
+      } else {
+        // Insert new module
+        const insertModuleQuery =
+          "INSERT INTO modules (course_id, module_name) VALUES (?, ?)";
+        const insertModuleValues = [data.course_id, module.module_name];
+        const moduleResult = await pool.query(
+          insertModuleQuery,
+          insertModuleValues
+        );
+        module.module_id = moduleResult[0].insertId;
+      }
 
       for (const subject of module.subjects) {
-        const subjectQuery =
-          "UPDATE subjects SET subject_name = ? WHERE subject_id = ?";
-        const subjectValues = [subject.subject_name, subject.subject_id];
-
-        const subjectResult = await pool.query(subjectQuery, subjectValues);
+        if (subject.subject_id) {
+          // Update existing subject
+          const updateSubjectQuery =
+            "UPDATE subjects SET subject_name = ? WHERE subject_id = ?";
+          const updateSubjectValues = [
+            subject.subject_name,
+            subject.subject_id,
+          ];
+          await pool.query(updateSubjectQuery, updateSubjectValues);
+        } else {
+          // Insert new subject
+          const insertSubjectQuery =
+            "INSERT INTO subjects (module_id, subject_name) VALUES (?, ?)";
+          const insertSubjectValues = [module.module_id, subject.subject_name];
+          const subjectResult = await pool.query(
+            insertSubjectQuery,
+            insertSubjectValues
+          );
+          subject.subject_id = subjectResult[0].insertId;
+        }
 
         for (const teacher of subject.teachers) {
           const teacherId = teacher.teacherID || teacher.instructor_id;
 
-          const teacherSubjectQuery =
-            "UPDATE instructor_subject SET section = ? WHERE instructor_id = ? AND subject_id = ?";
-          const teacherSubjectValues = [
-            teacher.section,
-            teacherId,
-            subject.subject_id,
-          ];
+          // Check if instructor_subject record exists
+          const checkTeacherSubjectQuery =
+            "SELECT * FROM instructor_subject WHERE instructor_id = ? AND subject_id = ?";
+          const checkTeacherSubjectValues = [teacherId, subject.subject_id];
+          const checkTeacherSubjectResult = await pool.query(
+            checkTeacherSubjectQuery,
+            checkTeacherSubjectValues
+          );
 
-          await pool.query(teacherSubjectQuery, teacherSubjectValues);
+          if (checkTeacherSubjectResult[0].length > 0) {
+            // Update existing instructor_subject record
+            const updateTeacherSubjectQuery =
+              "UPDATE instructor_subject SET section = ? WHERE instructor_id = ? AND subject_id = ?";
+            const updateTeacherSubjectValues = [
+              teacher.section,
+              teacherId,
+              subject.subject_id,
+            ];
+            await pool.query(
+              updateTeacherSubjectQuery,
+              updateTeacherSubjectValues
+            );
+          } else {
+            // Insert new instructor_subject record
+            const insertTeacherSubjectQuery =
+              "INSERT INTO instructor_subject (instructor_id, subject_id, section) VALUES (?, ?, ?)";
+            const insertTeacherSubjectValues = [
+              teacherId,
+              subject.subject_id,
+              teacher.section,
+            ];
+            await pool.query(
+              insertTeacherSubjectQuery,
+              insertTeacherSubjectValues
+            );
+          }
         }
 
         for (const topic of subject.topics) {
-          const topicQuery =
-            "UPDATE topics SET topic_name = ?, lecture_file_name = ?, lecture_file_type = ?, lecture_file = ? WHERE topic_id = ?";
-          const topicValues = [
-            topic.topic_name,
-            topic.lecture_file_name,
-            topic.lecture_file_type,
-            topic.lecture_file,
-            topic.topic_id,
-          ];
-
-          await pool.query(topicQuery, topicValues);
+          if (topic.topic_id) {
+            // Update existing topic
+            const updateTopicQuery =
+              "UPDATE topics SET topic_name = ?, lecture_file_name = ?, lecture_file_type = ?, lecture_file = ? WHERE topic_id = ?";
+            const updateTopicValues = [
+              topic.topic_name,
+              topic.lecture_file_name,
+              topic.lecture_file_type,
+              topic.lecture_file,
+              topic.topic_id,
+            ];
+            await pool.query(updateTopicQuery, updateTopicValues);
+          } else {
+            // Insert new topic
+            const insertTopicQuery =
+              "INSERT INTO topics (subject_id, topic_name, lecture_file_name, lecture_file_type, lecture_file) VALUES (?, ?, ?, ?, ?)";
+            const insertTopicValues = [
+              subject.subject_id,
+              topic.topic_name,
+              topic.lecture_file_name,
+              topic.lecture_file_type,
+              topic.lecture_file,
+            ];
+            await pool.query(insertTopicQuery, insertTopicValues);
+          }
         }
       }
     }
 
     res.status(200).json({ message: "Data updated successfully" });
   } catch (error) {
-    console.error("Error during database insertion:", error);
-    res.status(200).json({ error: "Internal Server Error" });
+    console.error("Error during database update:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
@@ -330,6 +468,7 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
             }
           }
         }
+
         const [papers] = await pool.query(sql.GET_FINAL_PAPERS_BY_SUBJECT_ID, [
           subject.subject_id,
         ]);
@@ -340,8 +479,10 @@ router.get("/getCourse/:courseId/:studentId", async (req, res) => {
               [paper.id, studentId]
             );
             if (paper_submitted.length == 0) {
+              console.log("Paper submitted", paper);
+
               if (paper.length > 0) {
-                finalPapers.push(paper[0]);
+                finalPapers.push(paper);
               }
             }
           }

@@ -348,7 +348,6 @@ WHERE
    VALUES(?, ?, ?, ?)
 `,
 
-
   MARK_ASSIGNMENT: `
 UPDATE assignment_submitted
 SET marks=?, grade=?, percentage=?
