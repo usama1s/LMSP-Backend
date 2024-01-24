@@ -39,24 +39,31 @@ module.exports = {
     }
   },
 
-
   async submitPaper(req, res) {
     try {
       const submittedPaperDetails = req.body;
-      const { student_id, paper_id, total_marks, obtained_marks, grade, percentage } = submittedPaperDetails;
-      await pool.query(sql.PAPER_SUBMISSION, [student_id, paper_id, total_marks, obtained_marks, grade, percentage]);
+      const {
+        student_id,
+        paper_id,
+        total_marks,
+        obtained_marks,
+        grade,
+        percentage,
+      } = submittedPaperDetails;
+      await pool.query(sql.PAPER_SUBMISSION, [
+        student_id,
+        paper_id,
+        total_marks,
+        obtained_marks,
+        grade,
+        percentage,
+      ]);
       res.status(200).json({ message: "Paper submitted successfully." });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
     }
   },
-
-
-
-
-
-
 
   // ASSIGNMENT NOT SUBMITTED
   async quizNotSubmit(req, res) {
@@ -95,6 +102,17 @@ module.exports = {
     try {
       const { student_id, course_id } = req.params;
       const quiz = await studentService.getQuiz(student_id, course_id);
+      res.status(200).json(quiz);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+
+  async getPaper(req, res) {
+    try {
+      const { student_id, course_id } = req.params;
+      const quiz = await studentService.getPaper(student_id, course_id);
       res.status(200).json(quiz);
     } catch (error) {
       console.error(error);

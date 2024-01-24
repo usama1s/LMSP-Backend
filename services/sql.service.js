@@ -561,6 +561,31 @@ INNER JOIN quiz ON quiz.quiz_id = quiz_question.quiz_id
 LEFT jOIN program_plan ON program_plan.program_plan_id=quiz.program_plan_id
 WHERE program_plan.course_id=?
 `,
+
+  GET_PAPER: `
+SELECT
+incharge_papers.*,
+subjects.subject_name,
+courses.course_name,
+courses.course_id,
+incharge_paper_questions.*,
+instructor_paper_questions.*
+
+FROM
+instructor_paper_questions
+INNER JOIN incharge_paper_questions ON incharge_paper_questions.question_id = instructor_paper_questions.id
+INNER JOIN incharge_papers ON incharge_papers.id = incharge_paper_questions.incharge_paper_id
+INNER JOIN subjects ON subjects.subject_id = incharge_papers.subject_id
+INNER JOIN modules ON modules.module_id = subjects.module_id
+INNER JOIN courses ON courses.course_id = modules.course_id
+WHERE courses.course_id=?
+`,
+
+  GET_PAPER_STATUS: `
+SELECT *
+FROM paper_submitted
+WHERE student_id = ? AND paper_id = ?;
+`,
   GET_QUIZ_SUBMITTED: `
 SELECT
 * 

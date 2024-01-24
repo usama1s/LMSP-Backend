@@ -93,6 +93,65 @@ module.exports = {
     }
   },
 
+  async getPaper(student_id, course_id) {
+    try {
+      const [papers] = await pool.query(sql.GET_PAPER, course_id);
+
+      const paperToAttempt = [];
+      for (const paper of papers) {
+        const [paperStatus] = await pool.query(sql.GET_PAPER_STATUS, [
+          student_id,
+          paper.incharge_paper_id,
+        ]);
+
+        if (paperStatus.length === 0) {
+          paperToAttempt.push(paper);
+        }
+      }
+      const groupedPapers = paperToAttempt.reduce((acc, paper) => {
+        const paperId = paper.incharge_paper_id;
+
+        if (!acc[paperId]) {
+          acc[paperId] = {
+            id: paperId,
+            title: paper.title,
+            paper_date: paper.paper_date,
+            subject_id: paper.subject_id,
+            section: paper.section,
+            admin_id: paper.admin_id,
+            subject_name: paper.subject_name,
+            course_name: paper.course_name,
+            course_id: paper.course_id,
+            questions: [],
+          };
+        }
+
+        acc[paperId].questions.push({
+          question_id: paper.question_id,
+          instructor_paper_id: paper.instructor_paper_id,
+          question: paper.question,
+          options: [
+            paper.option_1,
+            paper.option_2,
+            paper.option_3,
+            paper.option_4,
+          ],
+          correctOption: paper.answer,
+          question_picture: paper.question_picture,
+          question_video: paper.question_video,
+        });
+
+        return acc;
+      }, {});
+
+      const resultArray = Object.values(groupedPapers);
+
+      return resultArray;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
   // GET ASSIGNMENT
   async getAssignment(student_id, course_id) {
     try {
@@ -181,7 +240,9 @@ module.exports = {
       assignmentGrades = [];
       paperGrades = [];
 
-      const [quizes] = await pool.query(sql.GET_ALL_GRADES_QUIZES, [student_id]);
+      const [quizes] = await pool.query(sql.GET_ALL_GRADES_QUIZES, [
+        student_id,
+      ]);
       for (quiz of quizes) {
         quizGrades.push(quiz);
       }
@@ -201,7 +262,9 @@ module.exports = {
         section: quiz.section,
       }));
 
-      const [assignments] = await pool.query(sql.GET_ALL_GRADES_ASSIGNMENTS, [student_id]);
+      const [assignments] = await pool.query(sql.GET_ALL_GRADES_ASSIGNMENTS, [
+        student_id,
+      ]);
       for (assignment of assignments) {
         assignmentGrades.push(assignment);
       }
@@ -223,7 +286,9 @@ module.exports = {
         instructor_id: assignment.instructor_id,
       }));
 
-      const [papers] = await pool.query(sql.GET_ALL_GRADES_PAPERS, [student_id]);
+      const [papers] = await pool.query(sql.GET_ALL_GRADES_PAPERS, [
+        student_id,
+      ]);
       for (paper of papers) {
         paperGrades.push(paper);
       }
@@ -242,8 +307,11 @@ module.exports = {
         section: paper.section,
       }));
 
-
-      return { quizGrades: modifiedQuizGrades, assignmentGrades: modifiedAssignmentGrades, paperGrades: modifiedPaperGrades };
+      return {
+        quizGrades: modifiedQuizGrades,
+        assignmentGrades: modifiedAssignmentGrades,
+        paperGrades: modifiedPaperGrades,
+      };
     } catch (error) {
       console.log(error);
     }
