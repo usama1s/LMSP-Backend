@@ -33,10 +33,14 @@ module.exports = {
     grade
   ) {
     try {
+      const [total_marks] = await pool.query(
+        `SELECT assignment_total_marks FROM assignments where assignment_id=${assignment_id}`
+      );
       await pool.query(sql.ASSIGNMENT_SUBMISSION, [
         student_id,
         assignment_id,
         submittedFilePath,
+        total_marks[0].assignment_total_marks,
         marks,
         grade,
       ]);
@@ -56,6 +60,20 @@ module.exports = {
       return { message: "Assignment not submitted." };
     } catch (error) {
       console.log(error);
+    }
+  },
+
+  //SUBMIT COURSE FEEDBACK
+  async submitCourseFeedback(course_feedback_question_id, answer, student_id) {
+    try {
+      await pool.query(sql.SUBMIT_COURSE_FEEDBACK, [
+        course_feedback_question_id,
+        answer,
+        student_id,
+      ]);
+      return { message: "Feedback submitted successfully." };
+    } catch (err) {
+      console.log(err);
     }
   },
 
@@ -116,6 +134,7 @@ module.exports = {
             id: paperId,
             title: paper.title,
             paper_date: paper.paper_date,
+            paper_time: paper.paper_time,
             subject_id: paper.subject_id,
             section: paper.section,
             admin_id: paper.admin_id,
@@ -194,6 +213,16 @@ module.exports = {
       } else {
         return { message: "attendence is not avalaible" };
       }
+    } catch (error) {
+      console.log(error);
+    }
+  },
+
+  // SHOW NOTIFICATION
+  async getNotificationToShow() {
+    try {
+      const notifications = await pool.query(sql.SHOW_NOTIFICATION);
+      return [notifications[0]];
     } catch (error) {
       console.log(error);
     }
@@ -314,6 +343,19 @@ module.exports = {
       };
     } catch (error) {
       console.log(error);
+    }
+  },
+
+  //STUDENT ENROLLED COURSES FEEDBACK IDS
+  async getStudentEnrolledCoursesFeedback(student_id) {
+    try {
+      const [courseFeedBack] = await pool.query(
+        sql.GET_STUDENT_ENROLLED_COURSES_FEEDBACK_ID,
+        [student_id]
+      );
+      return courseFeedBack;
+    } catch (error) {
+      throw new Error("Error getting student enrolled courses feedback");
     }
   },
 };

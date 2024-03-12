@@ -65,6 +65,30 @@ module.exports = {
     }
   },
 
+  //SUBMIT COURSE FEEDBACK
+  async submitCourseFeedback(req, res) {
+    try {
+      const submittedCourseFeedbackDetails = req.body;
+      console.log(req.body);
+      const { feedback_questions, student_id } = submittedCourseFeedbackDetails;
+
+      for (const {
+        course_feedback_question_id,
+        answer,
+      } of feedback_questions) {
+        await studentService.submitCourseFeedback(
+          course_feedback_question_id,
+          answer,
+          student_id
+        );
+      }
+      res.status(200).json("Feedback submitted successfully");
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+
   // ASSIGNMENT NOT SUBMITTED
   async quizNotSubmit(req, res) {
     try {
@@ -103,6 +127,17 @@ module.exports = {
       const { student_id, course_id } = req.params;
       const quiz = await studentService.getQuiz(student_id, course_id);
       res.status(200).json(quiz);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+
+  // GET NOTIFICATIONS
+  async getNotifications(req, res) {
+    try {
+      const notifications = await studentService.getNotificationToShow();
+      res.status(200).json(notifications[0]);
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -186,6 +221,18 @@ module.exports = {
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+
+  async getStudentEnrolledCoursesFeedback(req, res) {
+    try {
+      const { student_id } = req.params;
+      const courseFeedback =
+        await studentService.getStudentEnrolledCoursesFeedback(student_id);
+      return res.json(courseFeedback);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
     }
   },
 };

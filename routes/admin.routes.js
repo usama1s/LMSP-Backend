@@ -714,11 +714,14 @@ router.post("/generateCertificate", async (req, res) => {
 
   try {
     const certificateQuery =
-      "INSERT INTO Certificates (course_id, user_id, issued_by, date,title) VALUES (?, ?, ?, ?,?)";
+      "INSERT INTO Certificates (course_id, user_id, issued_by,date_from,date_to,issued_date,title) VALUES (?, ?, ?, ?,?,?,?)";
     const certificateValues = [
       data.course_id,
       data.student_id,
       data.issued_by,
+      data.date_from,
+      data.date_to,
+      data.issued_date,
       data.date,
       data.title,
     ];
@@ -898,3 +901,23 @@ router.get(
   "/get-stats-by-subjects/:courseId",
   adminController.getAllStudentStatsByCourse
 );
+
+router.get("/get-question-type", adminController.getQuestionType);
+
+router.get(
+  "/get-courses-whose-feedback-is-not-created",
+  adminController.getCoursesWhoseFeedbackNotCreated
+);
+router.get(
+  "/get-courses-whose-feedback-is-created",
+  adminController.getCoursesWhoseFeedbackCreated
+);
+
+router.post("/add-course-feedback", adminController.addCourseFeedback);
+
+router.get(
+  "/get-course-feedback-to-update/:courseFeedbackId",
+  adminController.getCourseFeedbackToUpdate
+);
+
+router.post("/update-course-feedback/", adminController.updateCourseFeedback);

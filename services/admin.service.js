@@ -544,13 +544,13 @@ module.exports = {
     }
   },
 
-  async addPaper(subject_id, admin_id, paper_date, title) {
+  async addPaper(subject_id, admin_id, paper_date, paper_time, title) {
     try {
       const [addPaper] = await pool.query(sql.ADD_INCHARGE_PAPER, [
         subject_id,
         admin_id,
         paper_date,
-
+        paper_time,
         title,
       ]);
       return addPaper.insertId;
@@ -658,6 +658,100 @@ module.exports = {
       return studentCountPerCourse;
     } catch (error) {
       throw new Error("Error getting student statistics");
+    }
+  },
+  async getQuestionType() {
+    try {
+      const [questionType] = await pool.query(sql.GET_QUESTION_TYPE);
+      return questionType;
+    } catch (error) {
+      throw new Error("Error getting question type");
+    }
+  },
+
+  async getQuestionType() {
+    try {
+      const [questionType] = await pool.query(sql.GET_QUESTION_TYPE);
+      return questionType;
+    } catch (error) {
+      throw new Error("Error getting question type");
+    }
+  },
+
+  async getAllCoursesWhoseFeedbackIsNotCreated() {
+    try {
+      const [coursesFeedBackNotCreated] = await pool.query(
+        sql.GET_ALL_COURSES_WHOSE_FEEDBACK_IS_NOT_CREATED
+      );
+      return coursesFeedBackNotCreated;
+    } catch (error) {
+      throw new Error("Error getting courses feedback not created");
+    }
+  },
+
+  async getAllCoursesWhoseFeedbackIsCreated() {
+    try {
+      const [coursesFeedBackCreated] = await pool.query(
+        sql.GET_ALL_COURSES_WHOSE_FEEDBACK_IS_CREATED
+      );
+      return coursesFeedBackCreated;
+    } catch (error) {
+      throw new Error("Error getting courses feedback created");
+    }
+  },
+
+  async addCourseFeedback(course_id) {
+    try {
+      const [courseFeedback] = await pool.query(sql.ADD_COURSE_FEEDBACK, [
+        course_id,
+      ]);
+      return courseFeedback.insertId;
+    } catch (error) {
+      throw new Error("Error Course FeedBack is not added");
+    }
+  },
+
+  async addCourseFeedbackQuestions(
+    question,
+    question_type_id,
+    course_feedback_id
+  ) {
+    try {
+      await pool.query(sql.ADD_COURSE_FEEDBACK_QUESTIONS, [
+        question,
+        question_type_id,
+        course_feedback_id,
+      ]);
+    } catch (error) {
+      throw new Error("Error Course FeedBack Question is not added");
+    }
+  },
+
+  async getCourseFeedbackToUpdate(course_feedback_id) {
+    try {
+      const [courseFeedBack] = await pool.query(
+        sql.GET_COURSE_FEEDBACK_TO_UPDATE,
+        [course_feedback_id]
+      );
+      return courseFeedBack;
+    } catch (error) {
+      throw new Error("Error getting course feedback to update");
+    }
+  },
+
+  async updateCourseFeedbackQuestion(
+    question,
+    question_type_id,
+    course_feedback_question_id
+  ) {
+    try {
+      await pool.query(sql.UPDATE_COURSE_FEEDBACK_QUESTION, [
+        question,
+        question_type_id,
+        course_feedback_question_id,
+      ]);
+    } catch (error) {
+      return { error };
     }
   },
 };

@@ -8,14 +8,30 @@ module.exports = {
   async addQuiz(req, res) {
     try {
       const quizDetails = req.body;
-      const { quiz_date, quiz_questions, instructor_id, subject_id, section } =
-        quizDetails;
+      const {
+        quiz_date,
+        quiz_time,
+        quiz_questions,
+        instructor_id,
+        subject_id,
+        section,
+      } = quizDetails;
 
       const quizId = await instructorService.addQuiz(
         subject_id,
         instructor_id,
         quiz_date,
+        quiz_time,
         section
+      );
+
+      const notificationDescription = `New Quiz Added`;
+
+      await instructorService.addNotification(
+        notificationDescription,
+        quiz_date,
+        "Quiz",
+        subject_id
       );
 
       for (const {
@@ -48,12 +64,12 @@ module.exports = {
   async addAssignment(req, res) {
     try {
       const assignmentDetails = req.body;
-
       const {
         // program_plan_id,
         assignment_date,
         assignment_file,
         assignment_instruction,
+        assignment_total_marks,
         assignment_title,
         subject_id,
         instructor_id,
@@ -68,9 +84,18 @@ module.exports = {
         assignmentPath,
         assignment_instruction,
         assignment_title,
+        assignment_total_marks,
         subject_id,
         instructor_id,
         section
+      );
+
+      const notificationDescription = `New Assignment Added `;
+      await instructorService.addNotification(
+        notificationDescription,
+        assignment_date,
+        "Assignment",
+        subject_id
       );
 
       return res.json("Assignment added successfully");

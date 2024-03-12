@@ -3,12 +3,13 @@ const pool = require("../db.conn");
 
 module.exports = {
   // INSTRUCTOR ADD QUIZES
-  async addQuiz(subject_id, instructor_id, quiz_date, section) {
+  async addQuiz(subject_id, instructor_id, quiz_date, quiz_time, section) {
     try {
       const [addQuiz] = await pool.query(sql.ADD_QUIZ, [
         subject_id,
         instructor_id,
         quiz_date,
+        quiz_time,
         section,
       ]);
       return addQuiz.insertId;
@@ -77,6 +78,7 @@ module.exports = {
         assignmentFilePath,
         assignment_instruction,
         assignment_title,
+        assignment_total_marks,
         subject_id,
         instructor_id,
         section,
@@ -292,6 +294,17 @@ module.exports = {
       question_id,
     ]);
   },
+
+  //ADD Notification
+  async addNotification(description, expiry_date, type, subject_id) {
+    await pool.query(sql.ADD_NOTIFICATION, [
+      description,
+      expiry_date,
+      type,
+      subject_id,
+    ]);
+  },
+
   //Delete paper questions
   async deletePaperQuestions(paper_id) {
     try {
@@ -307,6 +320,18 @@ module.exports = {
     } catch (error) {
       console.error(error);
       throw new Error("Error deleting instructor paper");
+    }
+  },
+
+  //Get All Subjects
+  async getAllSubjects() {
+    try {
+      const subjects = await pool.query(sql.GET_ALL_SUBJECTS);
+      console.log(subjects);
+      return subjects[0];
+    } catch (error) {
+      console.error(error);
+      throw new Error("Error Getting SUbjects");
     }
   },
 };

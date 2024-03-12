@@ -25,6 +25,21 @@ module.exports = {
     }
   },
 
+  async registerStudent(req, res) {
+    try {
+      const studentDetails = req.body;
+
+      const registrationResult = await authService.registerStudent(
+        studentDetails
+      );
+
+      return res.status(201).json({ message: registrationResult.message });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      return res.status(401).json({ error });
+    }
+  },
+
   // SIGN IN
   async signIn(req, res) {
     try {

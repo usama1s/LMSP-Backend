@@ -62,6 +62,12 @@ module.exports = {
     WHERE email=? AND role=?
   `,
 
+  CHECK_STUDENT_REGISTERED: `
+  SELECT *
+  FROM users
+  WHERE email=?
+`,
+
   GET_ALL_STUDENTS: `
   SELECT *
   FROM student
@@ -72,7 +78,7 @@ module.exports = {
   SELECT *
   FROM student_enrollment
   INNER JOIN program_plan ON student_enrollment.program_plan_id  = program_plan.program_plan_id 
-  INNER JOIN course ON course.course_id = program_plan.course_id 
+  INNER JOIN course ON course .course_id = program_plan.course_id 
 `,
 
   CHANGE_PASSWORD: `
@@ -140,20 +146,20 @@ module.exports = {
 
   ADD_QUIZ: `
     INSERT INTO quiz
-    (subject_id,instructor_id, quiz_date, section)
-    VALUES(?, ?, ?, ?);
+    (subject_id,instructor_id, quiz_date,quiz_time, section)
+    VALUES(?, ?,?, ?, ?);
   `,
 
   ADD_PAPER: `
     INSERT INTO instructor_papers
-    (subject_id,instructor_id, paper_date, section,title)
-    VALUES(?, ?, ?, ?,?);
+    (subject_id,instructor_id, paper_date,paper_time, section,title)
+    VALUES(?, ?, ?,?, ?,?);
   `,
 
   ADD_INCHARGE_PAPER: `
     INSERT INTO incharge_papers
-    (subject_id,admin_id, paper_date,title)
-    VALUES(?, ?, ?,?);
+    (subject_id,admin_id, paper_date,paper_time,title)
+    VALUES(?, ?, ?,?,?);
   `,
 
   // SQL query for retrieving instructor papers by subject and filtering out past papers
@@ -268,8 +274,8 @@ module.exports = {
 
   ADD_ASSIGNMENT: `
     INSERT INTO assignments
-    ( assignment_date, assignment_file, assignment_instruction, assignment_title,subject_id,instructor_id)
-    VALUES(?, ?, ?, ?, ?, ?)
+    ( assignment_date, assignment_file, assignment_instruction, assignment_title,assignment_total_marks,subject_id,instructor_id)
+    VALUES(?, ?, ?, ?, ?,?, ?)
   `,
 
   EDIT_ASSIGNMENT_BY_ID: `
@@ -286,6 +292,10 @@ module.exports = {
     (profile_picture, email, password, role, marital_status, country, organization, designation, qualification, register_date)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `,
+
+  ADD_NOTIFICATION: `INSERT INTO notifications
+  (description,expiry_date,type,subject_id)
+  VALUES (?, ?, ?,?)`,
 
   //   GET_STUDENTS_BY_SUBJECT_ID: `
   // SELECT
@@ -476,8 +486,8 @@ WHERE
 
   ASSIGNMENT_SUBMISSION: `
    INSERT INTO assignment_submitted
-   (student_id, assignment_id, submitted_file, marks, grade)
-   VALUES(?, ?, ?, ?, ?)
+   (student_id, assignment_id, submitted_file, total_marks,marks, grade)
+   VALUES(?, ?,?, ?, ?, ?)
   
 `,
 
@@ -492,6 +502,11 @@ INSERT INTO assignment_submitted
 (student_id, assignment_id)
 VALUES(?, ?)
 
+`,
+  SHOW_NOTIFICATION: `
+SELECT n.description as description,s.subject_name as subject_name
+FROM notifications n JOIN subjects s on n.subject_id=s.subject_id
+WHERE n.expiry_date > CURDATE(); 
 `,
 
   QUIZ_SUBMISSION: `
@@ -722,6 +737,10 @@ inner join incharge_papers on
 	paper_submitted.paper_id  = incharge_papers.id 
 where
 	paper_submitted.student_id =?`,
+
+  GET_STUDENT_ENROLLED_COURSES_FEEDBACK_ID: `
+  SELECT cf.course_feedback_id,c.course_name  FROM course_feedback cf join student_enrollment se on cf.course_id=se.course_id join courses c on cf.course_id=c.course_id where se.student_id=15;
+  `,
 
   // ADMIN____________________________________________________________________________________________________________
 
@@ -1004,6 +1023,51 @@ FROM student
 INNER JOIN student_enrollment ON student.student_id = student_enrollment.student_id
 WHERE student_enrollment.course_id = ?;
 ;
+  `,
+
+  GET_ALL_SUBJECTS: `
+  SELECT * FROM subjects
+  `,
+
+  GET_ALL_COURSES_WHOSE_FEEDBACK_IS_NOT_CREATED: `SELECT c.course_id,c.course_name
+FROM courses c
+LEFT JOIN course_feedback cf
+ON c.course_id = cf.course_id
+WHERE cf.course_id IS NULL;`,
+
+  GET_ALL_COURSES_WHOSE_FEEDBACK_IS_CREATED: `SELECT c.course_id,c.course_name,cf.course_feedback_id
+FROM courses c
+LEFT JOIN course_feedback cf
+ON c.course_id = cf.course_id
+where cf.course_id=c.course_id
+;`,
+
+  GET_COURSE_FEEDBACK_TO_UPDATE: `
+SELECT * FROM course_feedback_questions where course_feedback_id=?
+`,
+
+  ADD_COURSE_FEEDBACK: `
+  INSERT INTO course_feedback
+  (course_id)VALUES (?)
+  `,
+  ADD_COURSE_FEEDBACK_QUESTIONS: `
+  INSERT INTO course_feedback_questions
+  (question,question_type_id,course_feedback_id)VALUES (?,?,?)
+  `,
+
+  GET_QUESTION_TYPE: `
+  SELECT * FROM question_type
+  `,
+
+  UPDATE_COURSE_FEEDBACK_QUESTION: `
+  UPDATE course_feedback_questions
+SET question = ?, question_type_id= ?
+WHERE course_feedback_question_id = ?;
+  `,
+
+  SUBMIT_COURSE_FEEDBACK: `
+  INSERT INTO course_feedback_submitted
+  (course_feedback_question_id,answer,student_id)VALUES (?,?,?)
   `,
 
   //   SELECT

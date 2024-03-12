@@ -30,5 +30,11 @@ router.post(
   "/assignment-not-submitted",
   studentController.assignmentNotSubmitted
 );
+router.get("/get-notifications", studentController.getNotifications);
+router.post("/submit-course-feedback", studentController.submitCourseFeedback);
+router.get(
+  "/get-course-feedback-by-student/:student_id",
+  studentController.getStudentEnrolledCoursesFeedback
+);
 
 module.exports = router;

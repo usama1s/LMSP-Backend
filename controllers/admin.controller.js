@@ -1,4 +1,6 @@
 const adminService = require("../services/admin.service");
+const pool = require("../db.conn");
+const instructorService = require("../services/instructor.service");
 
 module.exports = {
   //GET ALL USERS
@@ -207,12 +209,13 @@ module.exports = {
   async addPaper(req, res) {
     try {
       const paperDetails = req.body;
+      console.log(req.body);
       const {
         paper_date,
+        paper_time,
         paper_questions,
         admin_id,
         subject_id,
-
         title,
       } = paperDetails;
 
@@ -220,13 +223,22 @@ module.exports = {
         subject_id,
         admin_id,
         paper_date,
-
+        paper_time,
         title
       );
 
       for (const { question_id } of paper_questions) {
         await adminService.addPaperQuestion(paperId, question_id);
       }
+
+      const notificationDescription = `New Paper Added  `;
+
+      await instructorService.addNotification(
+        notificationDescription,
+        paper_date,
+        "Paper",
+        subject_id
+      );
 
       return res.json("Paper added successfully");
     } catch (error) {
@@ -289,6 +301,95 @@ module.exports = {
       const studentCountPerCourse =
         await adminService.getAllStudentStatsByCourse(courseId);
       return res.json(studentCountPerCourse);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+  async getQuestionType(req, res) {
+    try {
+      const questionType = await adminService.getQuestionType();
+      return res.json(questionType);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+  async getCoursesWhoseFeedbackNotCreated(req, res) {
+    try {
+      const courses =
+        await adminService.getAllCoursesWhoseFeedbackIsNotCreated();
+      return res.json(courses);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+  async getCoursesWhoseFeedbackCreated(req, res) {
+    try {
+      const courses = await adminService.getAllCoursesWhoseFeedbackIsCreated();
+      return res.json(courses);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+  async addCourseFeedback(req, res) {
+    try {
+      const feedbackDetails = req.body;
+      console.log(req.body);
+      const { course_feedback_questions, course_id } = feedbackDetails;
+
+      const course_feedback_id = await adminService.addCourseFeedback(
+        course_id
+      );
+      console.log(course_feedback_id);
+
+      for (const { question, question_type_id } of course_feedback_questions) {
+        await adminService.addCourseFeedbackQuestions(
+          question,
+
+          question_type_id,
+          course_feedback_id
+        );
+      }
+
+      return res.json("Feedback added successfully");
+    } catch (error) {
+      console.log(error);
+      return res.status(200).json({ error: "An error occurred" });
+    }
+  },
+
+  async getCourseFeedbackToUpdate(req, res) {
+    try {
+      const { courseFeedbackId } = req.params;
+      const courseFeedback = await adminService.getCourseFeedbackToUpdate(
+        courseFeedbackId
+      );
+      return res.json(courseFeedback);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+
+  async updateCourseFeedback(req, res) {
+    try {
+      const { course_feedback_questions } = req.body;
+
+      for (const {
+        question,
+        question_type_id,
+        course_feedback_question_id,
+      } of course_feedback_questions) {
+        await adminService.updateCourseFeedbackQuestion(
+          question,
+          question_type_id,
+          course_feedback_question_id
+        );
+      }
+      return res.status(200).json("Feedback Successfully Updated");
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: "An error occurred" });

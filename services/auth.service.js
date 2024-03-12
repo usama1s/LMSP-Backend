@@ -151,6 +151,35 @@ module.exports = {
     }
   },
 
+  //REGISTER STUDENT
+  async registerStudent(studentDetails) {
+    const { first_name, last_name, email, password } = studentDetails;
+    console.log(studentDetails);
+    const [user] = await pool.query(sql.CHECK_USER_REGISTERED, [email, 3]);
+    console.log(user);
+    if (user.length > 0) {
+      return { message: "Email is already registered" };
+    }
+    const register_date = new Date().toJSON().slice(0, 10);
+    const [user_id] = await pool.query(sql.REGISTER_USER, [
+      null,
+      email,
+      password,
+      3,
+      "Single",
+      "Pakistan",
+      null,
+      null,
+      null,
+      register_date,
+      first_name,
+      last_name,
+    ]);
+    console.log(user_id);
+    await pool.query(sql.ADD_STUDENT, [user_id.insertId, null, "inActive"]);
+    return { message: "Student Registered successfully." };
+  },
+
   //get user by id
 
   async getUserById(userId) {

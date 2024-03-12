@@ -2,6 +2,7 @@ const express = require("express");
 const instructorController = require("../controllers/instructor.controller");
 const sql = require("../services/sql.service");
 const pool = require("../db.conn");
+const instructorService = require("../services/instructor.service");
 const router = express.Router();
 
 // ROUTES
@@ -98,6 +99,179 @@ router.get("/students-by-courseId/:courseId", async (req, res) => {
     const students = studentsResult[0];
 
     res.status(200).json({ students });
+  } catch (error) {
+    console.error("Error getting students of a course:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+//students detail marks of specific course by course id
+router.get("/students-marks-by-course-id/:courseId", async (req, res) => {
+  const courseId = req.params.courseId;
+
+  try {
+    const quizQuery = `
+    SELECT 
+    qs.student_id,
+    CONCAT(u.first_name," ",u.last_name) AS name,
+      SUM(qs.obtained_marks) AS obtained_marks,
+      SUM(qs.total_marks) AS total_marks,
+      (SUM(qs.obtained_marks) / SUM(qs.total_marks)) * 100 AS percentage
+  FROM 
+      quiz_submitted qs
+  JOIN 
+      student s ON qs.student_id = s.student_id
+  JOIN users u ON s.user_id = u.id
+  JOIN 
+      student_enrollment ON s.student_id = student_enrollment.student_id
+  
+  WHERE student_enrollment.course_id = ? AND student_enrollment.enrollment_status=1
+  
+  GROUP BY
+    qs.student_id;
+    `;
+
+    const assignmentQuery = `SELECT 
+    qs.student_id,
+     SUM(qs.marks) AS obtained_marks,
+     SUM(qs.total_marks) AS total_marks,
+     (SUM(qs.marks) / SUM(qs.total_marks)) * 100 AS percentage
+ FROM 
+     assignment_submitted qs
+ JOIN 
+     student s ON qs.student_id = s.student_id
+ JOIN 
+     student_enrollment ON s.student_id = student_enrollment.student_id
+ 
+ WHERE student_enrollment.course_id = 25 AND student_enrollment.enrollment_status=1
+ 
+ GROUP By
+    qs.student_id`;
+
+    const paperQuery = `SELECT 
+    ps.student_id,
+      SUM(ps.obtained_marks) AS obtained_marks,
+      SUM(ps.total_marks) AS total_marks,
+      (SUM(ps.obtained_marks) / SUM(ps.total_marks)) * 100 AS percentage
+  FROM 
+      paper_submitted ps
+  JOIN 
+      student s ON ps.student_id = s.student_id
+  JOIN 
+      student_enrollment ON s.student_id = student_enrollment.student_id
+  
+  WHERE student_enrollment.course_id = 25 AND student_enrollment.enrollment_status=1
+  
+  GROUP BY
+    ps.student_id;`;
+    let quizes = await pool.query(quizQuery, [courseId]);
+    let assignments = await pool.query(assignmentQuery, [courseId]);
+    let papers = await pool.query(paperQuery, [courseId]);
+    quizes = quizes[0];
+    assignments = assignments[0];
+    papers = papers[0];
+    const details = quizes.map((quiz) => ({
+      student_id: quiz.student_id,
+      name: quiz.name,
+      quiz_obtained_marks: quiz.obtained_marks,
+      quiz_percentage: Math.floor(quiz.percentage),
+    }));
+    assignments.forEach((assignment) => {
+      const student = details.findIndex(
+        (detail) => detail.student_id === assignment.student_id
+      );
+      if (student != undefined)
+        details[student] = {
+          ...details[student],
+          assignments_obtained_marks: assignment.obtained_marks,
+          assignment_percentage: Math.floor(assignment.percentage),
+        };
+      else
+        details.push({
+          student_id: assignment.student_id,
+          assignments_obtained_marks: assignment.marks,
+          assignment_percentage: Math.floor(assignment.percentage),
+        });
+    });
+
+    papers.forEach((paper) => {
+      const student = details.findIndex(
+        (detail) => detail.student_id === paper.student_id
+      );
+      if (student != undefined)
+        details[student] = {
+          ...details[student],
+          papers_obtained_marks: paper.obtained_marks,
+          paper_percentage: Math.floor(paper.percentage),
+        };
+      else
+        details.push({
+          student_id: paper.student_id,
+          papers_obtained_marks: paper.obtained_marks,
+          paper_percentage: Math.floor(paper.percentage),
+        });
+    });
+
+    res.status(200).json(details);
+  } catch (error) {
+    console.error("Error getting students of a course:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+//get specific student all marks record by student id
+router.get("/students-marks-record/:studentId", async (req, res) => {
+  const studentId = req.params.studentId;
+
+  try {
+    const quizQuery = `
+    SELECT 
+    qq.quiz_id,
+    SUM(qq.obtained_marks) AS obtained_marks,
+    SUM(qq.total_marks) AS total_marks
+FROM 
+    quiz_submitted qq
+
+JOIN 
+    student s ON qq.student_id = s.student_id
+WHERE 
+s.student_id = ?
+GROUP BY
+  qq.quiz_id
+    `;
+
+    const assignmentQuery = `
+    SELECT
+        aq.assignment_id,aq.marks,aq.total_marks
+    FROM
+        assignment_submitted aq
+    JOIN
+        student s ON aq.student_id = s.student_id
+    WHERE
+    s.student_id = ?`;
+
+    const paperQuery = `SELECT 
+  ps.paper_id,
+  SUM(ps.obtained_marks) AS obtained_marks,
+  SUM(ps.total_marks) AS total_marks
+FROM 
+  paper_submitted ps
+
+JOIN 
+  student s ON ps.student_id = s.student_id
+WHERE 
+s.student_id = ?
+GROUP BY
+ps.paper_id`;
+    const quizes = await pool.query(quizQuery, [studentId]);
+    const assignments = await pool.query(assignmentQuery, [studentId]);
+    const papers = await pool.query(paperQuery, [studentId]);
+
+    res.status(200).json({
+      quizes: quizes[0],
+      assignments: assignments[0],
+      papers: papers[0],
+    });
   } catch (error) {
     console.error("Error getting students of a course:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -253,6 +427,15 @@ router.get("/get-scheduled-classes/:studentId", async (req, res) => {
     res.status(200).json({ scheduledClasses });
   } catch (error) {
     console.log("Error getting scheduled classes:", error);
+    res.status(200).json({ error: "Internal Server Error" });
+  }
+});
+
+router.get("/get-all-subjects", async (req, res) => {
+  try {
+    const subjects = await instructorService.getAllSubjects();
+    res.status(200).json(subjects);
+  } catch (error) {
     res.status(200).json({ error: "Internal Server Error" });
   }
 });
